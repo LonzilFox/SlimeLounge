@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SlimeLounge</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div id="boot" class="boot">SLIMELOUNGE v0.0.3</div>
+<div id="authScreen" class="auth-screen hidden">
+  <div class="panel auth-card">
+    <div class="auth-brand"><span id="authSlime" class="slime mint xl"></span><div><div class="logo-text">SLIMELOUNGE</div><div class="muted">聊天室 · 听歌室 · 游戏室</div></div></div>
+    <form id="registerForm">
+      <label>昵称<input id="regName" maxlength="16" required placeholder="你的显示昵称"></label>
+      <label>华为工号 <span class="hint">仅私密校验，不对外展示</span><input id="regEmployee" maxlength="16" required placeholder="4~16 位字母或数字"></label>
+      <label>史莱姆颜色<div id="colorPicker" class="color-picker"></div></label>
+      <label>设备备注<input id="regDevice" maxlength="32" placeholder="例如：公司电脑"></label>
+      <button class="primary full" type="submit">创建固定设备身份</button>
+      <div id="authError" class="error"></div>
+    </form>
+  </div>
+</div>
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand"><span id="selfSlime" class="slime mint"></span><div><b>SlimeLounge</b><small id="selfName"></small></div></div>
+    <nav>
+      <button data-section="chat" class="nav active"># 聊天室</button>
+      <button data-section="music" class="nav">♪ 听歌室</button>
+      <button data-section="games" class="nav">▦ 游戏室</button>
+      <button data-section="rankings" class="nav">▲ 排行榜</button>
+      <button data-section="friends" class="nav">☻ 好友</button>
+      <button data-section="me" class="nav">⚙ 我的</button>
+      <button id="adminNav" data-section="admin" class="nav hidden">◆ 管理</button>
+    </nav>
+    <div class="sidebar-bottom"><span id="connDot">●</span><span id="connText">未连接</span><small>v0.0.3</small></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="title-wrap"><h1 id="sectionTitle">聊天室</h1><p id="sectionSub">选择讨论区进入</p></div><div class="top-actions"><button id="refreshRooms">刷新</button></div></header>
+    <div id="roomBrowser" class="room-browser"></div>
+    <section id="roomView" class="room-view hidden">
+      <div class="room-head"><button id="leaveRoom">← 返回</button><div class="minw0"><h2 id="roomTitle"></h2><small id="roomMeta"></small></div></div>
+      <div id="roomBody" class="room-body"></div>
+    </section>
+    <section id="rankingsView" class="page hidden"></section>
+    <section id="friendsView" class="page hidden"></section>
+    <section id="meView" class="page hidden"></section>
+    <section id="adminView" class="page hidden"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script type="module" src="/app.js"></script>
+</body>
+</html>
