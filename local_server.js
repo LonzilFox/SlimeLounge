@@ -9,7 +9,7 @@ import {ROOM_DEFS,ROOM_MAP,roomInitialState,applyGameAction,publicGameState,addB
 
 const __filename=fileURLToPath(import.meta.url),ROOT=path.dirname(__filename),PUBLIC=path.join(ROOT,'public');
 try{if(typeof process.loadEnvFile==='function'&&fs.existsSync(path.join(ROOT,'.dev.vars')))process.loadEnvFile(path.join(ROOT,'.dev.vars'))}catch(e){console.warn('[WARN] .dev.vars:',e.message)}
-const APP='SlimeLounge',VERSION='0.0.3',HOST='0.0.0.0',PORT=Number(process.env.PORT||8787);
+const APP='SlimeLounge',VERSION='0.0.4',HOST='0.0.0.0',PORT=Number(process.env.PORT||8787);
 const DATA_DIR=process.env.SLIMELOUNGE_DATA_DIR||(process.platform==='win32'?path.join(process.env.LOCALAPPDATA||process.env.APPDATA||os.homedir(),'SlimeLounge'):path.join(os.homedir(),'.slimelounge'));
 fs.mkdirSync(DATA_DIR,{recursive:true});const DATA_FILE=path.join(DATA_DIR,'data.json');
 const SLIME_COLORS=new Set(['mint','sky','peach','lemon','lilac','milk','cocoa','rose','aqua','lime']);
@@ -69,7 +69,7 @@ function leaderboardPayload(){
 const musicCache=new Map();
 async function searchNetease(q){
   const query=clean(q,80);if(!query)return [];const key=query.toLowerCase(),hit=musicCache.get(key);if(hit&&Date.now()-hit.at<300000)return hit.results;
-  const base=String(process.env.NETEASE_SEARCH_BASE||'').replace(/\/$/,'');const urls=base?[`${base}/search?keywords=${encodeURIComponent(query)}&limit=12`]:[`https://music.163.com/api/search/get/web?csrf_token=hlpretag=&hlposttag=&s=${encodeURIComponent(query)}&type=1&offset=0&total=true&limit=12`,`https://music.163.com/api/search/get?s=${encodeURIComponent(query)}&type=1&limit=12&offset=0`];
+  let base=String(process.env.NETEASE_SEARCH_BASE||'').trim().replace(/\/$/,'');if(base&&!/^https?:\/\//i.test(base))base='https://'+base;const directNetease=/^https?:\/\/(?:www\.)?music\.163\.com$/i.test(base);const urls=base&&!directNetease?[`${base}/search?keywords=${encodeURIComponent(query)}&limit=12`]:[`https://music.163.com/api/search/get/web?csrf_token=hlpretag=&hlposttag=&s=${encodeURIComponent(query)}&type=1&offset=0&total=true&limit=12`,`https://music.163.com/api/search/get?s=${encodeURIComponent(query)}&type=1&limit=12&offset=0`];
   const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),2500);const attempt=async u=>{const r=await fetch(u,{signal:ctrl.signal,headers:{'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/150 Safari/537.36','referer':'https://music.163.com/','accept':'application/json,text/plain,*/*'}});if(!r.ok)throw Error(`HTTP ${r.status}`);const j=await r.json(),songs=j?.result?.songs||[];if(!songs.length)throw Error('没有搜索结果');return songs.map(x=>({id:String(x.id),name:x.name||'未知歌曲',artists:(x.artists||x.ar||[]).map(a=>a.name).filter(Boolean),album:x.album?.name||x.al?.name||'',duration:x.duration||x.dt||0}))};
   try{const results=await Promise.any(urls.map(attempt));musicCache.set(key,{at:Date.now(),results});return results}catch(e){if(ctrl.signal.aborted)throw Error('网易云搜索超时（2.5 秒）：当前网络无法访问音乐搜索源');const first=e?.errors?.[0]||e;throw Error('网易云搜索失败：'+(first?.message||'网络不可达'))}finally{clearTimeout(timer)}
 }

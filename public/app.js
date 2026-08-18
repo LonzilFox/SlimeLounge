@@ -5,7 +5,7 @@ const GAME_NAMES={gomoku:'五子棋',xiangqi:'中国象棋',chess:'国际象棋'
 const RANK_NAMES={overall:'综合',gomoku:'五子棋',xiangqi:'中国象棋',chess:'国际象棋',blackjack:'21点',poker:'德州扑克'};
 const STATUS_NAMES={online:'在线',busy:'忙碌',focus:'专注',meeting:'开会',away:'暂离',gaming:'游戏中',listening:'听歌中'};
 const storeKey='slimelounge.identity.v1';
-const state={identity:null,profile:null,employeeMasked:'',deviceLabel:'',rooms:[],section:'chat',room:null,roomTarget:null,ws:null,manualClose:false,reconnectAttempt:0,reconnectTimer:null,heartbeatTimer:null,roomUsers:[],messages:[],music:null,game:null,selected:null,social:null,selectedColor:'mint',rankings:null,rankTab:'overall',serviceOnline:false,focusTimer:null,focusViolated:false};
+const state={identity:null,profile:null,employeeMasked:'',deviceLabel:'',rooms:[],section:'chat',room:null,roomTarget:null,ws:null,manualClose:false,reconnectAttempt:0,reconnectTimer:null,heartbeatTimer:null,lastHeartbeatAck:0,lastWsClose:null,roomUsers:[],messages:[],music:null,game:null,selected:null,social:null,selectedColor:'mint',rankings:null,rankTab:'overall',serviceOnline:false,focusTimer:null,focusViolated:false};
 
 function slime(color='mint',cls=''){return `<span class="slime ${color} ${cls}"></span>`}
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),3200)}
@@ -36,8 +36,52 @@ function showSection(sec,force=false){if(!force&&gameActive()&&sec!==state.secti
 function renderRoomBrowser(){const rooms=state.rooms.filter(r=>state.section==='games'?r.category==='game':r.category===state.section),e=$('#roomBrowser');if(state.section==='chat'){e.className='room-browser channels';e.innerHTML=rooms.map(r=>`<article class="channel-row"><div class="channel-icon">#</div><div><h3>${esc(r.name)} ${r.adminOnlyPost?'<span class="role-badge admin">公告</span>':''}</h3><p>${esc(r.description||'讨论区')}</p></div><div class="channel-count">${r.online}/${r.capacity} <button data-room="${r.id}">进入</button></div></article>`).join('')}else{e.className='room-browser';e.innerHTML=rooms.map(r=>`<article class="room-card"><h3>${esc(r.name)}</h3><div class="room-count">在线 ${r.online}/${r.capacity}</div><p>${esc(r.description||'')}</p><span class="room-tag">${r.game?GAME_NAMES[r.game]:'听歌'}</span>${r.minPlayers?`<span class="room-tag">${r.minPlayers}~${r.capacity}人</span>`:''}${r.game?'<span class="room-tag">强化 AI</span>':''}<button data-room="${r.id}">进入房间</button></article>`).join('')}e.onclick=ev=>{const b=ev.target.closest('[data-room]');if(b)enterRoom(b.dataset.room)}}
 
 async function enterRoom(id){const def=state.rooms.find(r=>r.id===id);if(!def)return toast('房间不存在');state.room=def;state.roomTarget=id;state.manualClose=false;state.messages=[];state.roomUsers=[];state.game=null;state.music=null;state.selected=null;hidePages();$('#roomView').classList.remove('hidden');$('#roomTitle').textContent=def.name;$('#roomMeta').textContent=`${def.category==='game'?GAME_NAMES[def.game]:def.category==='music'?'听歌室':'讨论区'} · ${def.online}/${def.capacity}`;renderRoomShell();await connectRoom(id)}
-async function connectRoom(id){if(state.roomTarget!==id)return;clearTimeout(state.reconnectTimer);try{setConn('connecting',state.reconnectAttempt?'重新连接中':'连接中');const t=await post('/api/ticket',creds({roomId:id}),{timeout:5000});if(state.roomTarget!==id)return;const proto=location.protocol==='https:'?'wss:':'ws:';const ws=new WebSocket(`${proto}//${location.host}/api/ws?ticket=${encodeURIComponent(t.ticket)}&roomId=${encodeURIComponent(id)}`);state.ws=ws;ws.onopen=()=>{state.reconnectAttempt=0;setConn('online','房间已连接');clearInterval(state.heartbeatTimer);state.heartbeatTimer=setInterval(()=>send({type:'heartbeat'},false),15000);healthPing()};ws.onmessage=e=>{try{handleWS(JSON.parse(e.data))}catch(err){console.error(err)}};ws.onerror=()=>{};ws.onclose=()=>{clearInterval(state.heartbeatTimer);if(state.ws===ws)state.ws=null;if(state.manualClose||state.roomTarget!==id)return;state.reconnectAttempt++;const delay=Math.min(8000,700*2**Math.min(state.reconnectAttempt,4));setConn('connecting',`断线重连 ${Math.round(delay/1000)}s`);clearTimeout(state.reconnectTimer);state.reconnectTimer=setTimeout(()=>connectRoom(id),delay)}}catch(e){if(state.roomTarget!==id)return;state.reconnectAttempt++;const delay=Math.min(8000,800*2**Math.min(state.reconnectAttempt,4));setConn('connecting',`连接失败，${Math.round(delay/1000)}s 后重试`);state.reconnectTimer=setTimeout(()=>connectRoom(id),delay)}}
-function explicitGameLeave(){if(state.room?.category==='game'&&state.ws?.readyState===1)try{state.ws.send(JSON.stringify({type:'game_action',action:{type:'leave'}}))}catch{}}
+async function connectRoom(id){
+  if(state.roomTarget!==id)return;
+  clearTimeout(state.reconnectTimer);
+  if(!navigator.onLine){setConn('offline','网络离线，等待恢复');return}
+  try{
+    setConn('connecting',state.reconnectAttempt?'重新连接中':'连接中');
+    const t=await post('/api/ticket',creds({roomId:id}),{timeout:6000});
+    if(state.roomTarget!==id)return;
+    const proto=location.protocol==='https:'?'wss:':'ws:';
+    const ws=new WebSocket(`${proto}//${location.host}/api/ws?ticket=${encodeURIComponent(t.ticket)}&roomId=${encodeURIComponent(id)}`);
+    state.ws=ws;
+    let opened=false;
+    ws.onopen=()=>{
+      opened=true;state.reconnectAttempt=0;state.lastWsClose=null;state.lastHeartbeatAck=Date.now();
+      setConn('online','房间已连接');clearInterval(state.heartbeatTimer);
+      state.heartbeatTimer=setInterval(()=>{
+        if(state.ws!==ws||ws.readyState!==WebSocket.OPEN)return;
+        try{ws.send(JSON.stringify({type:'heartbeat'}))}catch{}
+      },20000);
+      healthPing();
+    };
+    ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='heartbeat_ack')state.lastHeartbeatAck=Date.now();handleWS(m)}catch(err){console.error(err)}};
+    ws.onerror=()=>{};
+    ws.onclose=ev=>{
+      clearInterval(state.heartbeatTimer);
+      if(state.ws===ws)state.ws=null;
+      state.lastWsClose={code:ev.code,reason:ev.reason||'',clean:ev.wasClean,at:Date.now()};
+      if(state.manualClose||state.roomTarget!==id)return;
+      state.reconnectAttempt++;
+      const delay=Math.min(12000,1000*2**Math.min(state.reconnectAttempt-1,4))+Math.floor(Math.random()*500);
+      const reason=ev.code&&ev.code!==1006?` · ${ev.code}${ev.reason?` ${ev.reason}`:''}`:'';
+      if(document.hidden){setConn('connecting',`后台断开${reason}，返回页面后重连`);return}
+      if(!navigator.onLine){setConn('offline','网络离线，等待恢复');return}
+      setConn('connecting',`断线重连 ${Math.ceil(delay/1000)}s${reason}`);
+      clearTimeout(state.reconnectTimer);state.reconnectTimer=setTimeout(()=>connectRoom(id),delay);
+    };
+    setTimeout(()=>{if(state.ws===ws&&!opened&&ws.readyState===WebSocket.CONNECTING){try{ws.close()}catch{}}},8000);
+  }catch(e){
+    if(state.roomTarget!==id)return;
+    state.reconnectAttempt++;
+    const delay=Math.min(12000,1200*2**Math.min(state.reconnectAttempt-1,4));
+    if(!navigator.onLine){setConn('offline','网络离线，等待恢复');return}
+    setConn('connecting',`连接失败，${Math.ceil(delay/1000)}s 后重试`);
+    state.reconnectTimer=setTimeout(()=>connectRoom(id),delay);
+  }
+}
 function leaveRoom(showBrowser=true,explicit=true){if(!state.roomTarget)return;if(explicit&&gameActive()&&!confirm('对局正在进行，退出会离开当前对局。确定退出？'))return false;if(explicit)explicitGameLeave();state.manualClose=true;state.roomTarget=null;clearTimeout(state.reconnectTimer);clearInterval(state.heartbeatTimer);const ws=state.ws;state.ws=null;if(ws)setTimeout(()=>{try{ws.close(1000,'leave room')}catch{}},40);state.room=null;state.game=null;state.music=null;state.selected=null;setConn(state.serviceOnline?'service':'offline',state.serviceOnline?'服务在线':'服务离线');$('#roomView').classList.add('hidden');if(showBrowser&&['chat','music','games'].includes(state.section)){$('#roomBrowser').classList.remove('hidden');loadRooms()}healthPing();return true}
 $('#leaveRoom').onclick=()=>leaveRoom(true,true);
 function renderRoomShell(){const locked=state.room?.adminOnlyPost&&!isStaff();if(state.room?.category==='chat'){$('#roomBody').innerHTML=`<section class="chat-center"><div class="channel-banner"><b># ${esc(state.room.name)}</b><span>${esc(state.room.description||'讨论区')}</span></div><div class="chat-log chat-log-main" id="chatLog"></div><form class="chat-form" id="chatForm"><input id="chatInput" maxlength="300" ${locked?'disabled':''} placeholder="${locked?'该频道仅管理员可发言':'给 #'+esc(state.room.name)+' 发送消息'}"><button ${locked?'disabled':''}>发送</button></form></section><aside class="room-side members-only"><div class="online-list"><b>在线成员</b><div id="onlineUsers"></div></div></aside>`}else{$('#roomBody').innerHTML=`<div class="room-main" id="roomMain"></div><aside class="room-side"><div class="online-list"><b>房间成员</b><div id="onlineUsers"></div></div><div class="chat-log" id="chatLog"></div><form class="chat-form" id="chatForm"><input id="chatInput" maxlength="300" placeholder="房间聊天..."><button>发送</button></form></aside>`}$('#chatForm').onsubmit=e=>{e.preventDefault();const i=$('#chatInput'),t=i.value.trim();if(t&&send({type:'chat',text:t})){i.value=''}};renderMain()}
@@ -84,5 +128,8 @@ window.addEventListener('beforeunload',e=>{if(gameActive()){e.preventDefault();e
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c])}
 function attr(s){return esc(s).replace(/`/g,'&#96;')}
 
+window.addEventListener('online',()=>{toast('网络已恢复');healthPing();if(state.roomTarget&&!state.ws)connectRoom(state.roomTarget)});
+window.addEventListener('offline',()=>{clearTimeout(state.reconnectTimer);setConn('offline','网络离线')});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.roomTarget&&!state.ws){clearTimeout(state.reconnectTimer);connectRoom(state.roomTarget)}});
 boot();
 setInterval(()=>{if(!state.roomTarget)loadRooms();healthPing();if(state.section==='friends'&&!state.roomTarget)renderFriends()},15000);

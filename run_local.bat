@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions
 cd /d "%~dp0"
-title SlimeLounge v0.0.3 Local Server
+title SlimeLounge v0.0.4 Local Server
 where node >nul 2>&1
 if errorlevel 1 goto NO_NODE
 node local_server.js

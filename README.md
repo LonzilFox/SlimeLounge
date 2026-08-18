@@ -1,4 +1,4 @@
-# SlimeLounge v0.0.3
+# SlimeLounge v0.0.4
 
 全像素 UI 的内部社交与小游戏站：聊天室、听歌室、好友、排行榜，以及五子棋 / 中国象棋 / 国际象棋 / 21点 / 德州扑克。
 
@@ -6,7 +6,7 @@
 
 - `run_local.bat` 启动的是你电脑上的 Node 服务。默认监听 `0.0.0.0:8787`，同一局域网设备在防火墙允许时可通过启动窗口显示的 LAN URL 访问。你的电脑关机后本地版就停止。
 - Cloudflare 部署版才是公网、无需你的电脑常开。
-- v0.0.3 把“服务在线”和“房间 WebSocket”分开显示，并加入自动重连/keepalive，避免未进入房间也一直显示“已断开”。
+- v0.0.4 把“服务在线”和“房间 WebSocket”分开显示，并加入自动重连/keepalive，避免未进入房间也一直显示“已断开”。
 
 ## 唯一 Owner / Admin
 
@@ -34,7 +34,7 @@ Cloudflare 正式部署建议把 `OWNER_EMPLOYEE_ID` 配置为 secret。设置�
 
 ## 音乐搜索
 
-输入歌曲或歌手名直接搜索，不要求粘贴链接。当前默认服务端尝试网易云网页搜索接口；公司网络若阻断 `music.163.com`，v0.0.3 会在约 2.5 秒内快速失败，不再长时间等待。可通过 `NETEASE_SEARCH_BASE` 指向你自己可访问的兼容搜索服务。
+输入歌曲或歌手名直接搜索，不要求粘贴链接。当前默认服务端尝试网易云网页搜索接口；公司网络若阻断 `music.163.com`，v0.0.4 会在约 2.5 秒内快速失败，不再长时间等待。可通过 `NETEASE_SEARCH_BASE` 指向你自己可访问的兼容搜索服务。
 
 ## 游戏房间
 
@@ -77,3 +77,10 @@ Cloudflare 正式部署建议把 `OWNER_EMPLOYEE_ID` 配置为 secret。设置�
 3. 浏览器访问 `http://localhost:8787`。
 
 无需 `npm install` 即可本地运行。Cloudflare 构建仍使用 Wrangler。
+
+
+## v0.0.4 线上排障
+
+- 网易云搜索：`NETEASE_SEARCH_BASE` 可以留空。若填写域名，v0.0.4 会自动补 `https://`。不要把 `music.163.com/search?...` 当成 API 地址。
+- 房间断线：状态栏会显示 WebSocket close code；浏览器切到后台时不会持续重连，回到页面自动恢复。
+- 手机访问：若 `*.workers.dev` 在某些网络打不开，建议给 Worker 绑定自己的 Custom Domain。

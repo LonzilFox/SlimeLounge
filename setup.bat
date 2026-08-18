@@ -1,9 +1,9 @@
 @echo off
 setlocal EnableExtensions
 cd /d "%~dp0"
-title SlimeLounge v0.0.3 Setup
+title SlimeLounge v0.0.4 Setup
 echo ========================================
-echo   SlimeLounge v0.0.3 - Setup Check
+echo   SlimeLounge v0.0.4 - Setup Check
 echo ========================================
 echo.
 where node >nul 2>&1

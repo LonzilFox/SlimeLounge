@@ -1,6 +1,13 @@
 # CHANGELOG
 
-## v0.0.3
+## v0.0.4
+
+- 修复 `NETEASE_SEARCH_BASE=music.163.com` 导致 `Invalid URL`；自动补 `https://`，且直接指向 `music.163.com` 时改用内置搜索 API 路径。
+- WebSocket 重连策略重做：显示关闭码/原因、后台暂停重复重连、返回前台立即恢复、网络 offline/online 感知、随机退避避免重连风暴。
+- 心跳间隔调整为 20 秒并记录 ACK，用于区分服务在线与房间连接状态。
+- 保留 v0.0.3 全部游戏、管理员、工号、排行榜和状态功能。
+
+## v0.0.4
 
 - 重做连接状态：区分“本地/线上服务在线”和“当前房间 WebSocket 已连接”，自动指数退避重连；本地 WebSocket 增加 TCP keepalive。
 - 本地启动窗口显示 Local URL 与 LAN URL，明确本地版只在 Node 服务运行期间可用。
