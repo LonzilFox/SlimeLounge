@@ -1,0 +1,29 @@
+// SlimeLounge v0.3.1 chat composer / multiline / reply / timestamp UI
+function chatMessagePerms(m){const staffOnly=!!state.room?.adminOnlyPost,staff=isStaff(),mine=m.userId===state.profile?.userId;return {edit:staffOnly?staff:mine,del:staffOnly?staff:(mine||staff)}}
+function pad2(n){return String(n).padStart(2,'0')}
+function chatTimeLabel(ts,now=Date.now()){
+  ts=Number(ts)||0;if(!ts)return'';const d=new Date(ts),n=new Date(now),hm=`${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  const dayKey=x=>`${x.getFullYear()}-${x.getMonth()}-${x.getDate()}`;
+  if(dayKey(d)===dayKey(n))return hm;
+  const y=new Date(n.getFullYear(),n.getMonth(),n.getDate()-1);
+  if(dayKey(d)===dayKey(y))return `昨天 ${hm}`;
+  if(d.getFullYear()===n.getFullYear())return `${d.getMonth()+1}月${d.getDate()}日 ${hm}`;
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${hm}`;
+}
+function chatReplyPreview(){const box=$('#chatReplyPreview');if(!box)return;const r=state.chatReplyTo;if(!r){box.classList.add('hidden');box.innerHTML='';return}box.classList.remove('hidden');box.innerHTML=`<div class="grow chat-reply-preview-body"><span class="reply-preview-label">回复</span><b>${esc(r.name||'消息')}</b><span class="reply-preview-text">${esc(String(r.text||'').replace(/\s+/g,' ').slice(0,120))}</span></div><button type="button" data-chat-reply-cancel aria-label="取消回复">×</button>`;box.querySelector('[data-chat-reply-cancel]').onclick=()=>{state.chatReplyTo=null;chatReplyPreview()}}
+function beginChatReply(m){state.chatReplyTo={messageId:m.id,name:m.name||'玩家',text:m.text||''};chatReplyPreview();const i=$('#chatInput');i?.focus()}
+function bindChatComposer(){const form=$('#chatForm'),i=$('#chatInput');if(!form||!i)return;chatReplyPreview();const submit=()=>{const t=i.value.trim();if(!t)return false;const payload={type:'chat',text:t};if(state.chatReplyTo?.messageId)payload.replyTo=state.chatReplyTo.messageId;if(send(payload)){i.value='';state.chatReplyTo=null;chatReplyPreview();return true}return false};form.onsubmit=e=>{e.preventDefault();submit()};i.onkeydown=e=>{if(e.key!=='Enter'||e.isComposing)return;if(e.ctrlKey||e.metaKey){e.preventDefault();const a=i.selectionStart??i.value.length,b=i.selectionEnd??a;i.setRangeText('\n',a,b,'end');return}if(!e.shiftKey&&!e.altKey){e.preventDefault();submit()}}}
+function fitChatEditInput(input){if(!input)return;input.style.height='auto';input.style.height=`${Math.max(54,input.scrollHeight+2)}px`}
+function beginChatEdit(row,m){const body=row.querySelector('.msg-text');if(!body)return;const old=m.text||'';body.innerHTML=`<textarea class="msg-edit-input" maxlength="3000" rows="1">${esc(old)}</textarea><div class="msg-edit-actions"><button type="button" data-msg-save>保存</button><button type="button" data-msg-cancel>取消</button></div>`;const input=body.querySelector('.msg-edit-input');requestAnimationFrame(()=>{fitChatEditInput(input);input.focus();input.setSelectionRange(input.value.length,input.value.length)});input.addEventListener('input',()=>fitChatEditInput(input));body.querySelector('[data-msg-cancel]').onclick=()=>renderChat(false);body.querySelector('[data-msg-save]').onclick=()=>{const text=input.value.trim();if(!text)return toast('消息不能为空');if(send({type:'chat_edit',messageId:m.id,text}))toast('消息已编辑')};input.onkeydown=e=>{if(e.key==='Escape'){e.preventDefault();renderChat(false)}}}
+function renderChat(scroll=false){
+  const e=$('#chatLog');if(!e)return;const first=!e.dataset.rendered,nearBottom=e.scrollHeight-e.scrollTop-e.clientHeight<72,force=state.room?.category==='game',y=e.scrollTop;
+  e.innerHTML=state.messages.map(m=>{
+    const p=state.room?.category==='chat'?chatMessagePerms(m):{edit:false,del:false};
+    const reply=m.reply?`<button type="button" class="msg-reply-ref" data-reply-jump="${esc(m.reply.messageId||'')}"><span class="msg-reply-hook" aria-hidden="true">↳</span><span class="msg-reply-name">${esc(m.reply.name||'玩家')}</span><span class="msg-reply-text">${esc(String(m.reply.text||'').replace(/\s+/g,' ').slice(0,140))}</span></button>`:'';
+    const rawAt=Number(m.at||m.createdAt)||0,time=chatTimeLabel(rawAt),actions=`<div class="msg-actions"><button type="button" data-msg-reply title="回复消息">回复</button>${p.edit?'<button type="button" data-msg-edit title="编辑消息">编辑</button>':''}${p.del?'<button type="button" data-msg-delete title="删除消息">删除</button>':''}</div>`;
+    return `<div class="msg" data-message-id="${esc(m.id||'')}">${slime(m.slimeColor,'sm',m.userId)}<div class="msg-body"><div class="msg-head"><b>${esc(m.name)}</b> ${roleBadge(m.role)}${m.title?`<span class="user-title msg-title">${esc(m.title)}</span>`:''}${time?`<time class="msg-time" datetime="${new Date(rawAt).toISOString()}">${esc(time)}</time>`:''}${m.editedAt?'<small class="msg-edited">（已编辑）</small>':''}</div>${reply}<div class="msg-text">${esc(m.text)}</div>${actions}</div></div>`
+  }).join('');
+  e.dataset.rendered='1';
+  e.querySelectorAll('[data-message-id]').forEach(row=>{const m=state.messages.find(x=>x.id===row.dataset.messageId);if(!m)return;row.querySelector('[data-msg-reply]')?.addEventListener('click',()=>beginChatReply(m));row.querySelector('[data-msg-edit]')?.addEventListener('click',()=>beginChatEdit(row,m));row.querySelector('[data-msg-delete]')?.addEventListener('click',()=>{if(confirm('删除这条消息？'))send({type:'chat_delete',messageId:m.id})});row.querySelector('[data-reply-jump]')?.addEventListener('click',ev=>{const id=ev.currentTarget.dataset.replyJump,target=e.querySelector(`[data-message-id="${CSS.escape(id)}"]`);if(target){target.scrollIntoView({block:'center'});target.classList.add('msg-highlight');setTimeout(()=>target.classList.remove('msg-highlight'),900)}})});
+  if(first||force||scroll||nearBottom)requestAnimationFrame(()=>{e.scrollTop=e.scrollHeight});else requestAnimationFrame(()=>{e.scrollTop=y})
+}

@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import path from 'node:path';
+const root=path.resolve(new URL('../..',import.meta.url).pathname),ok=(v,m)=>{if(!v)throw Error(m)};
+const app=fs.readFileSync(path.join(root,'public/app.js'),'utf8'),games=fs.readFileSync(path.join(root,'public/app-games.js'),'utf8'),startup=fs.readFileSync(path.join(root,'public/startup-ui.js'),'utf8'),html=fs.readFileSync(path.join(root,'public/index.html'),'utf8'),css=fs.readFileSync(path.join(root,'public/styles.css'),'utf8');
+ok(/boot\(\)\.then\(/.test(app),'core app no longer starts boot');
+ok(!/\bboot\(\)/.test(games),'lazy game module must never own app startup');
+ok(app.includes("function esc(")&&app.includes('function attr('),'core escaping helpers were left in a lazy module');
+ok(app.includes("document.addEventListener('visibilitychange'")&&app.includes("window.addEventListener('offline'"),'core lifecycle listeners were left in a lazy module');
+ok(app.includes('IndexedDB open timeout')&&app.includes('r.onblocked'),'IndexedDB can still freeze startup indefinitely');
+ok(startup.includes('setBootProgress')&&startup.includes('loadPixelFonts')&&startup.includes('showBootFailure'),'real boot progress / font recovery / retry UI missing');
+ok(html.indexOf('startup-ui.js')<html.indexOf('app.js'),'startup UI must load before app.js');
+ok(html.includes('bootStatus')&&html.includes('bootBar')&&html.includes('bootRetry'),'boot progress markup missing');
+ok(css.includes('.boot-track')&&css.includes('.boot-error'),'boot progress styling missing');
+ok(!html.includes('media="print" onload='),'CSP-blocked inline font onload handler returned');
+ok(html.includes('build=034'),'same-version cache bust is missing');
+console.log('[OK] v0.3.4 startup hotfix: boot ownership / progress / font loader / cache bust / IDB timeout');

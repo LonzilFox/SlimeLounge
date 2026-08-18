@@ -1,0 +1,22 @@
+# Copy to .dev.vars for local dev only. Never commit real values.
+# Cloudflare production: configure sensitive values as secrets.
+EMPLOYEE_HASH_SECRET=replace-with-a-long-random-secret
+# Strongly recommended: your private Huawei employee ID. When set, only this ID can initialize the unique Owner.
+OWNER_EMPLOYEE_ID=
+# Optional compatible Netease search API base, e.g. your own reachable NeteaseCloudMusicApi deployment.
+NETEASE_SEARCH_BASE=
+
+# Optional local outbound proxy for music search. run_local.bat auto-detects explicit Windows proxy first.
+# HTTPS_PROXY=http://proxy.example.com:8080
+# HTTP_PROXY=http://proxy.example.com:8080
+
+# Optional: daily chip check-in date boundary. Defaults to Asia/Shanghai.
+SLIMELOUNGE_TIME_ZONE=Asia/Shanghai
+
+# Production HTTPS / reverse proxy or Tailscale Funnel.
+# Example PUBLIC_ORIGIN: https://slimelounge.xxxxx.ts.net
+# IP changes are never used as device identity.
+SLIMELOUNGE_TRUST_PROXY=0
+SLIMELOUNGE_COOKIE_SECURE=0
+SLIMELOUNGE_PUBLIC_ORIGIN=
+SLIMELOUNGE_DISCONNECT_GRACE_MS=15000

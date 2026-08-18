@@ -1,0 +1,6 @@
+# Replace lounge.example.com with your real domain.
+# DNS A record -> your Tencent Cloud Hong Kong public IPv4.
+lounge.example.com {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:8090
+}

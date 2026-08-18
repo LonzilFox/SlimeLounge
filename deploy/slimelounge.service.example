@@ -1,0 +1,24 @@
+[Unit]
+Description=SlimeLounge Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/opt/SlimeLounge
+ExecStart=/usr/bin/node /opt/SlimeLounge/local_server.js
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+Environment=PORT=8090
+Environment=AUTO_OPEN=0
+Environment=SLIMELOUNGE_DATA_DIR=/var/lib/slimelounge
+# Funnel / Caddy production: reverse proxy connects from localhost; trust forwarded client IP headers.
+Environment=SLIMELOUNGE_TRUST_PROXY=1
+# Environment=SLIMELOUNGE_COOKIE_SECURE=1
+# Environment=SLIMELOUNGE_PUBLIC_ORIGIN=https://lounge.example.com
+EnvironmentFile=-/opt/SlimeLounge/.dev.vars
+
+[Install]
+WantedBy=multi-user.target

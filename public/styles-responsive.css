@@ -1,0 +1,567 @@
+/* v0.1.6 mobile game/music room drawer + dual music providers */
+.room-tools-toggle{display:none;margin-left:auto;white-space:nowrap}.room-side-mobile-head{display:none}.room-side-backdrop{display:none}.music-provider-tabs{display:flex;gap:8px;margin:0 0 10px}.music-provider-tabs button.active{border-color:#72dda0;background:#193126;color:#b9f5cc}.music-provider-badge{display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid #586d82;font-size:10px;line-height:1.2}.music-provider-badge.netease{border-color:#d95a62;color:#ff9aa0;background:#35191e}.music-provider-badge.qq{border-color:#52c986;color:#92efb7;background:#123224}.music-site-links{display:flex;gap:8px;flex-wrap:wrap;margin:9px 0}.music-account-card code{overflow-wrap:anywhere}
+@media(max-width:760px){
+  .room-head .minw0{flex:1;min-width:0}.room-tools-toggle.room-tools-enabled{display:inline-flex;align-items:center;justify-content:center;position:relative;z-index:72}
+  .room-body{display:block;position:relative;min-width:0}.room-main{width:100%;min-width:0;max-width:100%;min-height:calc(100dvh - 145px)}
+  .room-side-drawer{position:fixed;z-index:80;top:0;right:0;bottom:0;width:min(88vw,370px);max-height:none!important;border-radius:18px 0 0 18px;box-shadow:-16px 0 45px #0008;transform:translateX(105%);transition:transform 220ms var(--ease-ios);background:var(--panel);grid-template-rows:auto auto minmax(0,1fr) auto;padding-top:max(8px,env(safe-area-inset-top));padding-bottom:max(8px,env(safe-area-inset-bottom))}
+  .room-side-drawer.open{transform:translateX(0)}.room-side-mobile-head{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:2px solid #304154}.room-side-mobile-head button{min-width:38px;padding:6px 9px;font-size:20px}
+  .room-side-drawer .online-list{max-height:24vh}.room-side-drawer .chat-log{min-height:0}.room-side-backdrop{display:block;position:fixed;z-index:79;inset:0;background:#0000;pointer-events:none;transition:background-color 180ms var(--ease-ios)}.room-side-backdrop.open{background:#0008;pointer-events:auto}
+  body.room-drawer-open{overflow:hidden}.music-provider-tabs{position:sticky;top:0;z-index:2;background:var(--panel);padding:4px 0}.music-provider-tabs button{flex:1}
+}
+
+
+/* v0.1.8 interaction/layout hardening */
+.activity-actions [data-activity-return="music"]{white-space:nowrap;min-width:max-content;flex:1 0 auto}
+.go-board-shell{max-width:100%;overflow:auto;padding:10px;scrollbar-gutter:stable both-edges}.go-gomoku-board{width:648px!important;height:648px!important;min-width:648px;min-height:648px;background-size:34px 34px!important}.go-gomoku-board:before{width:612px!important;height:612px!important;background-size:34px 34px!important}.go-gomoku-board .gpoint{width:28px;height:28px}.go-gomoku-board .stone{width:25px;height:25px}.go-legend{max-width:680px;margin:5px auto;text-align:center}.game-toolbar-docked,.cards-area>.game-toolbar,.game-wrap>.game-toolbar,.mj-actions{position:sticky;bottom:4px;z-index:25;background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(12px);padding:8px;border:1px solid var(--line);border-radius:10px;box-shadow:0 -5px 18px #0005}
+/* Mahjong table: keep all four meld areas inside the felt and improve compact tile face */
+.mahjong-area{--mj-tile-w:38px;--mj-tile-h:54px;--mj-river-w:28px;--mj-river-h:39px}.mahjong-table-v2{width:820px;height:720px;border-radius:22px;overflow:hidden;background:radial-gradient(circle at 50% 47%,#267b66 0,#176452 50%,#0c4539 100%)}
+.mj-tile{border-radius:5px 5px 7px 7px;background:linear-gradient(110deg,#fffef7 0,#f8f1df 57%,#ddd2b8 100%)!important;border-color:#b7aa8f!important;box-shadow:inset -3px -3px 0 #cfc3a8,inset 1px 1px 0 #fff,0 2px 2px #0008}.mj-corner{display:none!important}.mj-man-num{font-size:25px;color:#17294b}.mj-man-mark{font-size:15px}.mj-seat-badge.riichi{box-shadow:0 0 0 2px #f4cf65,0 0 16px #f4cf6566}.mj-seat-badge.riichi:after{content:"立直";position:absolute;right:7px;bottom:-9px;padding:1px 8px;border-radius:10px;background:#f1e6d2;color:#c02934;font-weight:900;border:1px solid #8f222a;box-shadow:0 1px 4px #0007}
+.mj-seat-badge.top{top:10px}.mj-seat-badge.bottom{bottom:88px}.mj-hidden-hand.top{top:64px}.mj-hidden-hand.left{left:48px}.mj-hidden-hand.right{right:48px}.mj-meld-zone{max-width:300px;flex-wrap:wrap;gap:3px}.mj-meld-zone.bottom{right:22px;bottom:78px;justify-content:flex-end}.mj-meld-zone.top{left:22px;top:78px;transform:rotate(180deg);transform-origin:left top}.mj-meld-zone.left{left:62px;bottom:128px;transform:rotate(90deg);transform-origin:left bottom}.mj-meld-zone.right{right:62px;top:128px;transform:rotate(-90deg);transform-origin:right top}.mj-meld .mj-tile{width:28px;height:40px}.mj-meld .mj-tile.called{margin:0 5px}.mj-own-hand-zone{bottom:12px;width:720px}.mj-river-zone.bottom{top:58%}.mj-river-zone.top{top:27%}.mj-river-zone.left{left:30%;top:44%}.mj-river-zone.right{left:70%;top:44%}
+.mj-reactions,.mj-actions{max-width:820px;margin:6px auto;white-space:normal}.mj-rule-note{max-width:820px;margin:0 auto}.music-manual-cookie{margin-top:7px}.music-manual-cookie summary{cursor:pointer;color:var(--muted)}
+.admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.admin-group-title{position:sticky;top:0;z-index:4;margin:14px -12px 7px;padding:7px 12px;background:var(--panel2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--accent)}
+.friends-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.9fr);gap:12px;align-items:start}.friend-chat-panel{position:sticky;top:8px;min-height:460px;display:flex;flex-direction:column}.friend-chat-panel.empty{display:grid;place-items:center;color:var(--muted)}.friend-chat-head{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding-bottom:8px}.friend-chat-head small{display:block;color:var(--muted)}.friend-chat-log{flex:1;min-height:320px;max-height:56vh;overflow:auto;padding:10px 2px;display:flex;flex-direction:column;gap:7px}.dm{max-width:84%;display:grid;grid-template-columns:auto 1fr;gap:2px 7px;padding:7px 9px;border:1px solid var(--line);background:var(--panel2);border-radius:10px}.dm.mine{align-self:flex-end;background:#20394a}.dm.theirs{align-self:flex-start}.dm small{grid-column:1/-1;color:var(--muted);font-size:10px}.friend-chat-panel .chat-form{position:sticky;bottom:0;background:var(--panel);padding-top:7px}
+.device-link-code{letter-spacing:.11em;user-select:all;font-family:ui-monospace,Consolas,monospace;font-size:20px}
+@media(max-width:860px){.friends-layout{grid-template-columns:1fr}.friend-chat-panel{position:relative;top:auto;min-height:390px}.mahjong-table-v2{transform:scale(.78);transform-origin:top left;margin-right:-180px;margin-bottom:-158px}.go-board-shell{max-height:calc(100vh - 250px)}}
+@media(max-width:610px){.mahjong-table-v2{transform:scale(.60);margin-right:-328px;margin-bottom:-288px}.mj-reactions,.mj-actions{position:sticky;bottom:2px}.go-gomoku-board{transform:none!important;margin:0!important}.go-board-shell{max-height:calc(100vh - 220px);padding:4px}.game-toolbar-docked,.cards-area>.game-toolbar,.game-wrap>.game-toolbar,.mj-actions{bottom:2px;padding:6px}.activity-actions [data-activity-return="music"]{font-size:12px}.friends-layout{gap:7px}}
+
+/* v0.1.8 mahjong assets + viewport fit */
+.mj-tile.asset{padding:0!important;overflow:hidden!important;background:#f8f4e7!important}.mj-tile.asset>img{display:block;width:100%;height:100%;object-fit:contain}.mj-asset-fallback{display:none;width:100%;height:100%;place-items:center;background:#fffaf0;color:#15202a;font-weight:900;font-size:12px}.mj-table-scroll{display:flex;justify-content:center;align-items:flex-start;width:100%;overflow:hidden!important}.mahjong-table-v2{width:900px!important;height:760px!important;min-width:900px;min-height:760px;overflow:hidden!important;transform-origin:top center!important}.mj-meld-zone.bottom{right:28px!important;bottom:84px!important;max-width:320px}.mj-meld-zone.top{left:50%!important;right:auto!important;top:82px!important;transform:translateX(-50%) rotate(180deg)!important;transform-origin:center center!important;max-width:320px}.mj-meld-zone.left{left:84px!important;bottom:auto!important;top:50%!important;transform:translate(-50%,-50%) rotate(90deg)!important;transform-origin:center center!important;max-width:300px}.mj-meld-zone.right{right:84px!important;top:50%!important;transform:translate(50%,-50%) rotate(-90deg)!important;transform-origin:center center!important;max-width:300px}.mj-own-hand-zone{width:760px!important}.mj-hidden-hand.left{left:64px!important}.mj-hidden-hand.right{right:64px!important}.mj-reactions{position:sticky!important;bottom:4px!important;z-index:40!important;margin-top:-2px!important}.uno-score-strip{margin-top:2px}.device-redeem-inline{margin-top:12px}.device-redeem-inline summary{cursor:pointer;color:var(--muted)}
+@media(max-width:860px){.mahjong-table-v2{margin:0!important}.mj-table-scroll{max-height:calc(100vh - 220px)}.mahjong-area{overflow:hidden}.mj-reactions,.mj-actions{position:sticky!important;bottom:2px!important}.seat-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.seat-grid.compact{grid-template-columns:1fr 1fr;gap:5px}.seat-grid.compact .seat{min-height:72px;padding:6px}.seat-grid.compact small{font-size:10px}.mj-reactions button,.mj-actions button{min-width:56px;padding:6px}.uno-current-color{margin-top:4px}}
+
+/* v0.1.8 final interaction/layout fixes */
+.mahjong-table-v2{margin:0!important}
+.mj-table-scroll{min-height:0;max-width:100%;contain:layout paint}
+.mj-meld-zone{overflow:visible!important;white-space:nowrap;z-index:12}
+.mj-meld{display:inline-flex;align-items:flex-end;gap:1px;max-width:100%}
+.mj-meld .mj-tile{flex:0 0 auto}
+.mj-called-stack{display:inline-grid;grid-template-rows:auto auto;align-items:end;justify-items:center;transform:translateY(-5px)}
+.mj-called-stack>.mj-tile.added{margin-top:-30px;z-index:2}
+.mj-actions,.mj-reactions{max-width:min(100%,900px);margin-left:auto;margin-right:auto;box-sizing:border-box;backdrop-filter:blur(10px);background:color-mix(in srgb,var(--panel) 88%,transparent)}
+.mj-actions button,.mj-reactions button{white-space:nowrap}
+.game-toolbar-docked{z-index:45}
+@media(max-width:860px){
+  .mahjong-area{gap:6px}
+  .mahjong-area>.game-status,.mahjong-area>.game-clockbar,.mahjong-area>.auto-rule,.mahjong-area>.mj-rule-note{font-size:11px;padding:5px}
+  .mj-actions,.mj-reactions{position:sticky!important;bottom:0!important;z-index:60!important;max-height:92px;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap!important;padding:5px!important}
+  .mj-actions button,.mj-reactions button{flex:0 0 auto;padding:7px 9px}
+}
+@media(max-width:610px){
+  .mj-table-scroll{max-height:calc(100dvh - 190px)!important}
+  .mahjong-area>.game-status{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mj-rule-note{display:none}
+}
+
+/* unread badges + stable riichi table geometry */
+.nav-friends{position:relative}
+.nav-unread-badge,.dm-unread-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#e5484d;color:#fff;font-size:11px;font-weight:900;line-height:1;box-shadow:0 2px 8px #0006;border:1px solid #ffb4b7}
+.nav-unread-badge{margin-left:auto}.nav-unread-badge.hidden,.dm-unread-badge.hidden{display:none!important}
+.friend-chat-btn{position:relative;overflow:visible!important}.dm-unread-badge{position:absolute;right:-8px;top:-9px;pointer-events:none}
+/* Keep discard rows and melds in deterministic slots; JS scales the whole 900x760 table to the viewport. */
+.mahjong-table-v2{width:900px!important;height:760px!important;min-width:900px!important;min-height:760px!important;overflow:hidden!important;transform-origin:top center!important;margin:0!important}
+.mj-river-zone{width:176px!important;height:124px!important;z-index:10!important}
+.mj-river-zone.bottom{left:50%!important;top:54%!important;transform:translate(-50%,0)!important}
+.mj-river-zone.top{left:50%!important;top:46%!important;transform:translate(-50%,-100%) rotate(180deg)!important}
+.mj-river-zone.left{left:41%!important;top:50%!important;transform:translate(-100%,-50%) rotate(90deg)!important}
+.mj-river-zone.right{left:59%!important;top:50%!important;transform:translate(0,-50%) rotate(-90deg)!important}
+.mj-river-grid{display:grid!important;grid-template-columns:repeat(6,26px)!important;grid-auto-rows:36px!important;gap:1px!important;width:161px!important;align-content:start!important;justify-content:start!important}
+.mj-river-cell{width:26px!important;height:36px!important;display:grid!important;place-items:center!important;overflow:visible!important}
+.mj-river-cell .mj-tile.river-tile{width:26px!important;height:36px!important;min-width:26px!important;min-height:36px!important;margin:0!important;transform:none!important;transform-origin:center!important}
+.mj-river-cell.riichi-cell .mj-tile.river-tile{transform:rotate(90deg)!important;z-index:2!important}
+.mj-meld-zone{width:360px!important;height:48px!important;max-width:360px!important;display:flex!important;flex-wrap:nowrap!important;gap:3px!important;align-items:flex-end!important;overflow:visible!important;white-space:nowrap!important;z-index:13!important}
+.mj-meld-zone.bottom{left:50%!important;right:auto!important;bottom:72px!important;top:auto!important;transform:translateX(-50%)!important;justify-content:flex-end!important}
+.mj-meld-zone.top{left:50%!important;right:auto!important;top:72px!important;bottom:auto!important;transform:translateX(-50%) rotate(180deg)!important;transform-origin:center!important;justify-content:flex-end!important}
+.mj-meld-zone.left{left:72px!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translate(-50%,-50%) rotate(90deg)!important;transform-origin:center!important;justify-content:flex-end!important}
+.mj-meld-zone.right{right:72px!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translate(50%,-50%) rotate(-90deg)!important;transform-origin:center!important;justify-content:flex-end!important}
+.mj-meld{display:inline-flex!important;align-items:flex-end!important;gap:1px!important;flex:0 0 auto!important;max-width:none!important}
+.mj-meld .mj-tile{width:23px!important;height:33px!important;min-width:23px!important;min-height:33px!important;flex:0 0 auto!important}
+.mj-meld .mj-tile.called{margin:0 5px!important}
+.mj-called-stack{position:relative!important;display:inline-block!important;width:32px!important;height:38px!important;transform:none!important;flex:0 0 auto!important}
+.mj-called-stack>.mj-tile.called{position:absolute!important;left:3px!important;bottom:2px!important;margin:0!important}
+.mj-called-stack>.mj-tile.added{position:absolute!important;left:4px!important;bottom:16px!important;margin:0!important;z-index:3!important}
+@media(max-width:860px){.mahjong-table-v2{margin:0!important}.mj-table-scroll{overflow:hidden!important;max-width:100%!important}.mj-reactions,.mj-actions{position:sticky!important;bottom:0!important;z-index:60!important}}
+
+
+/* v0.2.2 responsive pixel UI / touch-first layout */
+:root{
+  --pxfont:'Z Labs Bitmap CN','Z Labs Pixel 12px M CN','Fusion Pixel 12px M zh_hans','Fusion Pixel 12px M latin','SimSun','Microsoft YaHei UI',monospace;
+  --pixel-border:#395069;--pixel-hi:#8ce7a0;--pixel-shadow:#05070a;
+  --motion-fast:120ms;--motion-mid:180ms;--ease-pixel:cubic-bezier(.2,.8,.2,1);
+}
+html,body,button,input,textarea,select{font-family:var(--pxfont)!important;font-synthesis:none;text-rendering:geometricPrecision}
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+body{font-synthesis:none;text-rendering:geometricPrecision;overscroll-behavior:none}
+/* Game glyph/face exceptions: preserve dedicated shapes rather than forcing the UI font. */
+.uno-face,.mj-tile,.chpiece{font-family:inherit}
+button,.room-card,.channel-row,.page-card,.room-main,.room-side,.music-player,.game-row,.panel{border-radius:2px!important}
+button{transition:transform var(--motion-fast) var(--ease-pixel),border-color var(--motion-fast) linear,background-color var(--motion-fast) linear,box-shadow var(--motion-fast) linear;image-rendering:pixelated}
+button:hover{transform:translate(-1px,-1px)}button:active{transform:translate(1px,1px) scale(.985)}
+.room-card,.channel-row,.page-card,.game-row{transition:transform var(--motion-mid) var(--ease-pixel),border-color var(--motion-mid) linear,box-shadow var(--motion-mid) linear}
+.room-card:hover,.channel-row:hover,.game-row:hover{transform:translateY(-2px);border-color:#55708c;box-shadow:5px 6px 0 var(--pixel-shadow)}
+
+.channel-icon{font-family:var(--pxfont)!important;text-shadow:2px 2px 0 #000}
+kbd,code{font-family:var(--pxfont)!important;border:1px solid var(--line2);background:#0b1118;padding:1px 4px}
+.music-cookie-guide{margin-top:10px;border:2px dashed var(--line2);padding:8px 10px;background:#0d151e}.music-cookie-guide summary{cursor:pointer;color:var(--accent);font-weight:700}.music-cookie-guide ol{padding-left:22px;line-height:1.7}.music-player-actions,.activity-actions{display:flex;gap:7px;flex-wrap:nowrap;align-items:center}.music-player-actions button,.activity-actions button,.activity-actions [data-music-skip],.activity-actions [data-activity-return],.activity-actions [data-activity-leave]{white-space:nowrap!important;word-break:keep-all!important;overflow-wrap:normal!important;min-width:max-content!important}
+.activity-card{image-rendering:pixelated}.activity-head,.activity-actions{font-family:var(--pxfont)!important}
+/* Riichi: top river faces the top player but keeps deterministic placement from its side. */
+.mj-river-zone.top{transform:translate(-50%,-100%)!important}
+.mj-river-grid.river-top{direction:rtl!important}
+.mj-river-grid.river-top .mj-tile.river-tile{transform:rotate(180deg)!important}
+.mj-river-grid.river-top .riichi-cell .mj-tile.river-tile{transform:rotate(90deg)!important}
+/* Drawn tile is always visibly separated at the far right until a discard merges the hand again. */
+.mj-hand-v2{display:flex!important;align-items:flex-end!important;justify-content:center!important;gap:2px!important;flex-wrap:nowrap!important;overflow:visible!important}
+.mj-own.drawn{margin-left:13px!important;position:relative}.mj-own.drawn:before{content:'摸';position:absolute;left:-11px;top:50%;transform:translateY(-50%);font:700 8px/1 var(--pxfont);color:var(--gold)}
+.mj-own-hand-zone{overflow:visible!important}
+/* Touch scroll hardening */
+.room-browser,.page,.room-main,.chat-log,.online-list,.board-shell,.go-board-shell,.mj-table-scroll,.friend-chat-log{touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.room-main{scrollbar-gutter:stable}
+
+@media(max-width:760px){
+  html,body{overflow:hidden!important;font-size:13px}
+  .app{display:block!important;height:100dvh!important;overflow:hidden!important;padding-bottom:64px}
+  .main{height:calc(100dvh - 64px)!important;min-height:0!important;width:100%!important;overflow:hidden!important}
+  .sidebar{position:fixed!important;left:0;right:0;bottom:0;top:auto;width:100%!important;height:64px!important;min-height:64px!important;z-index:120;padding:4px max(4px,env(safe-area-inset-right)) max(4px,env(safe-area-inset-bottom)) max(4px,env(safe-area-inset-left))!important;border-right:0!important;border-top:3px solid #293949!important;background:#0b1118f4!important}
+  .sidebar .brand,.sidebar-bottom{display:none!important}.sidebar nav{margin:0!important;padding:0!important;display:flex!important;gap:3px!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none;width:100%!important;height:54px!important}.sidebar nav::-webkit-scrollbar{display:none}.nav{flex:1 0 51px!important;min-width:51px!important;height:50px!important;padding:4px 2px!important;font-size:0!important;text-align:center!important;display:grid!important;place-items:center!important;box-shadow:1px 2px 0 #05070a!important}.nav::first-letter{font-size:18px!important}.nav-unread-badge{position:absolute!important;top:2px!important;right:2px!important;font-size:9px!important;min-width:15px!important;height:15px!important}
+  .topbar{min-height:50px!important;height:50px!important;padding:6px 8px!important}.topbar h1{font-size:16px!important}.top-actions button{padding:6px 7px!important}
+  .room-browser,.page{height:100%;overflow-y:auto!important;overflow-x:hidden!important;padding:8px!important;padding-bottom:22px!important;touch-action:pan-y!important}
+  .room-view{height:100%!important;overflow:hidden!important;padding:5px!important;grid-template-rows:auto minmax(0,1fr)!important}.room-head{min-height:38px!important;margin-bottom:5px!important;gap:5px!important}.room-head>button{padding:6px 7px!important}.room-head h2{font-size:14px!important}.room-head small{font-size:9px!important}
+  .room-body{height:100%!important;min-height:0!important;overflow:hidden!important}.room-main{height:100%!important;min-height:0!important;max-height:none!important;overflow:auto!important;padding:6px!important;touch-action:pan-x pan-y!important}
+  .game-wrap,.cards-area,.mahjong-area{min-width:0!important;max-width:100%!important}
+  .board-shell,.go-board-shell,.mj-table-scroll{max-width:100%!important;overflow:auto!important;touch-action:pan-x pan-y!important;-webkit-overflow-scrolling:touch!important}
+  .room-side-drawer{width:min(92vw,380px)!important;border-radius:2px 0 0 2px!important}
+  .activity-dock,.notify-stack{max-width:calc(100vw - 12px)!important;width:min(360px,calc(100vw - 12px))!important;right:6px!important;bottom:70px!important}.activity-actions{overflow-x:auto!important;padding-bottom:2px}.activity-actions button{flex:0 0 auto!important;padding:6px 7px!important;font-size:11px!important}
+  .music-layout{display:block!important}.music-player{margin-bottom:8px!important}.music-account-form{grid-template-columns:1fr!important}.music-account-form button{width:100%!important}.music-cookie-guide ol{padding-left:18px}
+  .friends-layout{display:block!important}.friend-chat-panel{position:relative!important;min-height:360px!important}
+  .mj-table-scroll{justify-content:flex-start!important;max-height:none!important;overflow:auto!important}.mahjong-table-v2{transform-origin:top left!important;margin:0!important}.mj-actions,.mj-reactions{position:sticky!important;bottom:0!important;z-index:80!important;overflow-x:auto!important;overflow-y:hidden!important;flex-wrap:nowrap!important}.mj-actions button,.mj-reactions button{flex:0 0 auto!important}
+}
+@media(max-width:760px) and (orientation:landscape){
+  .sidebar{height:52px!important;min-height:52px!important}.sidebar nav{height:42px!important}.nav{height:40px!important}.app{padding-bottom:52px!important}.main{height:calc(100dvh - 52px)!important}.topbar{display:none!important}.room-view{height:100%!important}.room-head{min-height:34px!important}.room-main{padding:4px!important}.activity-dock{bottom:56px!important}
+}
+@media(max-width:420px){
+  .room-head #roomMeta{display:none}.room-head .minw0{max-width:35vw}.room-tools-toggle{font-size:10px!important}
+  .channel-row{grid-template-columns:28px minmax(0,1fr)!important;gap:7px!important}.channel-count{grid-column:2!important;display:flex!important;align-items:center!important;justify-content:space-between!important}.channel-follow{grid-column:2!important}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+
+/* v0.2.2 final mobile/pixel/riichi polish */
+.msg-body{white-space:pre-wrap}
+.music-player-actions button,.activity-actions button,.music-site-links button,.music-provider-tabs button{white-space:nowrap!important;word-break:keep-all!important;overflow-wrap:normal!important}
+.activity-card .activity-body,.activity-card .music-now-mini{min-width:0}.activity-actions{max-width:100%;overflow-x:auto;scrollbar-width:thin}
+/* top player's river: same geometry as the other three rivers, rotated as one unit */
+.mj-river-zone.top{left:50%!important;top:39%!important;width:184px!important;height:126px!important;transform:translate(-50%,-100%) rotate(180deg)!important;transform-origin:center!important}
+.mj-river-grid.river-top{direction:ltr!important}
+.mj-river-grid.river-top .mj-tile.river-tile{transform:none!important}
+.mj-river-grid.river-top .riichi-cell .mj-tile.river-tile{transform:rotate(-90deg)!important}
+.mj-own.drawn{margin-left:18px!important}
+/* Touch devices must always have a scrollable stage even when a board/table is larger than the viewport. */
+@media(max-width:760px){
+  html,body{width:100%;height:100%;overflow:hidden!important;touch-action:manipulation}
+  .room-body,.room-main,.game-wrap,.cards-area,.mahjong-area{min-width:0!important;min-height:0!important}
+  .room-main{overflow:auto!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x pan-y!important;overscroll-behavior:auto!important;scrollbar-gutter:auto!important}
+  .board-shell,.go-board-shell,.mj-table-scroll{overflow:auto!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x pan-y!important;overscroll-behavior:auto!important;max-width:100%!important}
+  .mahjong-area{overflow:visible!important}.mj-table-scroll{max-height:calc(100dvh - 180px)!important;justify-content:flex-start!important}
+  .mj-actions,.mj-reactions,.game-toolbar-docked{position:sticky!important;bottom:2px!important;z-index:90!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;flex-wrap:nowrap!important;background:#0d151ee8!important;backdrop-filter:blur(4px)}
+  .mj-actions button,.mj-reactions button,.game-toolbar-docked button{flex:0 0 auto!important;white-space:nowrap!important}
+  .music-player-actions,.music-site-links,.music-provider-tabs{display:flex!important;overflow-x:auto!important;flex-wrap:nowrap!important;gap:6px!important}.music-player-actions button,.music-site-links button,.music-provider-tabs button{flex:0 0 auto!important}
+  .music-cookie-guide{max-height:40dvh;overflow:auto;-webkit-overflow-scrolling:touch}
+}
+
+/* v0.2.2 — unified pixel typography + iOS-like rounded surfaces */
+:root{--ui-radius-lg:18px;--ui-radius:14px;--ui-radius-sm:10px;--motion-view:180ms}
+html,body,body *,button,input,textarea,select,option,table,th,td,kbd,code{font-family:var(--pxfont)!important;font-synthesis:none}
+button,input,textarea,select,.room-card,.channel-row,.page-card,.room-main,.room-side,.music-player,.game-row,.panel,.auth-card,.song-row,.notice,.activity-card,.friend-chat-panel,.admin-user-box,.device-row,.player-chip,.seat,.game-status,.auto-rule,.mj-result,.mj-reactions,.mj-auto-controls,.uno-color-picker{border-radius:var(--ui-radius-sm)!important}
+.panel,.auth-card,.room-main,.room-side,.page-card,.activity-card,.friend-chat-panel{border-radius:var(--ui-radius-lg)!important}
+.room-card,.channel-row,.game-row,.music-player,.admin-user-box{border-radius:var(--ui-radius)!important}
+button{border-radius:11px!important}.role-badge,.status-badge,.id-badge,.room-tag,.practice-badge{border-radius:7px!important}
+.changelog-row{border-color:#304256!important;background:var(--panel)!important}
+.view-enter{animation:viewInUnified var(--motion-view) cubic-bezier(.22,.8,.26,1) both!important}
+@keyframes viewInUnified{from{opacity:.25;transform:translateY(7px) scale(.994)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Game-room voice */
+.voice-toggle{margin-left:auto;white-space:nowrap}.voice-toggle.on{background:#183d2c;border-color:var(--accent);box-shadow:0 0 0 2px #7fda9130,3px 3px 0 var(--shadow)}
+.voice-speaking-badge{display:inline-grid;place-items:center;width:24px;height:24px;padding:0;border:1px solid #5d7b69;border-radius:8px!important;color:#b8d8c2;background:#132019;font-size:12px;white-space:nowrap}.voice-speaking-badge.speaking{border-color:#5cff86;color:#d6ffe0;background:#123c20;box-shadow:0 0 0 2px #56ef7c55,0 0 14px #46f17866}.voice-remote-audio{display:none}.online-user.speaking{border-radius:9px!important;outline:2px solid #55ef7b;outline-offset:2px;background:#153821;box-shadow:0 0 14px #45f27433}.voice-toggle,.voice-icon-button{min-width:42px!important;min-height:38px!important;padding:6px 9px!important;font-size:20px!important;line-height:1!important}.voice-toggle.speaking,.voice-icon-button.speaking{border-color:#5cff86!important;background:#174729!important;box-shadow:0 0 0 3px #55ef7b55,0 0 18px #45f27466!important}
+
+/* UNO: stable hand/actions and sorted-card affordance */
+.uno-area{min-height:780px}.uno-hand.sorted{min-height:126px;align-content:flex-start}.uno-sorted-card{display:inline-flex;position:relative}.uno-sorted-card.drawn-card:after{content:'摸';position:absolute;left:50%;bottom:-15px;transform:translateX(-50%);font-size:9px;color:var(--accent)}
+.uno-action-reserve{min-height:118px;display:grid;align-content:start;gap:8px;padding-top:8px}.uno-action-placeholder{min-height:42px;display:grid;place-items:center;color:var(--muted);border:1px dashed #34475b;border-radius:10px}
+
+/* Riichi: reserve command space; melds never cover the local hand. */
+.mahjong-area{min-height:1030px}.mj-command-zone{min-height:190px;display:grid;grid-template-rows:auto minmax(54px,auto) minmax(58px,auto);gap:7px;align-content:start;margin-top:8px}.mj-auto-controls{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;padding:8px;border:2px solid #34475b;background:#101821}.mj-auto-controls small{flex:1 1 100%;text-align:center;color:var(--muted)}
+.mj-actions,.mj-reactions,.mj-reaction-placeholder{min-height:54px!important;margin:0 auto!important;align-items:center;justify-content:center}.mj-reaction-placeholder,.mj-action-placeholder{display:grid;place-items:center;color:var(--muted);border:1px dashed #34475b;border-radius:10px;width:min(100%,900px)}
+.mj-meld-zone.bottom{left:auto!important;right:28px!important;bottom:104px!important;transform:none!important;justify-content:flex-end!important;width:330px!important;max-width:330px!important}
+.mj-meld-zone.top{top:92px!important}.mj-meld-zone.left{left:82px!important}.mj-meld-zone.right{right:82px!important}
+.mj-river-zone.top{top:37.5%!important}
+.mj-own-hand-zone{bottom:16px!important;width:760px!important}
+.mj-river-cell.winning-discard{z-index:28!important}.mj-river-cell.winning-discard .mj-tile{box-shadow:0 0 0 4px #7fda91,0 0 22px #7fda91cc!important}.mj-win-mark{position:absolute;right:-9px;top:-11px;z-index:40;display:grid;place-items:center;width:22px;height:22px;border-radius:50%!important;background:#7fda91;color:#07110a;font-style:normal;font-weight:900;border:2px solid #d8ffe0;box-shadow:0 2px 8px #0008}
+
+@media(max-width:760px){
+  .room-side-drawer{border-radius:18px 0 0 18px!important}.voice-toggle{font-size:10px!important;padding:6px 7px!important}.room-head .minw0{flex:1 1 auto}
+  .uno-area{min-height:700px}.uno-action-reserve{min-height:108px}
+  .mahjong-area{min-height:980px}.mj-command-zone{min-height:176px}.mj-auto-controls{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.mj-auto-controls small{display:none}.mj-auto-controls button{flex:0 0 auto}
+}
+
+/* v0.2.3 — mobile-first responsive shell, Discord-like chat, wallet/rank UI */
+.nav-icon{display:inline-grid;place-items:center;width:22px;min-width:22px;font-size:16px;line-height:1}.nav-label{display:inline}.nav{position:relative;align-items:center;gap:7px}
+.game-wallet-card{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border:2px solid var(--line);background:var(--panel);border-radius:var(--ui-radius)!important}.game-wallet-card>div{display:grid;gap:5px}.game-wallet-card b{font-size:17px}.game-wallet-card small{color:var(--muted)}
+.rank-tabs,.rank-mode-tabs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}.rank-mode-tabs{padding:8px;border:1px solid var(--line);background:var(--input);border-radius:12px!important}.rank-table{width:100%;border-collapse:collapse}.rank-table th,.rank-table td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left}.rank-pos{font-weight:800;color:var(--gold)}
+.board-scale-stage{position:relative;display:block;margin:0 auto;flex:0 0 auto}.board-scale-stage>.gomoku-board,.board-scale-stage>.xiangqi-board,.board-scale-stage>.chess{display:block}.board-shell:has(.board-scale-stage),.go-board-shell:has(.board-scale-stage){display:block!important;overflow:hidden!important;max-width:100%!important}
+
+/* Chat no longer has an enter-room layer: channels + conversation + global member directory. */
+.chat-workspace-view{padding:0!important;grid-template-rows:minmax(0,1fr)!important}.chat-workspace-view>.room-head{display:none!important}.chat-workspace-view .room-body{display:block!important;height:100%;min-height:0;overflow:hidden}.discord-chat{height:100%;min-height:0;display:grid;grid-template-columns:220px minmax(300px,1fr) 250px;background:#0c1219;border:1px solid #26384a;border-radius:18px!important;overflow:hidden}
+.discord-channels{min-height:0;overflow-y:auto;padding:12px 8px;background:#101720;border-right:1px solid #29394a}.discord-channel-group{display:grid;gap:4px;margin-bottom:16px}.discord-channel-group>b{padding:3px 8px 6px;color:var(--muted);font-size:11px;text-transform:uppercase}.discord-channel{width:100%;display:flex;align-items:center;gap:7px;text-align:left;background:transparent;border:1px solid transparent;box-shadow:none!important;padding:8px 9px;color:#b9c6d2}.discord-channel:hover{transform:none!important;background:#19232e;border-color:#2d4053}.discord-channel.active{background:#243241;border-color:#40566d;color:#fff}.discord-channel>span{width:16px;text-align:center;color:#8fa2b4}.discord-channel.voice>span{color:#8fdda2}
+.discord-center{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:#121a23}.channel-banner{display:grid;gap:3px;padding:11px 14px;border-bottom:1px solid #2b3b4c}.channel-banner b{font-size:16px}.channel-banner span{font-size:11px;color:var(--muted)}.chat-log-main{padding:14px;min-height:0;overflow-y:auto}.discord-center>.chat-form{border-top:1px solid #2b3b4c;padding:10px 12px}
+.discord-members{min-height:0;overflow-y:auto;padding:12px 10px;background:#101720;border-left:1px solid #29394a}.discord-members>b{display:block;margin:2px 5px 10px;color:var(--muted);font-size:11px}.member-group{margin-bottom:13px}.member-group>small{display:block;margin:0 5px 5px;color:#8799aa;font-weight:700}.directory-user{display:flex;align-items:center;gap:7px;padding:6px 5px;border-radius:9px!important}.directory-user:hover{background:#19232e}.directory-user>div{min-width:0}.directory-user b{font-size:12px}.directory-user em{display:block;color:var(--muted);font-size:9px;font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.voice-channel-stage{height:100%;display:grid;align-content:center;justify-items:center;text-align:center;gap:11px;padding:24px}.voice-channel-mark{display:grid;place-items:center;width:72px;height:72px;border:2px solid #547263;border-radius:22px!important;background:#172a21;font-size:35px;color:#9be2ab}.voice-channel-stage h2,.voice-channel-stage p{margin:0}.voice-channel-stage small{color:var(--muted);max-width:520px}.voice-channel-members{display:grid;gap:7px;width:min(420px,100%);margin-top:8px}.voice-channel-user{display:flex;align-items:center;gap:8px;padding:9px 11px;border:1px solid #35475a;background:#0e151d;border-radius:12px!important;transition:border-color .1s ease,box-shadow .1s ease,background .1s ease}.voice-channel-user b{flex:1;text-align:left}.voice-channel-user span{font-size:15px;color:var(--muted)}.voice-channel-user.mic-on{border-color:#5b9b6d;background:#11241a}.voice-channel-user.mic-on span{color:#a7edb7}.voice-channel-user.speaking{border-color:#5cff86;background:#153c23;box-shadow:0 0 0 2px #55ef7b55,0 0 18px #45f27455}.voice-channel-user.speaking b{color:#d6ffe0}.voice-state-icon{display:grid;place-items:center;width:26px;height:26px}
+
+/* v0.2.3 has no in-app forced-landscape control. */
+
+@media(max-width:760px){
+  html,body{font-size:12px!important}
+  .auth-screen{display:block!important;height:100dvh!important;min-height:100dvh!important;overflow-y:auto!important;overflow-x:hidden!important;place-items:unset!important;padding:10px 8px calc(24px + env(safe-area-inset-bottom))!important;touch-action:pan-y!important;-webkit-overflow-scrolling:touch!important}
+  .auth-card{width:min(100%,520px)!important;margin:0 auto!important;padding:14px!important;min-height:max-content!important}.auth-brand{gap:10px!important;margin-bottom:10px!important}.auth-brand .slime.xl{width:54px;height:44px}.logo-text{font-size:18px!important}.auth-card label{margin:10px 0!important}.auth-card input{padding:8px!important;margin-top:5px!important}.color-chip{height:38px!important}.owner-recovery-box{margin-top:10px!important}.owner-recovery-box summary{font-size:11px!important;line-height:1.5}.owner-recovery-box p{font-size:10px!important;line-height:1.55}.auth-card button{padding:8px 9px!important}
+  .sidebar nav{align-items:stretch!important}.nav{flex:0 0 56px!important;min-width:56px!important;height:52px!important;padding:4px 2px!important;font-size:10px!important;display:grid!important;grid-template-rows:25px 13px!important;place-items:center!important;gap:1px!important}.nav::first-letter{font-size:inherit!important}.nav-icon{display:grid!important;font-size:18px!important;line-height:1!important}.nav-label{display:block!important;font-size:8px!important;line-height:1!important;white-space:nowrap}.nav-unread-badge{font-size:8px!important}
+  .game-wallet-card{padding:10px!important;align-items:stretch!important}.game-wallet-card b{font-size:14px}.game-wallet-card button{flex:0 0 auto;padding:7px!important}
+  .rank-tabs,.rank-mode-tabs{flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:4px}.rank-tabs button,.rank-mode-tabs button{flex:0 0 auto!important;white-space:nowrap}.rank-table{font-size:10px}.rank-table th,.rank-table td{padding:7px 5px}
+  .board-shell,.go-board-shell{overflow:hidden!important;padding:4px!important;max-width:100%!important}.board-scale-stage{margin:0 auto!important}.chess{grid-template-columns:repeat(8,58px)!important}.ccell{width:58px!important;height:58px!important;font-size:36px!important}.chpiece{font-size:40px!important}
+  .chat-workspace-view{height:100%!important;padding:4px!important}.discord-chat{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) minmax(72px,23dvh);border-radius:13px!important}.discord-channels{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:6px;border-right:0;border-bottom:1px solid #29394a;scrollbar-width:none}.discord-channels::-webkit-scrollbar{display:none}.discord-channel-group{display:flex;align-items:center;gap:4px;margin:0;flex:0 0 auto}.discord-channel-group>b{display:none}.discord-channel{width:auto;min-width:max-content;padding:7px 8px;font-size:10px}.discord-center{min-height:0}.channel-banner{padding:7px 9px}.channel-banner b{font-size:13px}.channel-banner span{font-size:9px}.chat-log-main{padding:8px}.discord-center>.chat-form{padding:6px;gap:5px}.discord-center>.chat-form input{padding:8px}.discord-center>.chat-form button{padding:7px 8px}.discord-members{border-left:0;border-top:1px solid #29394a;padding:6px 7px;overflow-y:auto}.discord-members>b{margin-bottom:4px}.member-group{margin-bottom:7px}.member-group>small{font-size:9px}.directory-user{padding:4px}.directory-user b{font-size:10px}.directory-user em{font-size:8px}.voice-channel-stage{align-content:start;padding:14px 10px;overflow-y:auto}.voice-channel-mark{width:48px;height:48px;border-radius:15px!important;font-size:24px}.voice-channel-members{gap:5px}.voice-channel-user{padding:7px 8px}
+  .room-main{overflow-y:auto!important;overflow-x:hidden!important;touch-action:pan-y!important}.game-wrap,.cards-area{width:100%!important;min-width:0!important}.game-status,.ready-help,.auto-rule{font-size:10px!important;line-height:1.5}.players-bar{gap:5px}.player-chip{font-size:9px;padding:5px 6px}
+}
+@media(max-width:420px){.auth-card{padding:11px!important}.logo-text{font-size:16px!important}.nav{flex-basis:53px!important;min-width:53px!important}.game-wallet-card{display:grid!important;grid-template-columns:1fr auto}.game-wallet-card small{font-size:9px}}
+@media(max-width:760px) and (orientation:landscape){
+  .sidebar{height:64px!important;min-height:64px!important}.sidebar nav{height:54px!important}.nav{height:52px!important}.app{padding-bottom:64px!important}.main{height:calc(100dvh - 64px)!important}.topbar{display:flex!important;height:50px!important;min-height:50px!important}.room-view{height:100%!important}.activity-dock{bottom:70px!important}
+}
+
+/* v0.2.4: Discord-style chat channel switching is instantaneous. */
+.room-view.no-view-animation{animation:none!important}
+
+/* v0.2.6: hidden state must always win over mobile layout rules. */
+.hidden,.app.hidden,.auth-screen.hidden,#app.hidden,#authScreen.hidden{display:none!important}
+@media(max-width:760px){
+  .auth-brand .slime.xl{width:54px!important;height:44px!important;border-width:3px!important}
+  .auth-brand .slime.xl:before,.auth-brand .slime.xl:after{width:5px!important;height:6px!important;top:20px!important}
+  .auth-brand .slime.xl:before{left:14px!important}.auth-brand .slime.xl:after{right:14px!important}
+}
+.auth-existing-notice{display:grid;gap:4px;margin:0 0 12px;padding:10px 12px;border:2px solid var(--accent);background:#12211b;border-radius:var(--ui-radius-sm)}
+.auth-existing-notice span{color:var(--muted);font-size:12px;line-height:1.5}.auth-recovery-first{margin-bottom:14px}.auth-new-title{margin:14px 0 4px;font-size:14px}
+.device-recovery-output{margin-top:7px;line-height:1.6}.device-recovery-output code{user-select:all}.device-network-detail{margin-top:5px}
+
+/* v0.2.7 — chess glyph isolation, desktop riichi fit, Discord-like mobile drawers */
+/* Chess pieces are symbols, not UI text. Keep them out of the global pixel-font override. */
+.chpiece{
+  font-family:"Segoe UI Symbol","Noto Sans Symbols 2","DejaVu Sans",serif!important;
+  font-synthesis:none!important;
+  line-height:1!important;
+  text-rendering:geometricPrecision;
+}
+
+/* Desktop riichi uses the room's available height instead of a fixed 1030px stage. */
+@media(min-width:761px){
+  .mahjong-area{
+    min-height:0!important;
+    height:100%!important;
+    max-height:100%!important;
+    overflow:hidden!important;
+    display:flex!important;
+    flex-direction:column!important;
+    gap:4px!important;
+  }
+  .mahjong-area>.game-status,
+  .mahjong-area>.game-clockbar,
+  .mahjong-area>.auto-rule,
+  .mahjong-area>.mj-rule-note,
+  .mahjong-area>.mj-result{flex:0 0 auto!important}
+  .mahjong-area>.mj-table-scroll{
+    flex:0 0 auto!important;
+    min-height:0!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    justify-content:center!important;
+    align-items:flex-start!important;
+  }
+  .mahjong-area>.mj-command-zone{
+    flex:0 0 auto!important;
+    min-height:0!important;
+    margin-top:auto!important;
+    padding-top:3px!important;
+    gap:4px!important;
+    grid-template-rows:auto auto auto!important;
+  }
+  .mj-command-zone .mj-auto-controls{padding:5px 7px!important}
+  .mj-command-zone .mj-actions,
+  .mj-command-zone .mj-reactions,
+  .mj-command-zone .mj-reaction-placeholder{min-height:44px!important}
+  .mj-reaction-placeholder{display:flex!important;flex-direction:column!important;gap:2px!important;text-align:center!important}
+
+  /* Each opponent reserves the exposed-meld end of their hand, as on a real table. */
+  .mj-meld-zone.top{
+    left:auto!important;right:28px!important;top:58px!important;
+    transform:rotate(180deg)!important;
+    transform-origin:center!important;
+    width:300px!important;max-width:300px!important;
+    justify-content:flex-start!important;
+  }
+  .mj-meld-zone.left{
+    left:54px!important;right:auto!important;top:auto!important;bottom:84px!important;
+    transform:rotate(90deg)!important;
+    transform-origin:left bottom!important;
+    width:286px!important;max-width:286px!important;
+    justify-content:flex-start!important;
+  }
+  .mj-meld-zone.right{
+    right:54px!important;left:auto!important;top:84px!important;bottom:auto!important;
+    transform:rotate(-90deg)!important;
+    transform-origin:right top!important;
+    width:286px!important;max-width:286px!important;
+    justify-content:flex-start!important;
+  }
+  .mj-hidden-hand.top.has-melds{left:calc(50% - (var(--meld-count) * 34px))!important}
+  .mj-hidden-hand.left.has-melds{top:calc(50% - (var(--meld-count) * 30px))!important}
+  .mj-hidden-hand.right.has-melds{top:calc(50% + (var(--meld-count) * 30px))!important}
+  .mj-river-zone.top{top:36%!important}
+}
+
+/* Mobile chat: one content column plus Discord-style slide-in channel/member drawers. */
+.discord-mobile-toolbar,.discord-mobile-drawer-head,.discord-drawer-backdrop{display:none}
+@media(max-width:760px){
+  .discord-chat{
+    position:relative!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:minmax(0,1fr)!important;
+    min-height:0!important;
+    height:100%!important;
+    overflow:hidden!important;
+  }
+  .discord-center{
+    grid-column:1!important;grid-row:1!important;
+    min-width:0!important;min-height:0!important;height:100%!important;
+    display:grid!important;
+    grid-template-rows:auto minmax(0,1fr) auto!important;
+  }
+  .discord-mobile-toolbar{
+    display:grid!important;
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+    align-items:center!important;
+    gap:7px!important;
+    min-height:43px!important;
+    padding:5px 6px!important;
+    border-bottom:1px solid #314357!important;
+    background:#111b26f2!important;
+    backdrop-filter:blur(12px)!important;
+    z-index:6!important;
+  }
+  .discord-mobile-toolbar>b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+  .discord-mobile-toolbar button{padding:6px 8px!important;font-size:10px!important;white-space:nowrap!important}
+  .discord-center>.channel-banner{display:none!important}
+  .discord-center>.chat-log-main{grid-row:2!important;min-height:0!important;overflow:auto!important;-webkit-overflow-scrolling:touch!important;padding:8px!important}
+  .discord-center>.chat-form{grid-row:3!important;position:relative!important;bottom:auto!important;margin:0!important;padding:6px!important;border-top:1px solid #314357!important;background:#101923f2!important}
+  .voice-channel-stage{grid-row:2/4!important;overflow:auto!important;-webkit-overflow-scrolling:touch!important}
+
+  .discord-channels,.discord-members{
+    display:block!important;
+    position:absolute!important;
+    top:0!important;bottom:0!important;
+    width:min(84vw,330px)!important;
+    max-width:330px!important;
+    height:100%!important;
+    z-index:120!important;
+    overflow:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    background:#101923!important;
+    box-shadow:0 10px 30px #000b!important;
+    transition:transform 160ms ease!important;
+  }
+  .discord-channels{left:0!important;right:auto!important;transform:translateX(-103%)!important;border-right:1px solid #314357!important}
+  .discord-members{right:0!important;left:auto!important;transform:translateX(103%)!important;border-left:1px solid #314357!important}
+  .discord-channels.open,.discord-members.open{transform:translateX(0)!important}
+  .discord-mobile-drawer-head{
+    display:flex!important;position:sticky!important;top:0!important;z-index:4!important;
+    align-items:center!important;justify-content:space-between!important;
+    min-height:44px!important;padding:6px 8px!important;
+    background:#111b26f4!important;border-bottom:1px solid #314357!important;
+  }
+  .discord-mobile-drawer-head button{width:34px!important;height:32px!important;padding:0!important;font-size:18px!important}
+  .discord-drawer-backdrop{
+    display:block!important;position:absolute!important;inset:0!important;z-index:110!important;
+    opacity:0!important;pointer-events:none!important;background:#0009!important;
+    transition:opacity 160ms ease!important;
+  }
+  .discord-drawer-backdrop.open{opacity:1!important;pointer-events:auto!important}
+  .discord-channel-group{display:block!important;padding:8px!important}
+  .discord-channel{width:100%!important;text-align:left!important;margin:2px 0!important}
+  .discord-members-title{display:none!important}
+}
+
+/* v0.2.7 meld correction: restore the three opponents' exposed sets to the table edges.
+   Earlier responsive overrides pulled them toward the center and over the concealed hands. */
+.mj-meld-zone.top{left:14px!important;right:auto!important;top:14px!important;bottom:auto!important;transform:rotate(180deg)!important;transform-origin:center!important;width:auto!important;max-width:430px!important;justify-content:flex-start!important}
+.mj-meld-zone.left{left:13px!important;right:auto!important;top:auto!important;bottom:100px!important;transform:rotate(90deg)!important;transform-origin:left bottom!important;width:auto!important;max-width:430px!important;justify-content:flex-start!important}
+.mj-meld-zone.right{right:13px!important;left:auto!important;top:100px!important;bottom:auto!important;transform:rotate(-90deg)!important;transform-origin:right top!important;width:auto!important;max-width:430px!important;justify-content:flex-start!important}
+.mj-hidden-hand.top.has-melds{left:50%!important}
+.mj-hidden-hand.left.has-melds,.mj-hidden-hand.right.has-melds{top:50%!important}
+
+/* v0.2.7 small patch: chat editing, active speaker emphasis, square pixel font. */
+.chat-workspace-view.view-enter{animation:none!important}
+@media(max-width:760px){.msg-actions{position:static!important;opacity:1!important;pointer-events:auto!important;justify-content:flex-end;margin-top:3px}.msg-actions button{padding:3px 5px!important}.msg{padding-right:4px!important}}
+
+@media (max-width:760px){
+  #pkRaiseAmt,#pkBuyIn,.raise-box input,.poker-buyin input{font-size:16px!important;min-height:42px}
+  .poker-run-boards{grid-template-columns:1fr}.dice-action-panel{grid-template-columns:1fr 1fr}.die-face{width:42px;height:42px}
+}
+
+/* v0.2.9 mobile chat/music */
+@media(max-width:760px){.discord-center>.chat-form textarea{padding:8px;min-height:42px}.activity-dock{width:min(410px,calc(100vw - 12px))!important}.music-control-row{grid-template-columns:auto auto minmax(80px,1fr) auto;gap:5px}.music-volume-row{grid-template-columns:auto minmax(100px,1fr) 38px}.music-controls{padding:8px}.activity-head{min-height:36px}}
+@media(max-width:760px){.chip-game-card summary{grid-template-columns:1fr auto}.chip-game-card summary span{grid-column:1/-1}.chip-game-grid{grid-template-columns:1fr 1fr}.chip-user-row{grid-template-columns:auto auto minmax(0,1fr)}.chip-user-row input,.chip-user-row button{grid-column:2/4;width:100%!important}}
+
+/* v0.3.1 mobile music bottom sheet: always sits above navigation and can collapse */
+@media(max-width:760px){
+  .activity-dock{left:6px!important;right:6px!important;bottom:calc(70px + env(safe-area-inset-bottom))!important;width:auto!important;max-width:none!important;display:block!important;pointer-events:none!important;z-index:110!important}
+  .activity-dock.hidden{display:none!important}.activity-dock>.activity-card{pointer-events:auto!important;width:100%!important;min-width:0!important;max-width:none!important;margin:0!important;border-radius:15px 15px 10px 10px!important;box-shadow:0 -8px 26px #0008!important;overflow:hidden!important}
+  .activity-dock>.activity-card+.activity-card{margin-top:6px!important}.music-activity .activity-head{height:38px!important;min-height:38px!important;padding:5px 8px!important;cursor:default!important}.activity-drag-label{display:none!important}.music-drawer-toggle{display:inline-flex!important;padding:4px 8px!important;font-size:9px!important;box-shadow:none!important;white-space:nowrap!important}.music-activity.drawer-collapsed .activity-body{max-height:90px!important;overflow:hidden!important;padding:7px 8px!important}.music-activity.drawer-collapsed .music-now-mini{grid-template-columns:32px minmax(0,1fr)!important}.music-activity.drawer-collapsed .music-cover-mini,.music-activity.drawer-collapsed .music-cover-placeholder{width:32px!important;height:32px!important}.music-activity.drawer-collapsed .music-control-row{grid-template-columns:30px 31px minmax(70px,1fr) 31px!important}.music-activity.drawer-collapsed .music-volume-row,.music-activity.drawer-collapsed .music-error,.music-activity.drawer-collapsed .activity-actions{display:none!important}.music-activity.drawer-expanded{max-height:min(58dvh,520px)!important}.music-activity.drawer-expanded .activity-body{max-height:calc(min(58dvh,520px) - 38px)!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;padding-bottom:12px!important}.music-activity .music-controls{margin:2px 0!important}.music-activity .music-control-row{grid-template-columns:32px 34px minmax(70px,1fr) 34px!important}.music-activity .music-volume-row{grid-template-columns:18px 50px minmax(70px,1fr) 35px!important}.music-activity .activity-actions{display:flex!important;overflow-x:auto!important;flex-wrap:nowrap!important}.music-activity .activity-actions button{flex:0 0 auto!important}.music-sheet-expanded .room-browser,.music-sheet-expanded .page,.music-sheet-expanded .room-main,.music-sheet-expanded .chat-log-main{scroll-padding-bottom:46dvh!important}
+  .notify-stack{bottom:calc(76px + env(safe-area-inset-bottom))!important;z-index:118!important}
+  .diag-user-picker{grid-template-columns:1fr!important}.diag-section-scroll{max-height:42dvh!important}
+}
+@media(max-width:760px) and (orientation:landscape){
+  .activity-dock{bottom:calc(70px + env(safe-area-inset-bottom))!important}.music-activity.drawer-expanded{max-height:min(68dvh,420px)!important}.music-activity.drawer-expanded .activity-body{max-height:calc(min(68dvh,420px) - 38px)!important}
+}
+
+/* v0.3.1 final mobile music sheet spacing */
+@media(max-width:760px){
+  .activity-dock{left:6px!important;right:6px!important;bottom:calc(68px + env(safe-area-inset-bottom))!important;width:auto!important;max-width:none!important;z-index:112!important;pointer-events:none!important}
+  .activity-dock>.music-activity{pointer-events:auto!important;border-radius:16px 16px 9px 9px!important;border:1px solid #3b5265!important;box-shadow:0 -10px 34px #000a!important;background:#0e1720f7!important;backdrop-filter:blur(14px)!important}
+  .music-activity .activity-head{height:34px!important;min-height:34px!important;padding:4px 8px!important;background:#13212d!important;border-bottom:1px solid #2d4254!important}
+  .music-activity .activity-head>b{font-size:10px!important}.music-drawer-toggle{margin-left:auto!important;border:1px solid #3c5265!important;border-radius:7px!important;background:#172735!important;padding:4px 7px!important}
+  .music-activity.drawer-collapsed .activity-body{max-height:78px!important;min-height:78px!important;padding:6px 8px!important;grid-template-columns:34px minmax(0,1fr)!important;grid-template-rows:30px 34px!important;gap:4px 7px!important;overflow:hidden!important}
+  .music-activity.drawer-collapsed .music-now-mini{grid-column:1/-1!important;grid-row:1!important;grid-template-columns:28px minmax(0,1fr)!important;gap:7px!important}.music-activity.drawer-collapsed .music-cover-mini,.music-activity.drawer-collapsed .music-cover-placeholder{width:28px!important;height:28px!important}.music-activity.drawer-collapsed .music-now-mini [data-music-title]{font-size:9px!important}
+  .music-activity.drawer-collapsed .music-controls{grid-column:1/-1!important;grid-row:2!important;margin:0!important;padding:2px 0!important;border:0!important;background:transparent!important;box-shadow:none!important}.music-activity.drawer-collapsed .music-control-row{grid-template-columns:30px 32px minmax(64px,1fr) 32px!important;gap:4px!important}.music-activity.drawer-collapsed .music-play-button{width:30px!important;height:28px!important;min-width:30px!important}.music-activity.drawer-collapsed .music-volume-row,.music-activity.drawer-collapsed .music-error,.music-activity.drawer-collapsed .activity-actions,[data-music-player]{display:none!important}
+  .music-activity.drawer-expanded{max-height:min(60dvh,540px)!important}.music-activity.drawer-expanded .activity-body{max-height:calc(min(60dvh,540px) - 34px)!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;padding:8px 9px 12px!important}.music-activity.drawer-expanded [data-music-player]{display:block!important}.music-activity.drawer-expanded .music-control-row{grid-template-columns:32px 34px minmax(72px,1fr) 34px!important}.music-activity.drawer-expanded .music-volume-row{grid-template-columns:40px minmax(80px,1fr) 38px!important}.music-activity.drawer-expanded .music-controls{margin:2px 0!important}.music-activity.drawer-expanded .activity-actions{display:flex!important;overflow-x:auto!important;flex-wrap:nowrap!important}.music-activity.drawer-expanded .activity-actions button{flex:0 0 auto!important}
+  body.music-sheet-present .room-browser,body.music-sheet-present .page,body.music-sheet-present .room-main,body.music-sheet-present .chat-log-main{padding-bottom:calc(var(--music-sheet-space,116px) + 14px)!important;scroll-padding-bottom:calc(var(--music-sheet-space,116px) + 14px)!important}
+  body.music-sheet-present .friend-chat-log{padding-bottom:calc(var(--music-sheet-space,116px) + 10px)!important;scroll-padding-bottom:calc(var(--music-sheet-space,116px) + 10px)!important}
+  .msg-edit-input{min-height:62px!important;font-size:16px!important}
+}
+@media(max-width:760px) and (orientation:landscape){.activity-dock{bottom:calc(56px + env(safe-area-inset-bottom))!important}.music-activity.drawer-expanded{max-height:min(72dvh,430px)!important}.music-activity.drawer-expanded .activity-body{max-height:calc(min(72dvh,430px) - 34px)!important}}
+
+/* v0.3.4 final Riichi geometry: wider table, larger readable tiles, exposed melds stay inside edges. */
+.mahjong-area{--mj-tile-w:44px!important;--mj-tile-h:61px!important;--mj-river-w:31px!important;--mj-river-h:44px!important}
+.mahjong-table-v2{width:980px!important;height:680px!important;min-width:980px!important;min-height:680px!important;transform-origin:top center!important}
+.mj-own-hand-zone{width:800px!important;bottom:12px!important}.mj-hand-v2{min-height:67px!important}.mj-own.drawn{margin-left:14px!important}
+.mj-river-zone{width:198px!important;height:138px!important}.mj-river-zone.top{top:29%!important}.mj-river-zone.bottom{top:56%!important}.mj-river-zone.left{left:31%!important;top:43%!important}.mj-river-zone.right{left:69%!important;top:43%!important}
+.mj-meld-zone.top{left:22px!important;right:auto!important;top:18px!important;bottom:auto!important;max-width:360px!important}.mj-meld-zone.bottom{right:22px!important;bottom:18px!important;max-width:360px!important}
+.mj-meld-zone.left{left:118px!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%) rotate(90deg)!important;transform-origin:left center!important;width:auto!important;max-width:300px!important;justify-content:flex-start!important}
+.mj-meld-zone.right{right:118px!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%) rotate(-90deg)!important;transform-origin:right center!important;width:auto!important;max-width:300px!important;justify-content:flex-start!important}
+.mj-meld .mj-tile{width:31px!important;height:44px!important}.mj-meld .mj-tile.called{margin:0 6px!important}
+.mj-result{display:grid;gap:9px!important}.mj-result-reveal{padding:9px;border:1px solid #8ea99d66;background:#0d1815aa}.mj-result-player{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}.mj-result-player small{color:#9fb0a8}.mj-result-hand{display:flex;align-items:flex-end;flex-wrap:wrap;gap:2px;min-height:64px}.mj-result-hand .mj-tile{width:41px!important;height:58px!important}.mj-result-win-extra{display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding-left:8px;border-left:1px solid #bca75b}.mj-result-win-extra small{writing-mode:vertical-rl;color:#e7ce78}.mj-result-melds{display:flex;align-items:center;gap:7px;margin-top:6px}.mj-result-melds>.mj-meld-zone{position:static!important;transform:none!important;max-width:none!important;width:auto!important}.mj-result-waits{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:7px;padding-top:6px;border-top:1px dashed #58766a}.mj-result-waits .mj-tile{width:33px!important;height:46px!important}.mj-tile.result-win{box-shadow:0 0 0 3px #efd263,0 0 14px #efd26388!important}
+@media(max-width:860px){.mj-table-scroll{justify-content:flex-start!important;overflow:auto!important}.mahjong-table-v2{transform-origin:top left!important}.ready-reminder{align-items:stretch;flex-direction:column}.ready-reminder button{width:100%}}
+@media(max-width:760px){.music-drawer-toggle{min-width:78px!important;min-height:34px!important;padding:6px 10px!important;touch-action:manipulation!important}.music-activity .activity-head{cursor:pointer!important;user-select:none!important}.music-activity.drawer-expanded{max-height:min(62dvh,560px)!important}.music-activity.drawer-expanded .activity-body{max-height:calc(min(62dvh,560px) - 40px)!important}.music-activity.drawer-expanded .music-volume-row{grid-template-columns:28px minmax(110px,1fr) 36px!important}.music-sheet-expanded .room-browser,.music-sheet-expanded .page,.music-sheet-expanded .room-main,.music-sheet-expanded .chat-log-main{padding-bottom:calc(var(--music-sheet-space,180px) + 26px)!important;scroll-padding-bottom:calc(var(--music-sheet-space,180px) + 26px)!important}}
+
+/* v0.3.4 final adaptive Riichi viewport. This block intentionally wins over older breakpoint experiments. */
+.mj-table-scroll{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  justify-content:center!important;
+  align-items:flex-start!important;
+  touch-action:pan-y!important;
+  overscroll-behavior:contain!important;
+}
+.mahjong-table-v2{
+  width:980px!important;
+  min-width:980px!important;
+  height:680px!important;
+  min-height:680px!important;
+  margin:0!important;
+  transform-origin:top center!important;
+  flex:0 0 auto!important;
+}
+@media(max-width:760px){
+  .mahjong-area{
+    min-height:0!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  .mahjong-area>.mj-table-scroll{
+    max-height:none!important;
+    overflow:hidden!important;
+    justify-content:center!important;
+    padding:2px 0!important;
+  }
+  .mahjong-table-v2{transform-origin:top center!important}
+  .mj-command-zone{position:relative!important;z-index:65!important;margin-top:6px!important}
+  .mj-actions,.mj-reactions{position:relative!important;bottom:auto!important;overflow-x:auto!important;overflow-y:hidden!important;flex-wrap:nowrap!important}
+  .mj-actions button,.mj-reactions button{flex:0 0 auto!important}
+}
+@media(max-width:760px) and (orientation:portrait){
+  .mahjong-table-v2{width:760px!important;min-width:760px!important;height:680px!important;min-height:680px!important}
+  .mj-own-hand-zone{width:690px!important;bottom:12px!important}
+  .mj-river-zone{width:184px!important;height:128px!important}
+  .mj-river-zone.top{left:50%!important;top:29%!important}
+  .mj-river-zone.bottom{left:50%!important;top:56%!important}
+  .mj-river-zone.left{left:34%!important;top:43%!important}
+  .mj-river-zone.right{left:66%!important;top:43%!important}
+  .mj-meld-zone.top{left:18px!important;right:auto!important;top:18px!important;max-width:310px!important}
+  .mj-meld-zone.bottom{left:auto!important;right:18px!important;bottom:18px!important;max-width:310px!important}
+  .mj-meld-zone.left{left:90px!important;right:auto!important;top:50%!important;bottom:auto!important;max-width:260px!important;transform:translateY(-50%) rotate(90deg)!important;transform-origin:left center!important}
+  .mj-meld-zone.right{right:90px!important;left:auto!important;top:50%!important;bottom:auto!important;max-width:260px!important;transform:translateY(-50%) rotate(-90deg)!important;transform-origin:right center!important}
+  .mj-hidden-hand.left{left:54px!important}.mj-hidden-hand.right{right:54px!important}
+  .mj-seat-badge.left{left:8px!important}.mj-seat-badge.right{right:8px!important}
+}
+@media(max-width:760px) and (orientation:landscape){
+  .mahjong-table-v2{width:980px!important;min-width:980px!important;height:680px!important;min-height:680px!important}
+  .mahjong-area>.mj-table-scroll{max-height:none!important}
+}
+
+/* v0.3.4 mahjong adaptive follow-up: keep melds inside frame, allow result area to scroll into view, and improve result readability on narrow screens. */
+.room-main.mahjong-room-main{overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:auto!important;-webkit-overflow-scrolling:touch;padding-bottom:22px!important;scroll-padding-bottom:72px}
+.room-main.mahjong-room-main .cards-area.mahjong-area{overflow:visible!important;align-content:start}
+.room-main.mahjong-room-main .mj-table-scroll{overflow:visible!important;max-height:none!important}
+.room-main.mahjong-room-main .mj-result{max-width:min(100%,960px)!important;margin:14px auto 6px!important;display:grid!important;gap:8px!important;text-align:left!important;overflow:visible!important}
+.room-main.mahjong-room-main .mj-result p{margin:0!important;line-height:1.6}
+.room-main.mahjong-room-main .mj-result-reveal{display:grid;gap:6px;padding:8px 0;border-top:1px dashed #41586c}
+.room-main.mahjong-room-main .mj-result-reveal:first-of-type{border-top:0}
+.room-main.mahjong-room-main .mj-result-player{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.room-main.mahjong-room-main .mj-result-hand{display:flex;flex-wrap:wrap;gap:2px;align-items:flex-end}
+.room-main.mahjong-room-main .mj-result-melds{display:grid;gap:4px}
+.room-main.mahjong-room-main .mj-result-waits{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.room-main.mahjong-room-main .mj-meld-zone.left{left:60px!important;max-width:280px}
+.room-main.mahjong-room-main .mj-meld-zone.right{right:60px!important;max-width:280px}
+.room-main.mahjong-room-main .mj-seat-badge.left{left:10px!important}
+.room-main.mahjong-room-main .mj-seat-badge.right{right:10px!important}
+.room-main.mahjong-room-main .mj-table-scroll[data-mj-layout="phone-portrait"] .mahjong-table-v2{margin-left:-12px!important}
+@media(max-width:860px){
+  .room-main.mahjong-room-main .mj-meld-zone.left{left:54px!important;bottom:124px!important;max-width:235px}
+  .room-main.mahjong-room-main .mj-meld-zone.right{right:54px!important;top:124px!important;max-width:235px}
+  .room-main.mahjong-room-main .mj-seat-badge.top{top:9px!important}
+  .room-main.mahjong-room-main .mj-seat-badge.bottom{bottom:88px!important}
+}
+@media(max-width:560px){
+  .room-main.mahjong-room-main .mj-result{padding:10px!important}
+  .room-main.mahjong-room-main .mj-result-player b{font-size:12px}
+  .room-main.mahjong-room-main .mj-meld-zone.left{left:50px!important;bottom:132px!important;max-width:210px}
+  .room-main.mahjong-room-main .mj-meld-zone.right{right:50px!important;top:132px!important;max-width:210px}
+}
+
+/* v0.3.4 profile card / shop / pet / achievements */
+.user-card-layer{position:fixed;inset:0;z-index:130;display:grid;place-items:center;padding:18px;background:#05080bb8;backdrop-filter:blur(5px)}.user-card-layer.hidden{display:none!important}.user-card-modal{position:relative;width:min(420px,94vw);overflow:hidden;border:2px solid #455d75;border-radius:16px;background:#101923;box-shadow:0 22px 70px #000a}.user-card-close{position:absolute;z-index:2;right:10px;top:10px;width:30px;height:30px;padding:0;border-radius:50%;background:#111a24}.user-card-banner{height:92px;background:linear-gradient(135deg,#1f5e63,#25395d 60%,#553b69)}.user-card-avatar{position:absolute;left:22px;top:50px;width:98px;height:82px;display:grid;place-items:center;border:5px solid #101923;border-radius:18px;background:#13212b}.user-card-info{padding:42px 22px 20px}.user-card-info h2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 5px}.user-title{display:inline-flex;padding:2px 7px;border:1px solid #8da8c2;border-radius:999px;font-size:9px;color:#dce9f5;background:#1a2a38}.user-card-stats{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.user-card-stats span{padding:5px 8px;border:1px solid #3c5369;border-radius:8px;background:#14202b;font-size:10px}.slime[data-user-id]{cursor:pointer}.slime[data-user-id]:hover{filter:brightness(1.08) drop-shadow(0 0 7px #ffffff2a)}
+.shop-hero{display:flex;justify-content:space-between;align-items:center;gap:14px}.shop-wallet{min-width:120px;padding:10px 14px;border:2px solid #5a6d7e;border-radius:12px;background:#111b26;display:grid;text-align:right}.shop-wallet b{font-size:22px;color:#f1ce68}.shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.shop-item{display:grid;grid-template-rows:1fr auto auto;gap:7px;padding:12px;border:2px solid #384e64;border-radius:12px;background:#111a24}.shop-item small{display:block;color:var(--muted);line-height:1.45;margin-top:4px}.shop-price{color:#f1ce68;font-weight:800}.pet-layout{display:grid;gap:12px}.pet-main{display:grid;grid-template-columns:minmax(180px,320px) minmax(0,1fr);gap:18px;align-items:center}.pet-stage{min-height:220px;display:grid;place-items:center;border:2px solid #3c5368;border-radius:18px;background:radial-gradient(circle at 50% 40%,#253b50,#101923 65%)}.pet-slime-wrap{position:relative;display:grid;place-items:center}.slime.pet-big{width:180px;height:145px}.pet-accessory-layer{position:absolute;left:50%;top:100%;transform:translate(-50%,-12px);display:flex;justify-content:center;gap:4px;width:max-content;max-width:210px;flex-wrap:wrap}.pet-equipped-tag{font-size:9px;padding:2px 5px;border-radius:999px;background:#1c2b38;border:1px solid #526a80;color:#cbd8e3}.pet-summary h2{margin:0 0 3px}.pet-stat,.level-line{display:grid;grid-template-columns:52px minmax(100px,1fr) auto;align-items:center;gap:8px;margin:9px 0}.prog-track{height:11px;border:1px solid #41586c;border-radius:999px;background:#0b1118;overflow:hidden}.prog-track i{display:block;height:100%;background:linear-gradient(90deg,#6fd48a,#9be4ac)}.prog-track.hunger i{background:linear-gradient(90deg,#e7b85c,#f0d17b)}.prog-track.mood i{background:linear-gradient(90deg,#df79ab,#edabd0)}.achievement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}.achievement{display:grid;gap:4px;padding:10px;border:1px solid #394f64;border-radius:10px;background:#111a24}.achievement.done{border-color:#5d9d6a;background:#13251a}.achievement small{color:var(--muted)}.achievement span{font-size:9px;color:#95a9ba}.pet-food-list,.pet-accessory-list{display:flex;flex-wrap:wrap;gap:7px}
+@media(max-width:700px){.pet-main{grid-template-columns:1fr}.pet-stage{min-height:180px}.slime.pet-big{width:145px;height:118px}.shop-hero{align-items:stretch}.shop-wallet{min-width:95px}.user-card-modal{width:min(390px,96vw)}}
+
+/* v0.3.4 final Riichi square table / relative-seat rails. Own hand is always bottom; opponents rotate around viewer. */
+.room-main.mahjong-room-main .mahjong-table-v2{width:820px!important;min-width:820px!important;height:820px!important;min-height:820px!important;border-radius:20px!important;overflow:hidden!important}
+.room-main.mahjong-room-main .mahjong-area{--mj-tile-w:40px;--mj-tile-h:56px;--mj-river-w:29px;--mj-river-h:40px;overflow:visible!important}
+.room-main.mahjong-room-main .mj-table-scroll{display:flex!important;justify-content:center!important;overflow:visible!important;max-height:none!important;padding:4px!important}
+.room-main.mahjong-room-main .mj-seat-badge.top{top:12px!important}.room-main.mahjong-room-main .mj-seat-badge.bottom{bottom:88px!important}.room-main.mahjong-room-main .mj-seat-badge.left{left:10px!important}.room-main.mahjong-room-main .mj-seat-badge.right{right:10px!important}
+.room-main.mahjong-room-main .mj-edge-rail{position:absolute;z-index:6;display:flex;align-items:flex-end;gap:6px;max-width:690px;transform-origin:center}.room-main.mahjong-room-main .mj-edge-concealed,.room-main.mahjong-room-main .mj-edge-melds{display:flex;align-items:flex-end;gap:1px;white-space:nowrap}.room-main.mahjong-room-main .mj-edge-concealed .mj-back{display:block;width:31px;height:45px;border-radius:3px;flex:0 0 auto}.room-main.mahjong-room-main .mj-edge-concealed .mj-tile{width:31px!important;height:45px!important}.room-main.mahjong-room-main .mj-edge-concealed .mj-tile img{width:100%;height:100%}.room-main.mahjong-room-main .mj-edge-rail.top{top:62px;left:50%;transform:translateX(-50%) rotate(180deg)}.room-main.mahjong-room-main .mj-edge-rail.left{left:54px;top:50%;transform:translate(-50%,-50%) rotate(90deg)}.room-main.mahjong-room-main .mj-edge-rail.right{right:54px;top:50%;transform:translate(50%,-50%) rotate(-90deg)}.room-main.mahjong-room-main .mj-edge-waits{position:absolute;left:50%;top:-19px;transform:translateX(-50%) rotate(0deg);padding:2px 6px;border-radius:8px;background:#10231ddd;border:1px solid #d9c16f;color:#f2dfa2;font-size:9px;white-space:nowrap}.room-main.mahjong-room-main .mj-edge-rail.top .mj-edge-waits{transform:translateX(-50%) rotate(180deg)}
+.room-main.mahjong-room-main .mj-meld{flex:0 0 auto}.room-main.mahjong-room-main .mj-edge-melds .mj-meld .mj-tile,.room-main.mahjong-room-main .mj-own-melds .mj-meld .mj-tile{width:28px!important;height:40px!important}.room-main.mahjong-room-main .mj-edge-melds .mj-tile.called,.room-main.mahjong-room-main .mj-own-melds .mj-tile.called{margin:0 5px!important}
+.room-main.mahjong-room-main .mj-own-hand-zone{left:50%!important;bottom:12px!important;width:740px!important}.room-main.mahjong-room-main .mj-own-rail{display:flex;align-items:flex-end;justify-content:center;gap:8px;max-width:740px}.room-main.mahjong-room-main .mj-own-melds{display:flex;align-items:flex-end;gap:2px;flex:0 0 auto}.room-main.mahjong-room-main .mj-hand-v2{flex:0 1 auto;min-width:0}
+.room-main.mahjong-room-main .mj-center-v2{top:50%!important;width:146px!important;height:132px!important}.room-main.mahjong-room-main .mj-river-zone.bottom{left:50%!important;top:59%!important}.room-main.mahjong-room-main .mj-river-zone.top{left:50%!important;top:31%!important}.room-main.mahjong-room-main .mj-river-zone.left{left:31%!important;top:47%!important}.room-main.mahjong-room-main .mj-river-zone.right{left:69%!important;top:47%!important}
+.room-main.mahjong-room-main .mj-result{max-width:min(100%,820px)!important;margin:12px auto!important}.room-main.mahjong-room-main .mj-result-line{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:5px 0;border-top:1px dashed #40566a}.room-main.mahjong-room-main .mj-result-line span{color:var(--muted)}
+@media(max-width:860px){.room-main.mahjong-room-main{padding-left:4px!important;padding-right:4px!important}.room-main.mahjong-room-main .mj-table-scroll{margin:0!important}.room-main.mahjong-room-main .mj-result{font-size:11px!important}.room-main.mahjong-room-main .mj-command-zone{padding-bottom:10px}}
+/* v0.3.4 pet equipment visual slots */
+.pet-accessory-visual{position:absolute;inset:0;pointer-events:none;z-index:3}.pet-acc{position:absolute;display:block;image-rendering:pixelated}.pet-acc-acc_bow{left:50%;top:4%;width:38px;height:22px;transform:translateX(-50%);background:linear-gradient(135deg,#ff8eaa 0 42%,transparent 43%),linear-gradient(225deg,#ff8eaa 0 42%,transparent 43%)}.pet-acc-acc_bow:after{content:"";position:absolute;left:14px;top:7px;width:10px;height:10px;background:#ffd1dc;box-shadow:0 0 0 2px #633849}.pet-acc-acc_leaf{left:57%;top:0;width:24px;height:30px;background:#80d66e;clip-path:polygon(0 70%,45% 0,100% 18%,74% 82%,38% 100%);box-shadow:3px 3px 0 #315c37}.pet-acc-acc_star{left:58%;top:8%;width:26px;height:26px;background:#f6d45b;clip-path:polygon(50% 0,61% 36%,100% 36%,68% 58%,80% 100%,50% 73%,20% 100%,32% 58%,0 36%,39% 36%);filter:drop-shadow(2px 2px #5d4b1c)}.pet-acc-acc_glasses{left:50%;top:42%;width:80px;height:28px;transform:translateX(-50%);border-top:5px solid #26334b}.pet-acc-acc_glasses:before,.pet-acc-acc_glasses:after{content:"";position:absolute;top:0;width:27px;height:22px;border:5px solid #26334b;border-radius:50%}.pet-acc-acc_glasses:before{left:2px}.pet-acc-acc_glasses:after{right:2px}.pet-acc-acc_scarf{left:50%;bottom:12%;width:88px;height:18px;transform:translateX(-50%);background:#d7657c;border:3px solid #5c3040;box-shadow:0 4px 0 #8d3e52}.pet-equipped-list{min-height:22px;display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:8px}.pet-equipped-tag{padding:2px 6px;border:1px solid #455c70;border-radius:8px;background:#14212b;font-size:9px}
+.msg-title{vertical-align:middle;margin-left:1px}
+.title-admin-row input[data-title-input]{min-width:160px;padding:7px}

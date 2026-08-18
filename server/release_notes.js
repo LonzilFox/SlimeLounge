@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+export function syncReleaseNotes({data,root,crypto}){
+  data.releaseNotesPublished=Array.isArray(data.releaseNotesPublished)?data.releaseNotesPublished:[];
+  const dir=path.join(root,'release_notes');if(!fs.existsSync(dir))return {added:0};
+  const published=new Set(data.releaseNotesPublished),arr=data.roomMessages['chat-changelog']||(data.roomMessages['chat-changelog']=[]);let added=0;
+  for(const file of fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort()){
+    let note;try{note=JSON.parse(fs.readFileSync(path.join(dir,file),'utf8'))}catch{continue}
+    const id=String(note.id||path.basename(file,'.json'));if(!id||published.has(id))continue;
+    const owner=data.users[data.ownerUserId]||Object.values(data.users).find(x=>x.role==='admin')||null;
+    const title=String(note.title||id),items=Array.isArray(note.items)?note.items.map(x=>String(x).trim()).filter(Boolean):[];
+    const text=[title,...items.map(x=>`• ${x}`)].join('\n').slice(0,3000);
+    arr.push({id:crypto.randomUUID(),userId:owner?.userId||'SYSTEM:release',name:owner?.name||'SlimeLounge',slimeColor:owner?.slimeColor||'mint',role:owner?.role||'admin',text,at:Date.now(),editedAt:0,systemReleaseId:id});
+    while(arr.length>100)arr.shift();published.add(id);data.releaseNotesPublished.push(id);added++;
+  }
+  return {added};
+}

@@ -1,0 +1,15 @@
+{
+  "name": "slimelounge",
+  "version": "0.3.4",
+  "private": true,
+  "type": "module",
+  "description": "Pixel slime chat, music and multiplayer game rooms",
+  "scripts": {
+    "dev": "node local_server.js",
+    "check": "node tools/02_validation/02_run_all_checks.mjs",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.120.1"
+  }
+}

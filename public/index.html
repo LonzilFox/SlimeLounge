@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=yes">
+<meta name="theme-color" content="#0b0f14">
+<link rel="icon" href="/favicon.ico?v=0.3.4" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=0.3.4">
+<link rel="apple-touch-icon" href="/icon-192.png?v=0.3.4">
+<title>SlimeLounge</title>
+<link rel="preconnect" href="https://fontsapi.zeoseven.com" crossorigin>
+<link rel="stylesheet" href="/styles.css?v=0.3.4&build=034">
+<link rel="stylesheet" href="/styles-games.css?v=0.3.4&build=034">
+<link rel="stylesheet" href="/styles-responsive.css?v=0.3.4&build=034">
+</head>
+<body>
+<div id="boot" class="boot">
+  <div class="boot-card">
+    <div class="boot-logo">SLIMELOUNGE <small>v0.3.4</small></div>
+    <div id="bootStatus" class="boot-status">正在载入界面...</div>
+    <div class="boot-track" role="progressbar" aria-label="加载进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="5"><span id="bootBar" style="width:5%"></span></div>
+    <div id="bootPercent" class="boot-percent">5%</div>
+    <button id="bootRetry" class="boot-retry hidden" type="button">重新加载</button>
+    <div id="bootError" class="boot-error hidden"></div>
+  </div>
+</div>
+<div id="authScreen" class="auth-screen hidden">
+  <div class="panel auth-card">
+    <div class="auth-brand"><span id="authSlime" class="slime mint xl"></span><div><div class="logo-text">SLIMELOUNGE</div><div class="muted">聊天室 · 听歌室 · 游戏室</div></div></div>
+    <div class="auth-existing-notice"><b>以前注册过？不要重新注册。</b><span>优先恢复原设备身份，账号、好友、筹码和排行榜都会保留。</span></div>
+    <details class="owner-recovery-box auth-recovery-first"><summary>已有 SlimeLounge 账号 · 恢复 / 绑定这台设备</summary><p class="muted">有其他已登录设备时，在「我的 → 多设备登录」生成绑定码；如果所有设备都掉登录，让 Owner 在「管理 → 用户与设备 → 旧设备 → 生成恢复码」。Owner 生成的设备恢复码会沿用原 Device ID，不会再新增一台设备。</p><label>设备绑定 / 恢复码<input id="deviceLinkCode" maxlength="96" autocomplete="one-time-code" placeholder="例如 ABCD-EFGH-JKLM-NPQR"></label><label>设备备注<input id="deviceLinkDevice" maxlength="32" placeholder="自动识别系统 · 浏览器，也可自己改"></label><button id="deviceLinkRedeemBtn" type="button" class="full primary">恢复原账号</button><div id="deviceLinkError" class="error"></div></details>
+    <form id="registerForm">
+      <h3 class="auth-new-title">第一次使用 · 注册新账号</h3>
+      <label>昵称<input id="regName" maxlength="16" required placeholder="你的显示昵称"></label>
+      <label>华为工号 <span class="hint">仅私密校验，不对外展示</span><input id="regEmployee" maxlength="9" minlength="6" pattern="[A-Za-z0-9]{6,9}" required placeholder="6~9 位英文字母或数字"></label><div class="notice auth-old-user-hint"><b>旧用户重新注册提示</b><br><small>如果你以前使用的是 <code>00XXXXXX</code> 形式的 8 位工号，请去掉开头的 <code>00</code>，使用后 6 位重新注册；不要额外输入空格、横杠或下划线。</small></div>
+      <label>史莱姆颜色<div id="colorPicker" class="color-picker"></div></label>
+      <label>设备备注<input id="regDevice" maxlength="32" placeholder="自动识别系统 · 浏览器，也可自己改"></label>
+      <button class="primary full" type="submit">创建固定设备身份</button>
+      <div id="authError" class="error"></div><button id="localIdentityBtn" type="button" class="full hidden">本机身份管理 / 恢复旧身份</button><div id="localIdentityPanel" class="local-admin-panel hidden"></div>
+      <details class="owner-recovery-box"><summary>Owner 换电脑 / 重装系统恢复</summary><p class="muted">先在腾讯云服务器执行 <code>bash tools/01_runtime/02_owner_recovery.sh</code> 生成 10 分钟一次性恢复码。仅知道工号无法恢复 Owner。</p><label>Owner 工号<input id="ownerRecoverEmployee" maxlength="9" placeholder="6~9 位英文字母或数字"></label><label>一次性恢复码<input id="ownerRecoverCode" maxlength="64" autocomplete="one-time-code" placeholder="服务器生成的恢复码"></label><label>新设备备注<input id="ownerRecoverDevice" maxlength="32" placeholder="例如：Windows · Edge"></label><button id="ownerRecoverBtn" type="button" class="full">恢复原 Owner 到这台设备</button><div id="ownerRecoverError" class="error"></div></details>
+    </form>
+  </div>
+</div>
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand"><span id="selfSlime" class="slime mint"></span><div><b>SlimeLounge</b><small id="selfName"></small></div></div>
+    <nav>
+      <button data-section="chat" class="nav active"><span class="nav-icon">▣</span><span class="nav-label">聊天室</span></button>
+      <button data-section="music" class="nav"><span class="nav-icon">♪</span><span class="nav-label">听歌室</span></button>
+      <button data-section="games" class="nav"><span class="nav-icon">▦</span><span class="nav-label">游戏室</span></button>
+      <button data-section="rankings" class="nav"><span class="nav-icon">▲</span><span class="nav-label">排行榜</span></button>
+      <button data-section="shop" class="nav"><span class="nav-icon">◆</span><span class="nav-label">商城</span></button>
+      <button data-section="pet" class="nav"><span class="nav-icon">●</span><span class="nav-label">宠物</span></button>
+      <button data-section="friends" class="nav nav-friends"><span class="nav-icon">☻</span><span class="nav-label">好友</span><span id="friendUnreadBadge" class="nav-unread-badge hidden">0</span></button>
+      <button data-section="me" class="nav"><span class="nav-icon">⚙</span><span class="nav-label">我的</span></button>
+      <button id="adminNav" data-section="admin" class="nav hidden"><span class="nav-icon">◆</span><span class="nav-label">管理</span></button>
+    </nav>
+    <div class="sidebar-bottom"><span id="connDot">●</span><span id="connText">未连接</span><small>v0.3.4</small></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="title-wrap"><h1 id="sectionTitle">聊天室</h1><p id="sectionSub">选择讨论区进入</p></div><div class="top-actions"><button id="refreshRooms">刷新</button></div></header>
+    <div id="roomBrowser" class="room-browser"></div>
+    <section id="roomView" class="room-view hidden">
+      <div class="room-head"><button id="leaveRoom">← 返回</button><div class="minw0"><h2 id="roomTitle"></h2><small id="roomMeta"></small></div><button id="voiceToggle" class="voice-toggle hidden" type="button" aria-pressed="false" title="V 键开关麦克风">🎙 开麦</button><button id="roomToolsToggle" class="room-tools-toggle" type="button" aria-expanded="false">☰ 在线 / 聊天</button></div>
+      <div id="roomBody" class="room-body"></div>
+    </section>
+    <section id="rankingsView" class="page hidden"></section>
+    <section id="shopView" class="page hidden"></section>
+    <section id="petView" class="page hidden"></section>
+    <section id="friendsView" class="page hidden"></section>
+    <section id="meView" class="page hidden"></section>
+    <section id="adminView" class="page hidden"></section>
+  </main>
+</div>
+<div id="activityDock" class="activity-dock"></div>
+<div id="notifyStack" class="notify-stack"></div>
+<div id="toast" class="toast"></div>
+<script defer src="/startup-ui.js?v=0.3.4&build=034"></script>
+<script defer src="/app.js?v=0.3.4&build=034"></script>
+<script defer src="/chat-ui.js?v=0.3.4&build=034"></script>
+<script defer src="/progression-ui.js?v=0.3.4&build=034"></script>
+</body>
+</html>
