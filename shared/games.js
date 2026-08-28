@@ -37,7 +37,8 @@ export const BOT_PREFIX='BOT:';
 export const isBotId=v=>typeof v==='string'&&v.startsWith(BOT_PREFIX);
 const botId=(kind)=>`${BOT_PREFIX}${kind}:${uid()}`;
 
-function shuffle(deck, rnd=Math.random){
+function secureRandom(){const c=globalThis.crypto;if(c?.getRandomValues){const a=new Uint32Array(1);c.getRandomValues(a);return a[0]/4294967296}return Math.random()}
+function shuffle(deck,rnd=secureRandom){
   for(let i=deck.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
   return deck;
 }
@@ -229,29 +230,52 @@ function chessAction(s,userId,a){
 }
 
 // ---------------- Blackjack ----------------
-function bjValue(cards){let total=0,aces=0;for(const c of cards){if(c.r==='A'){aces++;total+=11;}else total+=Math.min(10,cardValueRank(c.r));}while(total>21&&aces){total-=10;aces--;}return total;}
-export function createBlackjack(){return {kind:'blackjack',seats:Array(5).fill(null),phase:'waiting',dealer:[],deck:[],turnSeat:null,turnStartedAt:0,turnTimeoutMs:CARD_TURN_MS,finishedAt:0,defaultStack:2000,betMin:10,betMax:200,defaultBet:20,message:'等待 1~5 位玩家入座',handNo:1};}
+function bjInfo(cards){let hard=0,aces=0;for(const c of cards||[]){if(c.r==='A'){aces++;hard+=1}else hard+=Math.min(10,cardValueRank(c.r))}let total=hard,soft=false;if(aces&&hard+10<=21){total=hard+10;soft=true}return {total,soft}}
+function bjValue(cards){return bjInfo(cards).total}
+function bjShoe(decks=6){const out=[];for(let n=0;n<decks;n++)for(const c of stdDeck())out.push({...c,id:`${n}:${c.id}`});return shuffle(out)}
+function bjSplitRank(c){return ['10','J','Q','K'].includes(String(c?.r))?10:String(c?.r)}
+function bjPairKind(cards){return cards?.length===2&&cards[0].r===cards[1].r?'pair':''}
+function bjPairOdds(kind){return kind==='pair'?12:0}
+function bjHand(cards=[],bet=0,box=1,fromSplit=false){const info=bjInfo(cards);return {cards,bet,box,fromSplit,stood:false,busted:info.total>21,blackjack:!fromSplit&&cards.length===2&&info.total===21,surrendered:false,doubled:false,splitAces:false,result:'',payout:0}}
+export function createBlackjack(){return {kind:'blackjack',seats:Array(5).fill(null),phase:'waiting',dealer:[],deck:[],turnSeat:null,turnHand:0,turnStartedAt:0,turnTimeoutMs:CARD_TURN_MS,finishedAt:0,defaultStack:2000,betMin:10,betMax:200,defaultBet:20,pairBetMax:100,maxBoxes:3,maxHands:4,decks:6,message:'等待 1~5 位玩家入座',handNo:1};}
 function bjSeat(s,userId){return s.seats.findIndex(x=>x?.userId===userId)}
+function bjPlayer(userId,chips,bet,ready=false,isBot=false){return {userId,isBot,chips,bet,pairBet:0,boxes:1,boxBets:[bet,bet,bet],pairBets:[0,0,0],ready,hands:[],activeHand:0,result:null,sideResult:''}}
+function bjActiveHand(p){return p?.hands?.[p.activeHand||0]||null}
+function bjPlayableHand(h){return !!h&&!h.stood&&!h.busted&&!h.surrendered&&!h.blackjack}
+function bjFindNext(s,fromSeat=-1,fromHand=-1){for(let pass=0;pass<2;pass++){const a=pass?0:Math.max(0,fromSeat),z=pass?Math.max(0,fromSeat):s.seats.length;for(let i=a;i<z;i++){const p=s.seats[i];if(!p?.ready)continue;const h0=i===fromSeat?fromHand+1:0;for(let h=h0;h<(p.hands||[]).length;h++)if(bjPlayableHand(p.hands[h]))return [i,h]}}return [-1,-1]}
+function bjSetTurn(s,seat,hand){s.turnSeat=seat;s.turnHand=hand;if(seat>=0){s.seats[seat].activeHand=hand;s.turnStartedAt=Date.now()}else{s.turnStartedAt=0}}
+function bjAllInsuranceDone(s){return s.seats.filter(p=>p?.ready&&p.hands?.length).every(p=>p.insuranceResolved)}
+function bjStartPlayAfterPeek(s){const dealerNatural=s.dealer.length===2&&bjValue(s.dealer)===21;if(dealerNatural)return bjDealer(s,true);const [i,h]=bjFindNext(s,-1,-1);s.phase='playing';bjSetTurn(s,i,h);s.message='庄家无 Blackjack · 玩家行动';if(i<0)bjDealer(s,false)}
 function bjStart(s){
-  const occupied=s.seats.filter(Boolean);if(occupied.length<1)throw Error('至少需要 1 位玩家');if(occupied.some(x=>!x.isBot&&!isBotId(x.userId)&&!x.ready))throw Error('所有真人玩家都准备后才能开始');const active=occupied.filter(x=>x.ready&&x.chips>0);if(active.length<1)throw Error('至少需要 1 位可参与玩家');s.practice=active.some(x=>x.isBot||isBotId(x.userId));s.practiceSnapshot=s.practice?Object.fromEntries(s.seats.filter(x=>x&&!x.isBot&&!isBotId(x.userId)).map(x=>[x.userId,x.chips])):null;s.deck=shuffle(stdDeck());s.dealer=[s.deck.pop(),s.deck.pop()];
-  for(const seat of s.seats)if(seat){seat.hand=[];seat.result=null;seat.stood=false;seat.busted=false;if(seat.ready&&seat.chips>0){seat.bet=clamp(Number(seat.bet)||s.defaultBet||20,s.betMin||10,Math.min(s.betMax||200,seat.chips));seat.chips-=seat.bet;seat.hand=[s.deck.pop(),s.deck.pop()];seat.blackjack=bjValue(seat.hand)===21;seat.stood=seat.blackjack;}else{seat.hand=[];seat.blackjack=false;}}
-  s.phase='playing';s.turnSeat=s.seats.findIndex(x=>x?.ready&&x.hand.length&&!x.stood&&!x.busted);s.turnStartedAt=Date.now();s.finishedAt=0;s.message='本局开始';if(s.turnSeat<0)bjDealer(s);
+  const occupied=s.seats.filter(Boolean);if(occupied.length<1)throw Error('至少需要 1 位玩家');if(occupied.some(x=>!x.isBot&&!isBotId(x.userId)&&!x.ready))throw Error('所有真人玩家都准备后才能开始');const active=occupied.filter(x=>x.ready&&x.chips>0);if(active.length<1)throw Error('至少需要 1 位可参与玩家');s.practice=active.some(x=>x.isBot||isBotId(x.userId));s.practiceSnapshot=s.practice?Object.fromEntries(s.seats.filter(x=>x&&!x.isBot&&!isBotId(x.userId)).map(x=>[x.userId,x.chips])):null;s.deck=bjShoe(s.decks||6);s.dealer=[s.deck.pop(),s.deck.pop()];
+  for(const p of s.seats)if(p){p.hands=[];p.activeHand=0;p.result=null;p.sideResult='';p.insurance=0;p.insuranceResolved=false;if(p.ready&&p.chips>0){p.bet=clamp(Number(p.bet)||s.defaultBet||20,s.betMin||10,Math.min(s.betMax||200,p.chips));p.pairBet=clamp(Number(p.pairBet)||0,0,Math.min(s.pairBetMax||100,p.chips));p.boxes=clamp(Number(p.boxes)||1,1,s.maxBoxes||3,1);p.boxBets=Array.from({length:s.maxBoxes||3},(_,i)=>clamp(Number(p.boxBets?.[i])||p.bet,s.betMin||10,s.betMax||200,p.bet));p.pairBets=Array.from({length:s.maxBoxes||3},(_,i)=>clamp(Number(p.pairBets?.[i])||0,0,s.pairBetMax||100,0));const wagers=Array.from({length:p.boxes},(_,i)=>({bet:p.boxBets[i],pair:p.pairBets[i]})),totalNeed=wagers.reduce((n,x)=>n+x.bet+x.pair,0);if(totalNeed>p.chips)throw Error(`${p.userId} 筹码不足以支付 ${p.boxes} 门下注（需要 ${totalNeed}）`);for(let box=1;box<=p.boxes;box++){const w=wagers[box-1];p.chips-=w.bet+w.pair;const cards=[s.deck.pop(),s.deck.pop()],h=bjHand(cards,w.bet,box,false),kind=bjPairKind(cards),odds=bjPairOdds(kind);if(w.pair>0&&odds){p.chips+=w.pair*(odds+1);p.sideResult+=(p.sideResult?' · ':'')+`第${box}门 对子边注命中 ${odds}:1`;}p.hands.push(h)}p.hand=p.hands[0]?.cards||[];}else p.hand=[]}
+  s.finishedAt=0;const up=s.dealer[0];if(up?.r==='A'){s.phase='insurance';s.turnStartedAt=Date.now();s.message='庄家明牌 A · 可购买保险（最高主注一半，2:1）';for(const p of s.seats)if(p?.ready&&p.hands?.length&&p.isBot){p.insuranceResolved=true;p.insurance=0}if(bjAllInsuranceDone(s))bjStartPlayAfterPeek(s);return}if(Math.min(10,cardValueRank(up?.r))===10&&bjValue(s.dealer)===21){bjDealer(s,true);return}bjStartPlayAfterPeek(s)
 }
-function bjAdvance(s){let i=s.turnSeat;for(let n=0;n<5;n++){i=(i+1)%5;const p=s.seats[i];if(p?.ready&&p.hand.length&&!p.stood&&!p.busted){s.turnSeat=i;s.turnStartedAt=Date.now();return;}}bjDealer(s);}
-function bjDealer(s){s.phase='dealer';const dealerBlackjack=s.dealer.length===2&&bjValue(s.dealer)===21;if(!dealerBlackjack)while(bjValue(s.dealer)<17)s.dealer.push(s.deck.pop());const dv=bjValue(s.dealer);for(const p of s.seats)if(p?.ready&&p.hand.length){const v=bjValue(p.hand),natural=p.hand.length===2&&v===21;let mult=0;if(v>21){p.result='爆牌';mult=0;}else if(dealerBlackjack){if(natural){p.result='Blackjack 平局';mult=1}else{p.result='庄家 Blackjack';mult=0}}else if(natural){p.result='Blackjack · 3:2';mult=2.5}else if(dv>21||v>dv){p.result='胜';mult=2;}else if(v===dv){p.result='平';mult=1}else{p.result='负';mult=0}p.chips+=Math.floor(p.bet*mult);p.ready=(p.isBot||isBotId(p.userId));}if(s.practice&&s.practiceSnapshot){for(const p of s.seats)if(p){if(p.isBot||isBotId(p.userId))p.chips=s.defaultStack||2000;else if(s.practiceSnapshot[p.userId]!=null)p.chips=s.practiceSnapshot[p.userId];}}s.phase='result';s.turnSeat=null;s.turnStartedAt=0;s.finishedAt=Date.now();s.message=`庄家 ${dealerBlackjack?'Blackjack':dv>21?'爆牌':dv}，本局结束`;s.handNo++;}
+function bjAdvance(s){const [i,h]=bjFindNext(s,s.turnSeat,s.turnHand);if(i<0)return bjDealer(s,false);bjSetTurn(s,i,h)}
+function bjSettleHand(h,dv,dealerNatural){const v=bjValue(h.cards);let mult=0;if(h.surrendered){h.result='投降 · 退回半注';mult=.5}else if(v>21||h.busted){h.result='爆牌';mult=0}else if(dealerNatural){if(h.blackjack){h.result='Blackjack 平局';mult=1}else{h.result='庄家 Blackjack';mult=0}}else if(h.blackjack){h.result='Blackjack · 3:2';mult=2.5}else if(dv>21||v>dv){h.result='胜';mult=2}else if(v===dv){h.result='平';mult=1}else{h.result='负';mult=0}h.payout=Math.floor(h.bet*mult);return h.payout}
+function bjDealer(s,peekNatural=false){s.phase='dealer';const dealerNatural=s.dealer.length===2&&bjValue(s.dealer)===21;if(!dealerNatural&&!peekNatural)while(true){const x=bjInfo(s.dealer);if(x.total<17)s.dealer.push(s.deck.pop());else break}const dv=bjValue(s.dealer);for(const p of s.seats)if(p?.ready&&p.hands?.length){if(p.insurance>0&&dealerNatural){p.chips+=p.insurance*3;p.sideResult+=(p.sideResult?' · ':'')+`保险命中 +${p.insurance*2}`}let net=0;for(const h of p.hands){const pay=bjSettleHand(h,dv,dealerNatural);p.chips+=pay;net+=pay-h.bet}p.result=net>0?`本局 +${net}`:net<0?`本局 ${net}`:'本局持平';p.hand=p.hands[0]?.cards||[];p.ready=(p.isBot||isBotId(p.userId));}if(s.practice&&s.practiceSnapshot){for(const p of s.seats)if(p){if(p.isBot||isBotId(p.userId))p.chips=s.defaultStack||2000;else if(s.practiceSnapshot[p.userId]!=null)p.chips=s.practiceSnapshot[p.userId];}}s.phase='result';bjSetTurn(s,-1,-1);s.finishedAt=Date.now();s.message=`庄家 ${dealerNatural?'Blackjack':dv>21?'爆牌':dv}，本局结束`;s.handNo++}
 function blackjackAction(s,userId,a){
-  if(a.type==='join'){
-    let i=bjSeat(s,userId);if(i<0){i=Number.isInteger(a.seat)?a.seat:s.seats.findIndex(x=>!x);if(i<0||i>=s.seats.length||s.seats[i])throw Error('座位不可用');s.seats[i]={userId,chips:clamp(Number(a.chips)||s.defaultStack||2000,0,100000000),bet:s.defaultBet||20,ready:false,hand:[],stood:false,busted:false,result:null};}return;
-  }
-  if(a.type==='leave'){const i=bjSeat(s,userId);if(i>=0){if(s.phase==='playing'&&s.turnSeat===i){s.seats[i]=null;bjAdvance(s);}else s.seats[i]=null;}return;}
+  if(a.type==='join'){let i=bjSeat(s,userId);if(i<0){i=Number.isInteger(a.seat)?a.seat:s.seats.findIndex(x=>!x);if(i<0||i>=s.seats.length||s.seats[i])throw Error('座位不可用');s.seats[i]=bjPlayer(userId,clamp(Number(a.chips)||s.defaultStack||2000,0,100000000),s.defaultBet||20,false,false)}return}
+  if(a.type==='leave'){const i=bjSeat(s,userId);if(i>=0){if(['playing','dealer','insurance'].includes(s.phase)&&s.turnSeat===i){s.seats[i]=null;bjAdvance(s)}else s.seats[i]=null}return}
   const i=bjSeat(s,userId);if(i<0)throw Error('请先入座');const p=s.seats[i];
-  if(a.type==='bet'){if(s.phase==='playing'||s.phase==='dealer')throw Error('本局进行中');p.bet=clamp(Number(a.amount)||s.defaultBet||20,s.betMin||10,Math.min(s.betMax||200,p.chips));return;}
-  if(a.type==='ready'){if(s.phase==='playing'||s.phase==='dealer')throw Error('本局进行中');p.ready=!p.ready;if(s.phase==='result')s.phase='waiting';return;}
-  if(a.type==='start'){if(!['waiting','result'].includes(s.phase))throw Error('本局进行中');bjStart(s);return;}
-  if(a.type==='hit'){if(s.phase!=='playing'||s.turnSeat!==i)throw Error('还没轮到你');p.hand.push(s.deck.pop());const v=bjValue(p.hand);if(v>21){p.busted=true;p.result='爆牌';bjAdvance(s);}else if(v===21){p.stood=true;bjAdvance(s);}return;}
-  if(a.type==='double'){if(s.phase!=='playing'||s.turnSeat!==i)throw Error('还没轮到你');if(p.hand.length!==2||p.stood||p.busted)throw Error('只有起手两张牌时可以加倍');if(p.chips<p.bet)throw Error('剩余筹码不足以加倍');p.chips-=p.bet;p.bet*=2;p.hand.push(s.deck.pop());const v=bjValue(p.hand);if(v>21){p.busted=true;p.result='加倍爆牌'}p.stood=true;bjAdvance(s);return;}
-  if(a.type==='stand'){if(s.phase!=='playing'||s.turnSeat!==i)throw Error('还没轮到你');p.stood=true;bjAdvance(s);return;}
-  throw Error('未知操作');
+  if(a.type==='bet'){if(['playing','dealer','insurance'].includes(s.phase))throw Error('本局进行中');p.bet=clamp(Number(a.amount)||s.defaultBet||20,s.betMin||10,Math.min(s.betMax||200,p.chips));return}
+  if(a.type==='pair_bet'){if(['playing','dealer','insurance'].includes(s.phase))throw Error('本局进行中');p.pairBet=clamp(Number(a.amount)||0,0,Math.min(s.pairBetMax||100,p.chips));return}
+  if(a.type==='box_bet'){if(['playing','dealer','insurance'].includes(s.phase))throw Error('本局进行中');const box=clamp(Number(a.box)||1,1,s.maxBoxes||3,1)-1;p.boxBets=Array.from({length:s.maxBoxes||3},(_,i)=>Number(p.boxBets?.[i])||p.bet||s.defaultBet||20);p.pairBets=Array.from({length:s.maxBoxes||3},(_,i)=>Number(p.pairBets?.[i])||0);p.boxBets[box]=clamp(Number(a.amount)||s.defaultBet||20,s.betMin||10,s.betMax||200,s.defaultBet||20);p.pairBets[box]=clamp(Number(a.pairAmount)||0,0,s.pairBetMax||100,0);if(box===0){p.bet=p.boxBets[0];p.pairBet=p.pairBets[0]}return}
+  if(a.type==='boxes'){if(['playing','dealer','insurance'].includes(s.phase))throw Error('本局进行中');p.boxes=clamp(Number(a.count)||1,1,s.maxBoxes||3,1);return}
+  if(a.type==='ready'){if(['playing','dealer','insurance'].includes(s.phase))throw Error('本局进行中');p.ready=!p.ready;if(s.phase==='result')s.phase='waiting';return}
+  if(a.type==='start'){if(!['waiting','result'].includes(s.phase))throw Error('本局进行中');bjStart(s);return}
+  if(s.phase==='insurance'){
+    if(a.type==='insurance'){if(p.insuranceResolved)throw Error('保险已经选择');const max=Math.floor((p.hands||[]).reduce((n,h)=>n+(Number(h.bet)||0),0)/2),amt=clamp(Number(a.amount)||0,0,Math.min(max,p.chips));p.chips-=amt;p.insurance=amt;p.insuranceResolved=true;if(bjAllInsuranceDone(s))bjStartPlayAfterPeek(s);return}
+    if(a.type==='insurance_decline'){p.insurance=0;p.insuranceResolved=true;if(bjAllInsuranceDone(s))bjStartPlayAfterPeek(s);return}
+    throw Error('请先完成保险选择')
+  }
+  if(s.phase!=='playing'||s.turnSeat!==i)throw Error('还没轮到你');const h=p.hands?.[s.turnHand];if(!h)throw Error('当前手牌不存在');
+  if(a.type==='hit'){if(h.splitAces)throw Error('分 A 后只能补一张');h.cards.push(s.deck.pop());const v=bjValue(h.cards);if(v>21){h.busted=true;h.result='爆牌';bjAdvance(s)}else if(v===21){h.stood=true;bjAdvance(s)}return}
+  if(a.type==='stand'){h.stood=true;bjAdvance(s);return}
+  if(a.type==='double'){if(h.cards.length!==2||h.stood||h.busted||h.surrendered)throw Error('只有当前手起手两张牌时可以加倍');if(h.splitAces)throw Error('分 A 后不可加倍');if(p.chips<h.bet)throw Error('剩余筹码不足以加倍');p.chips-=h.bet;h.bet*=2;h.doubled=true;h.cards.push(s.deck.pop());if(bjValue(h.cards)>21){h.busted=true;h.result='加倍爆牌'}h.stood=true;bjAdvance(s);return}
+  if(a.type==='surrender'){if(h.cards.length!==2||h.fromSplit||h.doubled)throw Error('晚投降仅限原始起手两张牌');h.surrendered=true;h.stood=true;bjAdvance(s);return}
+  if(a.type==='split'){if(h.cards.length!==2||h.stood||h.busted)throw Error('只有两张牌可以分牌');if(bjSplitRank(h.cards[0])!==bjSplitRank(h.cards[1]))throw Error('两张牌点数不同，不能分牌');if(p.hands.length>=(s.maxHands||4))throw Error('最多分成 4 手牌');if(p.chips<h.bet)throw Error('筹码不足以匹配分牌下注');p.chips-=h.bet;const c2=h.cards.pop(),ace=h.cards[0].r==='A';h.fromSplit=true;h.blackjack=false;h.cards.push(s.deck.pop());const nh=bjHand([c2,s.deck.pop()],h.bet,h.box,true);nh.splitAces=ace;h.splitAces=ace;p.hands.splice(s.turnHand+1,0,nh);if(ace){const canSplitAgain=x=>x.cards.length===2&&x.cards[0].r==='A'&&x.cards[1].r==='A'&&p.hands.length<(s.maxHands||4);if(!canSplitAgain(h))h.stood=true;if(!canSplitAgain(nh))nh.stood=true;if(h.stood)bjAdvance(s)}return}
+  throw Error('未知操作')
 }
 
 // ---------------- Texas Hold'em ----------------
@@ -427,9 +451,11 @@ function chSearchBeam(s,side,root,depth,alpha,beta){const king=chFindKing(s.boar
 function chessBotMove(s){const side=s.turn,moves=chMoves(s,side),scored=[];for(const m of moves){const ns=chApplyCopy(s,m.x1,m.y1,m.x2,m.y2,'q');ns.turn=1-side;scored.push({m,ns,v:chSearch(ns,1-side,side,2,-Infinity,Infinity)+(m.order||0)*.08})}scored.sort((a,b)=>b.v-a.v);let best=scored[0],bv=-Infinity;for(const x of scored.slice(0,6)){const deep=x.v+chSearchBeam(x.ns,1-side,side,3,-Infinity,Infinity)*.16+Math.random()*.25;if(deep>bv){bv=deep;best=x}}return best?.m||null;}
 
 function blackjackBotAction(s,p){
-  const total=bjValue(p.hand),dealer=s.dealer[0],dv=dealer?Math.min(10,cardValueRank(dealer.r==='A'?'A':dealer.r)):10;let aces=0,raw=0;for(const c of p.hand){if(c.r==='A'){aces++;raw+=11}else raw+=Math.min(10,cardValueRank(c.r))}while(raw>21&&aces){raw-=10;aces--;}const soft=aces>0&&raw<=21;
-  if(soft){if(total<=17)return 'hit';if(total===18&&dv>=9)return 'hit';return 'stand';}
-  if(total<=11)return 'hit';if(total===12)return (dv>=4&&dv<=6)?'stand':'hit';if(total>=13&&total<=16)return (dv>=2&&dv<=6)?'stand':'hit';return 'stand';
+  if(s.phase==='insurance')return {type:'insurance_decline'};const h=bjActiveHand(p);if(!h)return {type:'stand'};const total=bjValue(h.cards),dealer=s.dealer[0],dv=dealer?Math.min(10,cardValueRank(dealer.r)):10,soft=bjInfo(h.cards).soft,pair=h.cards.length===2&&cardValueRank(h.cards[0].r)===cardValueRank(h.cards[1].r);
+  if(pair&&p.chips>=h.bet&&p.hands.length<(s.maxHands||4)){const v=cardValueRank(h.cards[0].r);if([8,11].includes(v)||v===9&&![7,10,11].includes(dv)||v===7&&dv<=7||v===6&&dv<=6||v===4&&[5,6].includes(dv)||[2,3].includes(v)&&dv<=7)return {type:'split'}}
+  if(h.cards.length===2&&!h.fromSplit&&p.chips>=h.bet){if(total===11||total===10&&dv<=9||total===9&&dv>=3&&dv<=6)return {type:'double'}}
+  if(h.cards.length===2&&!h.fromSplit&&!soft&&((total===16&&dv>=9)||(total===15&&dv===10)))return {type:'surrender'};
+  if(soft){if(total<=17)return {type:'hit'};if(total===18&&dv>=9)return {type:'hit'};return {type:'stand'}}if(total<=11)return {type:'hit'};if(total===12)return (dv>=4&&dv<=6)?{type:'stand'}:{type:'hit'};if(total>=13&&total<=16)return (dv>=2&&dv<=6)?{type:'stand'}:{type:'hit'};return {type:'stand'}
 }
 function pokerPreflopStrength(cards){if(!cards||cards.length<2)return .3;const [a,b]=cards,va=cardValueRank(a.r),vb=cardValueRank(b.r),hi=Math.max(va,vb),lo=Math.min(va,vb),pair=va===vb,suited=a.s===b.s,gap=hi-lo;let s=hi/14*.36+lo/14*.12;if(pair)s=.52+hi/14*.42;if(suited)s+=.07;if(gap<=1)s+=.08;else if(gap===2)s+=.035;if(hi===14)s+=.08;return clamp(s,0,1);}
 function pokerMonteCarlo(s,p,samples=44){const known=[...p.cards,...s.community],knownIds=new Set(known.map(c=>c.id)),deck=stdDeck().filter(c=>!knownIds.has(c.id)),opp=Math.max(1,pkActive(s).length-1);let score=0;for(let z=0;z<samples;z++){const d=shuffle(deck.slice()),comm=s.community.concat(d.splice(0,5-s.community.length)),my=best7([...p.cards,...comm]);let win=true,ties=0;for(let o=0;o<opp;o++){const oh=[d.pop(),d.pop()],r=best7([...oh,...comm]),cmp=cmpRank(my,r);if(cmp<0){win=false;break;}if(cmp===0)ties++;}if(win)score+=ties?1/(ties+1):1;}return score/samples;}
@@ -444,7 +470,7 @@ export function addBotToGame(s,seat=null){
   const id=botId(s.kind);
   if(['gomoku','xiangqi','chess'].includes(s.kind)){const i=Number.isInteger(seat)?seat:s.players.findIndex(x=>!x);if(i<0||i>1||s.players[i])throw Error('没有空位');s.players[i]=id;s.ready[i]=true;boardReadyMaybeStart(s);return id;}
   if(!['waiting','result'].includes(s.phase))throw Error('对局进行中，不能调整 AI');const i=Number.isInteger(seat)?seat:s.seats.findIndex(x=>!x);if(i<0||i>=s.seats.length||s.seats[i])throw Error('没有空位');
-  if(s.kind==='blackjack')s.seats[i]={userId:id,isBot:true,chips:s.defaultStack||2000,bet:s.defaultBet||20,ready:true,hand:[],stood:false,busted:false,result:null};
+  if(s.kind==='blackjack')s.seats[i]=bjPlayer(id,s.defaultStack||2000,s.defaultBet||20,true,true);
   else if(s.kind==='poker')s.seats[i]=pkPlayer(id,s.defaultStack||2000,true,true,s.defaultStack||2000);
   return id;
 }
@@ -463,7 +489,7 @@ export function advanceBots(s,maxSteps=80){
     if(s.kind==='xiangqi'){const id=s.players[s.turn];if(!s.started||!isBotId(id)||s.winner||s.players.some(x=>!x))break;const m=xiangqiBotMove(s);if(!m)break;xiangqiAction(s,id,{type:'move',...m});continue;}
     if(s.kind==='chess'){const id=s.players[s.turn];if(!s.started||!isBotId(id)||s.winner||s.result||s.players.some(x=>!x))break;const m=chessBotMove(s);if(!m)break;chessAction(s,id,{type:'move',...m});continue;}
     if(s.kind==='blackjack'){
-      if(!['playing','dealer'].includes(s.phase))break;const p=s.seats[s.turnSeat];if(!p||!(p.isBot||isBotId(p.userId)))break;blackjackAction(s,p.userId,{type:blackjackBotAction(s,p)});continue;
+      if(!['playing','dealer'].includes(s.phase))break;const p=s.seats[s.turnSeat];if(!p||!(p.isBot||isBotId(p.userId)))break;blackjackAction(s,p.userId,blackjackBotAction(s,p));continue;
     }
     if(s.kind==='poker'){
       if(!['preflop','flop','turn','river'].includes(s.phase))break;const p=s.seats[s.turnSeat];if(!p||!(p.isBot||isBotId(p.userId)))break;pokerAction(s,p.userId,pokerBotAction(s,p));continue;
@@ -473,14 +499,14 @@ export function advanceBots(s,maxSteps=80){
 }
 export function hasBot(s){return !s?false:s.kind==='dice'?diceHasBot(s):isExtraKind(s.kind)?extraHasBot(s):['gomoku','xiangqi','chess'].includes(s.kind)?s.players.some(isBotId):s.seats?.some(x=>x&&(x.isBot||isBotId(x.userId)))||false}
 export function createGame(kind){if(kind==='dice')return createDiceGame();if(isExtraKind(kind))return createExtraGame(kind);if(kind==='gomoku')return createGomoku();if(kind==='xiangqi')return createXiangqi();if(kind==='chess')return createChess();if(kind==='blackjack')return createBlackjack();if(kind==='poker')return createPoker();return null;}
-export function tickGame(state,now=Date.now()){if(!state)return {changed:false};if(state.kind==='dice')return tickDice(state,now);if(isExtraKind(state.kind))return tickExtraGame(state,now);let changed=false,forceLeaveUsers=[];if(state.kind==='poker'&&state.phase==='run_choice'&&state.runChoiceDeadline&&now>=state.runChoiceDeadline){for(const i of pkActive(state))if(!state.runChoices[i])state.runChoices[i]=1;pkFinalizeRuns(state);changed=true;}if(['gomoku','xiangqi','chess'].includes(state.kind)&&state.started&&!state.winner&&!state.result){const side=state.turn,remain=boardClockRemaining(state,side,now);if(remain<=0){state.timeBanks[side]=0;const other=state.players?.[1-side];if(other)state.winner=other;state.result='time_forfeit';state.started=false;state.finishedAt=now;changed=true;}}if(['blackjack','poker'].includes(state.kind)&&state.turnSeat!=null&&state.turnStartedAt&&now-state.turnStartedAt>=(state.turnTimeoutMs||CARD_TURN_MS)){const seat=state.seats?.[state.turnSeat];if(seat&&!seat.isBot&&!isBotId(seat.userId)){try{applyGameAction(state,seat.userId,{type:state.kind==='blackjack'?'stand':'fold'});}catch{}changed=true;}}const ended=(state.winner||state.result||['result'].includes(state.phase));if(ended&&!state.finishedAt){state.finishedAt=now;changed=true;}return {changed,forceLeaveUsers,autoReset:!!(state.finishedAt&&now-state.finishedAt>=RESULT_AUTO_LEAVE_MS)};}
+export function tickGame(state,now=Date.now()){if(!state)return {changed:false};if(state.kind==='dice')return tickDice(state,now);if(isExtraKind(state.kind))return tickExtraGame(state,now);let changed=false,forceLeaveUsers=[];if(state.kind==='blackjack'&&state.phase==='insurance'&&state.turnStartedAt&&now-state.turnStartedAt>=15000){for(const p of state.seats||[])if(p?.ready&&p.hands?.length&&!p.insuranceResolved){p.insurance=0;p.insuranceResolved=true}bjStartPlayAfterPeek(state);changed=true;}if(state.kind==='poker'&&state.phase==='run_choice'&&state.runChoiceDeadline&&now>=state.runChoiceDeadline){for(const i of pkActive(state))if(!state.runChoices[i])state.runChoices[i]=1;pkFinalizeRuns(state);changed=true;}if(['gomoku','xiangqi','chess'].includes(state.kind)&&state.started&&!state.winner&&!state.result){const side=state.turn,remain=boardClockRemaining(state,side,now);if(remain<=0){state.timeBanks[side]=0;const other=state.players?.[1-side];if(other)state.winner=other;state.result='time_forfeit';state.started=false;state.finishedAt=now;changed=true;}}if(['blackjack','poker'].includes(state.kind)&&state.turnSeat!=null&&state.turnStartedAt&&now-state.turnStartedAt>=(state.turnTimeoutMs||CARD_TURN_MS)){const seat=state.seats?.[state.turnSeat];if(seat&&!seat.isBot&&!isBotId(seat.userId)){try{applyGameAction(state,seat.userId,{type:state.kind==='blackjack'?'stand':'fold'});}catch{}changed=true;}}const ended=(state.winner||state.result||['result'].includes(state.phase));if(ended&&!state.finishedAt){state.finishedAt=now;changed=true;}return {changed,forceLeaveUsers,autoReset:!!(state.finishedAt&&now-state.finishedAt>=RESULT_AUTO_LEAVE_MS)};}
 
 export function applyGameAction(state,userId,action){if(!state)throw Error('不是游戏房间');if(state.kind==='dice'){applyDiceAction(state,userId,action);return state}if(isExtraKind(state.kind)){applyExtraGameAction(state,userId,action);return state}if(state.kind==='gomoku')gomokuAction(state,userId,action);else if(state.kind==='xiangqi')xiangqiAction(state,userId,action);else if(state.kind==='chess')chessAction(state,userId,action);else if(state.kind==='blackjack')blackjackAction(state,userId,action);else if(state.kind==='poker')pokerAction(state,userId,action);else throw Error('未知游戏');return state;}
 
 export function publicGameState(state,viewerId){
   if(!state)return null;if(state.kind==='dice')return publicDiceState(state,viewerId);if(isExtraKind(state.kind))return publicExtraGameState(state,viewerId);const s=clone(state);s.serverNow=Date.now();
-  if(s.kind==='blackjack'&&['playing','dealer'].includes(s.phase)){
-    if(s.dealer.length>1&&s.phase==='playing')s.dealer=[s.dealer[0],{hidden:true}];
+  if(s.kind==='blackjack'&&['insurance','playing','dealer'].includes(s.phase)){
+    if(s.dealer.length>1&&['insurance','playing'].includes(s.phase))s.dealer=[s.dealer[0],{hidden:true}];
   }
   if(s.kind==='poker'){
     const live=['preflop','flop','turn','river','run_choice'].includes(s.phase);

@@ -1,6 +1,6 @@
 {
-  "id": "v0.3.4",
-  "title": "SlimeLounge v0.3.4",
+  "id": "v0.3.3",
+  "title": "SlimeLounge v0.3.3",
   "date": "2026-08-28",
   "items": [
     "修复大厅轻量同步中的脚本错误：补回 socialPresenceSort 共享排序函数，避免出现 \"socialPresenceSort is not defined\" 后影响大厅/好友在线排序。",

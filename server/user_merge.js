@@ -11,7 +11,7 @@ export function createUserMergeService({data,refreshWallet,RANKED_KINDS,normaliz
     if(!target.employeeHash&&source.employeeHash){
       target.employeeHash=source.employeeHash;target.employeeId=source.employeeId||'';target.employeeMasked=source.employeeMasked;target.employeeStatus=source.employeeStatus;data.employeeIndex[source.employeeHash]=targetId;
     }else if(source.employeeHash&&data.employeeIndex[source.employeeHash]===sourceId)delete data.employeeIndex[source.employeeHash];
-    for(const f of data.friendships){if(f.a===sourceId)f.a=targetId;if(f.b===sourceId)f.b=targetId}
+    for(const f of data.friendships){if(f.a===sourceId)f.a=targetId;if(f.b===sourceId)f.b=targetId;if(f.remarks?.[sourceId]){f.remarks[targetId]??=f.remarks[sourceId];delete f.remarks[sourceId]}}
     for(const [key,arr] of Object.entries(data.directMessages||{})){
       for(const m of arr||[]){if(m.from===sourceId)m.from=targetId;if(m.to===sourceId)m.to=targetId}
       const ids=key.split('|').map(x=>x===sourceId?targetId:x).sort(),nk=ids.join('|');

@@ -1,0 +1,11 @@
+export function createMusicHttpRoutes({passiveSession,json,limitUser,clean,proxyQQAudio,proxyNeteaseAudio,probeQQAudio,probeNeteaseAudio,searchQQ,searchNetease,findPublicMusicFallback}){
+  const session=(req,res,key,limit)=>{const a=passiveSession(req);if(!a){json(res,401,{ok:false,error:'请先登录'});return null}if(!limitUser(a,key,limit,60000,req)){json(res,429,{ok:false,error:'音乐请求过于频繁'});return null}return a};
+  return async function handleMusicHttp(req,res,url){
+    if(req.method!=='GET'||!url.pathname.startsWith('/api/music/'))return false;
+    if(url.pathname==='/api/music/audio'){const a=session(req,res,'music-audio',180);if(!a)return true;const provider=url.searchParams.get('provider')==='qq'?'qq':'netease',id=clean(url.searchParams.get('id')||'',40),mediaId=clean(url.searchParams.get('mediaId')||'',40);provider==='qq'?proxyQQAudio(req,res,id,mediaId,a.u.userId):proxyNeteaseAudio(req,res,id,a.u.userId);return true}
+    if(url.pathname==='/api/music/probe'){const a=session(req,res,'music-probe',90);if(!a)return true;const provider=url.searchParams.get('provider')==='qq'?'qq':'netease',id=clean(url.searchParams.get('id')||'',40),mediaId=clean(url.searchParams.get('mediaId')||'',40);if(provider==='netease'&&!/^\d{3,20}$/.test(id)){json(res,400,{ok:false,error:'歌曲 ID 无效',provider});return true}if(provider==='qq'&&!/^[A-Za-z0-9]{6,32}$/.test(id)){json(res,400,{ok:false,error:'QQ音乐歌曲 MID 无效',provider});return true}const r=provider==='qq'?await probeQQAudio(id,mediaId,a.u.userId):await probeNeteaseAudio(id,a.u.userId);json(res,r.ok?200:404,{...r,provider});return true}
+    if(url.pathname==='/api/music/search'){const a=session(req,res,'music-search',45);if(!a)return true;try{const provider=url.searchParams.get('provider')==='qq'?'qq':'netease',q=clean(url.searchParams.get('q')||'',80),r=provider==='qq'?await searchQQ(q):await searchNetease(q);json(res,200,{ok:true,provider,results:r.results||[],fallback:!!r.fallback})}catch(e){json(res,502,{ok:false,error:e.message})}return true}
+    if(url.pathname==='/api/music/fallback'){const a=session(req,res,'music-fallback',30);if(!a)return true;const r=await findPublicMusicFallback(clean(url.searchParams.get('q')||'',80),clean(url.searchParams.get('exclude')||'',80));json(res,r.ok?200:404,r);return true}
+    return false;
+  }
+}

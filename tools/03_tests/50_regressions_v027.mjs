@@ -23,7 +23,7 @@ async function wsAction(ws,action,pred=()=>true){const pending=waitMsg(ws,m=>m.t
 try{
   await waitServer();
   const health=await (await fetch(`http://127.0.0.1:${port}/api/health`)).json();
-  if(health.version!=='0.3.4')throw Error(`expected v0.3.4, got ${health.version}`);
+  if(health.version!=='0.3.9')throw Error(`expected v0.3.9, got ${health.version}`);
   const owner=await post('/api/register',{name:'V027',employeeId:'V027OWN',slimeColor:'mint',deviceLabel:'test'});
 
   // Reproduce the reported path: human takes seat 1/white, AI takes seat 2/black (the first mover), then human presses Ready.
@@ -82,7 +82,7 @@ try{
   if(!baseCss.includes("'Fusion Pixel 12px M zh_hans'")||!baseCss.includes('.msg-actions'))throw Error('square pixel font/chat edit UI missing');
   if(!app.includes('voice_activity')||!css.includes('.voice-channel-user.speaking')||!css.includes('.voice-toggle.speaking'))throw Error('active-speaker detection/highlight missing');
   if(!app.includes("classList.toggle('no-view-animation',def.category==='chat')"))throw Error('chat channel transition still animates');
-  if(!readme.includes('v0.3.4')||readme.includes('## 更新日志'))throw Error('README should describe current v0.3.1 and contain no changelog section');
+  if(!readme.includes('v0.3.9')||readme.includes('## 更新日志'))throw Error('README should describe current v0.3.1 and contain no changelog section');
 
   console.log('[OK] v0.2.9 retained v0.2.7 regressions: chat edit/delete / staff announcements / active speaker / no channel animation / square pixel font / README baseline');
 } finally {

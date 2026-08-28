@@ -1,0 +1,2 @@
+import {spawn} from 'node:child_process';
+export function openBrowser(url){if(process.env.AUTO_OPEN==='0')return;if(process.platform==='linux'&&!process.env.DISPLAY&&!process.env.WAYLAND_DISPLAY)return;try{const [cmd,args]=process.platform==='win32'?['cmd',['/c','start','',url]]:process.platform==='darwin'?['open',[url]]:['xdg-open',[url]],child=spawn(cmd,args,{detached:true,stdio:'ignore'});child.on('error',()=>{});child.unref()}catch{}}

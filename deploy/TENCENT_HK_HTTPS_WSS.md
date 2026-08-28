@@ -1,6 +1,6 @@
 # 腾讯云香港轻量服务器：SlimeLounge HTTPS / WSS / 语音部署
 
-适用于当前 SlimeLounge v0.3.4 的 Node.js + systemd 部署。Node 继续监听 8090，公网只开放 80/443，由 Caddy 负责 HTTPS/WSS。
+适用于当前 SlimeLounge v0.3.8 的 Node.js + systemd 部署。Node 继续监听 8090，公网只开放 80/443，由 Caddy 负责 HTTPS/WSS。
 
 ## 结论
 
@@ -179,7 +179,7 @@ sudo systemctl status caddy --no-pager
 curl http://127.0.0.1:8090/api/health
 ```
 
-应返回 SlimeLounge v0.3.4。
+应返回 SlimeLounge v0.3.8。
 
 再测试公网 HTTPS：
 

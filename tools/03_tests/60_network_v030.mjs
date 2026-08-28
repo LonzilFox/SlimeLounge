@@ -12,7 +12,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function wait(){for(let i=0;i<60;i++){try{const r=await fetch(base+'/api/health');if(r.ok)return await r.json()}catch{}await sleep(100)}throw Error('server did not start\n'+out)}
 async function post(url,obj){const r=await fetch(base+url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(obj)}),j=await r.json().catch(()=>({}));if(!r.ok)throw Error(`${url}: ${r.status} ${j.error||''}`);return j}
 try{
- const health=await wait();if(health.version!=='0.3.4'||health.trustProxy!==true)throw Error('health/proxy default mismatch');
+ const health=await wait();if(health.version!=='0.3.9'||'trustProxy' in health||'port' in health)throw Error('health/version or data minimization mismatch');
  const a=await post('/api/register',{name:'网络测试',employeeId:'NET001',slimeColor:'mint',deviceLabel:'test'}),cred={userId:a.userId,deviceId:a.deviceId,deviceToken:a.deviceToken,tabId:'v030'};
  const sync=await post('/api/sync/light',{...cred,section:'chat',roomId:'chat-general',presenceStatus:'online',activityLabel:'',since:Date.now(),includeUsers:true});if(!sync.ok||!Array.isArray(sync.users)||!sync.unread)throw Error('light sync failed');
  for(let i=0;i<25;i++)await post('/api/room/snapshot',{...cred,roomId:'chat-general'}); // > old shared 240/min pressure pattern is safe per user endpoint limit

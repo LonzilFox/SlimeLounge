@@ -23,8 +23,8 @@ export function createChatService({data,crypto,clean,isStaff,scheduleSave,broadc
       const text=cleanChat(m.text,3000);if(!text)return true;
       if(def.readOnly)throw Error('该频道为只读');
       if(staffOnly(def)&&!isStaff(u))throw Error('该讨论区仅 Owner / Admin 可以发言');
-      const parent=arr.find(x=>x.id===String(m.replyTo||''));const reply=parent?{messageId:parent.id,userId:parent.userId,name:parent.name,text:String(parent.text||'').slice(0,500)}:null;const msg={id:crypto.randomUUID(),userId:c.userId,name:u.name,slimeColor:u.slimeColor,role:u.role||'member',title:u.equippedTitle||'',text,reply,at:now,editedAt:0};
-      arr.push(msg);while(arr.length>100)arr.shift();try{onChat?.(u,msg,c.roomId)}catch{}scheduleSave();broadcast(c.roomId,{type:'chat',message:msg});return true;
+      const parent=arr.find(x=>x.id===String(m.replyTo||''));const reply=parent?{messageId:parent.id,userId:parent.userId,name:parent.name,text:String(parent.text||'').slice(0,500)}:null;const msg={id:crypto.randomUUID(),userId:c.userId,name:u.name,slimeColor:u.slimeColor,role:u.role||'member',title:u.equippedTitle||'',titles:u.equippedTitles||[],text,reply,at:now,editedAt:0};
+      arr.push(msg);const cap=def?.category==='chat'?1000:100;while(arr.length>cap)arr.shift();try{onChat?.(u,msg,c.roomId)}catch{}scheduleSave();broadcast(c.roomId,{type:'chat',message:msg});return true;
     }
     const id=String(m.messageId||''),idx=arr.findIndex(x=>x.id===id),msg=arr[idx];
     if(!msg)throw Error('消息不存在或已经被删除');

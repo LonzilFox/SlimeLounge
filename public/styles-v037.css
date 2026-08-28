@@ -1,0 +1,83 @@
+/* SlimeLounge v0.3.7 final layout / admin information architecture / boss view */
+
+/* Consistent vertical rhythm. */
+.room-browser,.page,.room-main{min-width:0;max-width:100%}
+.game-row-list,.shop-section,.pet-layout,.admin-setting-body{min-width:0}
+.game-row-list{display:grid!important;gap:12px!important}
+.game-row{margin:0!important;min-width:0}
+.game-row+.game-row{margin-top:0!important}
+.page>.page-card,.page>.admin-page-intro,.page>.admin-setting-group{margin-top:0}
+.page>.page-card:last-child,.page>.admin-setting-group:last-child{margin-bottom:0}
+.game-browser>.game-wallet-card{margin-bottom:14px}
+.game-browser>.game-mode-tabs{margin-bottom:14px!important}
+
+/* Admin top-level tabs: exactly seven categories and horizontally scrollable when narrow. */
+.admin-tabs-v037{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:2px 1px 10px;margin-bottom:12px;scrollbar-width:thin;position:sticky;top:0;z-index:8;background:linear-gradient(var(--bg) 78%,transparent)}
+.admin-tabs-v037 button{flex:0 0 auto;white-space:nowrap}
+.admin-page-intro{padding:13px 15px;margin:0 0 10px;border:2px solid #30475b;background:#101923;border-radius:10px}
+.admin-page-intro h3{margin:0 0 5px}.admin-page-intro p{margin:0;color:var(--muted);line-height:1.55}
+.admin-setting-group{display:block;margin:0 0 10px;border:2px solid #344b60;background:#101821;border-radius:10px;overflow:hidden;box-shadow:0 5px 14px #0002}
+.admin-setting-group>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;padding:12px 14px;background:#14212c;user-select:none}
+.admin-setting-group>summary::-webkit-details-marker{display:none}
+.admin-setting-group>summary span{display:grid;gap:3px;min-width:0}.admin-setting-group>summary b{font-size:13px}.admin-setting-group>summary small{font-size:10px;color:var(--muted);font-weight:400;white-space:normal}.admin-setting-group>summary i{font-style:normal;color:#71869a;font-size:9px;white-space:nowrap}
+.admin-setting-group[open]>summary{border-bottom:1px solid #344b60}.admin-setting-body{padding:12px 14px}
+.admin-setting-body>.page-card{margin-bottom:10px!important;box-shadow:none!important;border-width:1px!important}
+.admin-subsetting{border:1px solid #344b60;background:#0e171f;margin-top:10px;border-radius:8px;overflow:hidden}.admin-subsetting>summary{cursor:pointer;padding:9px 10px;font-weight:700;background:#15212c}
+.admin-list-tools{display:flex;align-items:center;gap:9px;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px}.admin-list-tools small{color:var(--muted)}
+.admin-item-scroll{max-height:min(520px,55vh);overflow:auto;overscroll-behavior:contain;padding-right:3px}
+.user-growth-scroll{max-height:min(560px,60vh)}
+.admin-save-strip{position:sticky;bottom:6px;z-index:3;margin:8px 0;padding:8px;background:#101821e8;border:1px solid #344b60;border-radius:8px;backdrop-filter:blur(5px)}
+.title-admin-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:7px}.title-admin-summary>div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:8px;border:1px solid #344b60;background:#0d161f}.title-admin-summary small{grid-column:1/-1;color:var(--muted)}
+.admin-users{max-height:min(720px,72vh);overflow:auto;overscroll-behavior:contain}
+
+/* Pet hub: fishing/market live above pet care, not in single-player games. */
+.pet-activity-hub{margin-bottom:14px!important}.pet-activity-head h3{margin:0 0 4px}.pet-activity-head p{margin:0}
+.pet-activity-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.pet-activity-card{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:10px;row-gap:2px;align-items:center;text-align:left;padding:12px!important;min-width:0}
+.pet-activity-card>span{grid-row:1/3;font-size:22px}.pet-activity-card>b{font-size:13px}.pet-activity-card>small{color:var(--muted);font-size:10px;white-space:normal}
+
+/* Boss view: deliberately resembles a compact neutral status/records panel instead of a card table. */
+.poker-boss-shell{font-family:ui-monospace,"Cascadia Mono","SFMono-Regular",Consolas,monospace!important;gap:7px!important;background:#0e1217;padding:8px;border:1px solid #2c3741;color:#b9c3cc}
+.poker-boss-shell .game-clock{opacity:.55;font-size:9px}
+.boss-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 7px;border-bottom:1px solid #2c3741;color:#8e9ca8;font-size:10px}
+.boss-toolbar button,.poker-boss-shell button{border:1px solid #37434e!important;background:#141a20!important;color:#aeb9c2!important;box-shadow:none!important;border-radius:3px!important;padding:5px 8px!important;transform:none!important}
+.poker-boss-shell button.primary{background:#1d2a31!important;color:#d3dde4!important;border-color:#4d5c67!important}.poker-boss-shell button.danger{color:#b8aeb0!important;border-color:#51474a!important}
+.boss-total{font-size:10px;padding:4px 7px;color:#8f9ca7}
+.boss-community{display:flex!important;gap:5px!important;min-height:22px!important;align-items:center!important;padding:3px 7px!important;border-bottom:1px dashed #27323b}
+.boss-token{display:inline!important;width:auto!important;height:auto!important;min-width:0!important;min-height:0!important;padding:0 3px!important;border:0!important;background:transparent!important;box-shadow:none!important;color:#bcc6ce!important;font:600 11px/1.5 ui-monospace,"Cascadia Mono",Consolas,monospace!important;white-space:nowrap}
+.boss-token.muted{color:#5c6872!important}
+.boss-seat-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:4px!important}
+.boss-seat-grid .seat{min-height:0!important;padding:6px 8px!important;border:1px solid #2c3741!important;background:#11171c!important;box-shadow:none!important;border-radius:2px!important;font-size:9px;color:#94a0aa}
+.boss-seat-grid .seat>b{font-size:10px;color:#bcc5cd}.boss-seat-grid .seat.turn{outline:1px solid #66737e!important}.boss-seat-grid .cards{min-height:18px!important;gap:4px!important;margin-top:2px}
+.boss-actions{padding-top:5px;border-top:1px solid #2c3741;gap:4px!important}.boss-actions .raise-box{font-size:9px;color:#87939d}.boss-actions input{width:70px!important;padding:4px!important;border:1px solid #39454f!important;background:#0d1217!important;box-shadow:none!important}
+.boss-buyin{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:7px!important;padding:7px!important;border:1px solid #2c3741!important;background:#11171c!important}.boss-buyin small{color:#788590}.boss-buyin label{display:flex;gap:6px;align-items:center}.boss-buyin input{width:100px}
+
+/* System-wide defensive responsive rules: browser zoom effectively narrows the CSS viewport. */
+.main,.room-body,.room-main,.room-side,.page,.page-card,.panel,.game-row,.game-row-title,.game-room-buttons,.shop-grid,.market-grid,.pet-layout,.friends-layout,.admin-edit-grid,.form-grid{min-width:0!important}
+img,svg,canvas,video,audio{max-width:100%}
+input,textarea,select,button{max-width:100%}
+.page-card,.room-main,.room-side,.game-row,.admin-user-box{overflow-wrap:anywhere}
+.form-grid{grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr))!important}
+.shop-grid{grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr))!important}
+.market-grid{grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr))!important}
+.game-room-buttons{align-items:stretch}.game-room-btn{height:auto;min-height:52px}
+
+@media(max-width:900px){
+  .game-row{grid-template-columns:1fr!important;gap:9px!important}.game-room-buttons{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr))!important;width:100%}
+  .admin-tabs-v037{position:static}.admin-setting-body{padding:10px}.boss-seat-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:760px){
+  .page,.room-browser{padding:9px!important}.page-card{padding:11px!important;margin-bottom:10px!important}.room-view{padding:6px!important}
+  .pet-activity-grid{grid-template-columns:1fr}.admin-setting-group>summary{padding:10px}.admin-setting-body{padding:9px}
+  .admin-item-scroll{max-height:48vh}.admin-save-strip{bottom:74px}
+  .diag-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.market-order{grid-template-columns:1fr 1fr!important}.market-order input{grid-column:1/-1}
+  .boss-buyin{grid-template-columns:1fr!important}.boss-buyin input{width:100%}
+}
+@media(max-width:520px){
+  .form-grid{grid-template-columns:1fr!important}.diag-grid{grid-template-columns:1fr 1fr!important}.game-room-buttons{grid-template-columns:1fr 1fr!important}
+  .game-row-title p{font-size:10px}.admin-tabs-v037{gap:5px}.admin-tabs-v037 button{padding:7px 8px!important;font-size:10px!important}
+  .boss-seat-grid{grid-template-columns:1fr!important}.boss-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}.boss-actions .raise-box{grid-column:1/-1}
+}
+.chip-user-list{max-height:min(520px,55vh);overflow:auto;overscroll-behavior:contain;padding-right:3px}
+.chip-game-settings{display:grid;gap:8px}.chip-game-card{margin:0!important}
+@media(max-width:390px){.sudoku-board{grid-template-columns:repeat(9,30px)!important}.sudoku-board input{width:30px!important;height:30px!important;font-size:15px!important}.game-room-buttons{grid-template-columns:1fr!important}}

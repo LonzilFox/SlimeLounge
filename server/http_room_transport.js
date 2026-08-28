@@ -1,4 +1,4 @@
-export function createHttpRoomTransport({body,auth,json,limitUser,verifiedOnly,roomData,roomPollTouch,cancelDisconnectedSeatCleanup,schedulePresenceSave,roomChanges,roomSnapshot,clean,actionSeen,message,rememberAction,tabTouch,roomPollDrop,roomHasUser,scheduleDisconnectedSeatCleanup,clearGameChatIfEmpty,diagnostics}){
+export function createHttpRoomTransport({body,auth,json,limitUser,verifiedOnly,roomData,roomPollTouch,cancelDisconnectedSeatCleanup,schedulePresenceSave,roomChanges,roomSnapshot,clean,actionSeen,message,rememberAction,tabTouch,roomPollDrop,roomHasUser,scheduleDisconnectedSeatCleanup,clearGameChatIfEmpty,diagnostics,validateRoomMessage}){
   return async function handleHttpRoomTransport(req,res,url){
     if(req.method!=='POST'||!['/api/room/snapshot','/api/room/poll','/api/room/action','/api/room/disconnect'].includes(url.pathname))return false;
     const b=await body(req),a=auth(b.userId,b.deviceId,b.deviceToken,req);
@@ -19,7 +19,7 @@ export function createHttpRoomTransport({body,auth,json,limitUser,verifiedOnly,r
     }
     if(url.pathname==='/api/room/action'){
       const actionId=clean(b.clientActionId,96);if(actionSeen(a.u.userId,roomId,actionId)){json(res,200,{ok:true,...roomSnapshot(roomId,a.u.userId),transport:'http-long-poll',actionAck:actionId,duplicate:true});return true}
-      try{message({closed:false,socket:{destroyed:true},userId:a.u.userId,roomId,tabId:tid,countedWs:false},JSON.stringify({...b.message,clientActionId:actionId||b.message?.clientActionId||''}),true);if(actionId)rememberAction(a.u.userId,roomId,actionId);json(res,200,{ok:true,...roomSnapshot(roomId,a.u.userId),transport:'http-long-poll',actionAck:actionId})}catch(e){json(res,400,{ok:false,error:e.message||'房间操作失败'})}return true;
+      try{const wire=validateRoomMessage({...b.message,clientActionId:actionId||b.message?.clientActionId||''});message({closed:false,socket:{destroyed:true},userId:a.u.userId,roomId,tabId:tid,countedWs:false},JSON.stringify(wire),true);if(actionId)rememberAction(a.u.userId,roomId,actionId);json(res,200,{ok:true,...roomSnapshot(roomId,a.u.userId),transport:'http-long-poll',actionAck:actionId})}catch(e){json(res,400,{ok:false,error:e.message||'房间操作失败'})}return true;
     }
     json(res,200,{ok:true,...roomSnapshot(roomId,a.u.userId),transport:'http-long-poll'});return true;
   }

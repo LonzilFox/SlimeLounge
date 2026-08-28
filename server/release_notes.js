@@ -12,7 +12,7 @@ export function syncReleaseNotes({data,root,crypto}){
     const title=String(note.title||id),items=Array.isArray(note.items)?note.items.map(x=>String(x).trim()).filter(Boolean):[];
     const text=[title,...items.map(x=>`• ${x}`)].join('\n').slice(0,3000);
     arr.push({id:crypto.randomUUID(),userId:owner?.userId||'SYSTEM:release',name:owner?.name||'SlimeLounge',slimeColor:owner?.slimeColor||'mint',role:owner?.role||'admin',text,at:Date.now(),editedAt:0,systemReleaseId:id});
-    while(arr.length>100)arr.shift();published.add(id);data.releaseNotesPublished.push(id);added++;
+    while(arr.length>1000)arr.shift();published.add(id);data.releaseNotesPublished.push(id);added++;
   }
   return {added};
 }

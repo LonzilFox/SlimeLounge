@@ -24,14 +24,14 @@ try{
   if(!ok)throw Error('migration server start timeout\n'+logs);
   await sleep(80);
   const data=JSON.parse(fs.readFileSync(path.join(tmp,'data.json'),'utf8'));
-  if(data.schemaVersion!==22)throw Error(`schema did not migrate to 22: ${data.schemaVersion}`);
+  if(data.schemaVersion!==23)throw Error(`schema did not migrate to 23: ${data.schemaVersion}`);
   if(data.roomMessages?.['chat-changelog']?.some(x=>x.id==='legacy-auto-log'||x.text==='legacy generated changelog'))throw Error('legacy generated changelog was not cleared');
   if(!data.roomMessages?.['chat-changelog']?.some(x=>String(x.text||'').includes('SlimeLounge v0.2.9')))throw Error('v0.2.9 release note was not appended after migration');
   const backups=fs.readdirSync(path.join(tmp,'backups')).filter(x=>x.endsWith('.json'));
   if(!backups.length)throw Error('pre-migration backup was not created');
   const backed=JSON.parse(fs.readFileSync(path.join(tmp,'backups',backups[0]),'utf8'));
   if(!backed.roomMessages?.['chat-changelog']?.some(x=>x.text==='legacy generated changelog'))throw Error('backup did not preserve pre-migration changelog');
-  console.log('[OK] v0.2.4 migration: v0.2.1-era data -> schema 22, old generated changelog cleared once + v0.2.9 release note appended, backup preserved');
+  console.log('[OK] v0.2.4 migration: v0.2.1-era data -> schema 23, old generated changelog cleared once + v0.2.9 release note appended, backup preserved');
 }finally{
   if(proc&&!proc.killed)proc.kill('SIGTERM');
   await sleep(80);
