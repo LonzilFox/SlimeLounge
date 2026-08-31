@@ -5,7 +5,7 @@ const isPlain=o=>!!o&&typeof o==='object'&&!Array.isArray(o)&&Object.getPrototyp
 function safeTree(v,depth=0){
   if(depth>4)throw Error('输入层级过深');
   if(v==null||typeof v==='boolean')return;
-  if(typeof v==='number'){if(!Number.isFinite(v)||Math.abs(v)>1e9)throw Error('数值参数无效');return}
+  if(typeof v==='number'){if(!Number.isFinite(v)||Math.abs(v)>Number.MAX_SAFE_INTEGER)throw Error('数值参数无效');return}
   if(typeof v==='string'){if(v.length>4000)throw Error('字符串参数过长');return}
   if(Array.isArray(v)){if(v.length>64)throw Error('数组参数过长');for(const x of v)safeTree(x,depth+1);return}
   if(!isPlain(v))throw Error('对象参数无效');

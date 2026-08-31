@@ -8,7 +8,7 @@ function textLike(type){return /^(?:text\/|application\/(?:javascript|json|xml)|
 export function createStaticService({publicDir,contentType,applySecurityHeaders,version}){
   return function serveStatic(req,res,url){
     let p;try{p=decodeURIComponent(url.pathname)}catch{p='/index.html'}if(p==='/')p='/index.html';
-    const requested=path.normalize(path.join(publicDir,p));if(!requested.startsWith(publicDir))return false;
+    const requested=path.normalize(path.join(publicDir,p)),rel=path.relative(publicDir,requested);if(rel==='..'||rel.startsWith(`..${path.sep}`)||path.isAbsolute(rel)){applySecurityHeaders(res);res.writeHead(403,{'content-type':'text/plain; charset=utf-8','cache-control':'no-store'});res.end('Forbidden');return true}
     fs.stat(requested,(err,st)=>{
       const fallback=path.join(publicDir,'index.html'),file=!err&&st.isFile()?requested:fallback;
       fs.stat(file,(e,realSt)=>{

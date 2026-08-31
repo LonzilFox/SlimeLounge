@@ -26,7 +26,7 @@ export function createChatState({data,ROOM_MAP,body,auth,json,scheduleSave}){
     if(url.pathname==='/api/chat/unread'){json(res,200,{ok:true,channelUnread:unreadSummary(a.u.userId)});return true}
     const roomId=String(b.roomId||''),def=ROOM_MAP[roomId];if(!def||def.category!=='chat'||def.channelType==='voice'){json(res,400,{ok:false,error:'不是文字聊天频道'});return true}
     if(url.pathname==='/api/chat/read'){markRead(a.u.userId,roomId,Date.now());json(res,200,{ok:true,channelUnread:unreadSummary(a.u.userId)});return true}
-    const arr=data.roomMessages[roomId]||[],beforeAt=Math.max(0,Number(b.beforeAt)||Date.now()+1),limit=Math.max(10,Math.min(60,Math.floor(Number(b.limit)||40))),older=arr.filter(m=>(Number(m.at)||0)<beforeAt),items=older.slice(-limit),hasMore=older.length>items.length;
+    const arr=data.roomMessages[roomId]||[],beforeAt=Math.max(0,Number(b.beforeAt)||Date.now()+1),limit=Math.max(8,Math.min(36,Math.floor(Number(b.limit)||24))),older=arr.filter(m=>(Number(m.at)||0)<beforeAt),items=older.slice(-limit),hasMore=older.length>items.length;
     json(res,200,{ok:true,items,hasMore});return true;
   }
   return {handle,unreadSummary,markRead};

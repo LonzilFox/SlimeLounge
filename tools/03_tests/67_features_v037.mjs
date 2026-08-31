@@ -8,7 +8,7 @@ const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const app=read('public/app.js'),games=read('public/app-games.js'),pet=read('public/progression-ui.js'),leisure=read('public/leisure-ui.js'),poker=read('public/game-poker.js'),css=read('public/styles-v038.css'),html=read('public/index.html');
 
 // Multiplayer game discovery and first-class leisure navigation.
-ok(app.includes("['dice','doudizhu','gomoku','xiangqi','chess','go','blackjack','poker','uno','mahjong']"),'doudizhu missing from multiplayer room order');
+ok(app.includes("'doudizhu'")&&app.includes("doudizhu:'三人斗地主"),'doudizhu missing from multiplayer game discovery'); // exact v0.4.1 placement is covered by 70_features_v040.mjs
 ok(app.includes("doudizhu:'三人斗地主")&&app.includes("loadFeatureScript('game-doudizhu')"),'doudizhu UI module/description missing');
 ok(!app.includes('leisure-row')&&!app.includes('data-leisure='),'fishing/market still exposed from single-player games');
 ok(html.includes('data-section="fishing"')&&html.includes('data-section="market"')&&!pet.includes('data-pet-leisure="fishing"')&&!pet.includes('data-pet-leisure="market"'),'fishing/market are not first-class nav items');
@@ -27,7 +27,7 @@ ok(poker.includes('boss-token')&&poker.includes('数据协作')&&poker.includes(
 ok(css.includes('.poker-boss-shell')&&css.includes('.boss-token'),'boss-mode neutral visual treatment missing');
 
 // Responsive / spacing baseline.
-ok(html.includes('styles-v038.css?v=0.3.9&build=039'),'v0.3.8 responsive stylesheet not loaded');
+ok(html.includes('styles-v038.css?v=0.4.1&build=041'),'v0.3.8 responsive stylesheet not loaded');
 ok(css.includes('.game-row-list')&&css.includes('gap:12px')&&css.includes('@media(max-width:520px)')&&css.includes('min-width:0!important'),'spacing/zoom responsive guardrails missing');
 
 // v0.3.6 -> v0.3.8 migration must preserve Owner custom values/deletions and append ONLY v4 additions.
@@ -43,7 +43,7 @@ const previous={
   achievements:DEFAULT_PROGRESSION_CONFIG.achievements.filter(x=>!['fish_250','market_200','pet_100','game_300'].includes(x.id))
 };
 const up=normalizeProgressionConfig(previous);
-ok(up.version===4&&up.account.levelXpBase===777&&up.pet.feedXp===91,'v3 growth customization overwritten by v4 migration');
+ok(up.version===5&&up.account.levelXpBase===777&&up.pet.feedXp===91,'v3 growth customization overwritten by v4 migration');
 ok(up.shop.accessories.find(x=>x.id==='acc_bow')?.price===76543,'custom accessory price overwritten');
 ok(!up.shop.accessories.some(x=>x.id==='acc_leaf'),'previously deleted old default accessory was resurrected');
 for(const id of ['acc_flower','acc_crown','acc_headphones'])ok(up.shop.accessories.some(x=>x.id===id),`new v4 accessory not appended: ${id}`);

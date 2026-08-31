@@ -42,7 +42,7 @@ try{
   for(const [who,x,y] of moves)await act(who,'gomoku-1',who===a?'g-a':'g-b',{type:'place',x,y});
   const aa=await auth(a),bb=await auth(b);
   if(aa.profile.chips!==2930||bb.profile.chips!==2030)throw Error(`gomoku entry-fee + zero-sum mismatch A=${aa.profile.chips} B=${bb.profile.chips}`);
-  let lb=await (await fetch(`http://127.0.0.1:${port}/api/leaderboards`)).json();
+  let lb=await post('/api/leaderboards',cred(a));
   const ga=lb.leaderboards.games.gomoku.human.find(x=>x.userId===a.userId),gb=lb.leaderboards.games.gomoku.human.find(x=>x.userId===b.userId);
   if(ga?.losses!==1||gb?.wins!==1)throw Error('gomoku human leaderboard result mismatch');
 
@@ -50,7 +50,7 @@ try{
   const beforePractice=(await auth(a)).profile.chips;
   const beforeAiLoss=lb.leaderboards.games.gomoku.ai.find(x=>x.userId===a.userId)?.losses||0;
   await room(a,'gomoku-2','gp-a');await act(a,'gomoku-2','gp-a',{type:'join',seat:0});await act(a,'gomoku-2','gp-a',{type:'add_bot',seat:1});await act(a,'gomoku-2','gp-a',{type:'ready'});await act(a,'gomoku-2','gp-a',{type:'leave'});
-  const afterPractice=(await auth(a)).profile.chips;lb=await (await fetch(`http://127.0.0.1:${port}/api/leaderboards`)).json();
+  const afterPractice=(await auth(a)).profile.chips;lb=await post('/api/leaderboards',cred(a));
   const afterAiLoss=lb.leaderboards.games.gomoku.ai.find(x=>x.userId===a.userId)?.losses||0;
   if(afterPractice!==beforePractice-8||afterAiLoss!==beforeAiLoss)throw Error('AI practice should charge only entry fee, not an extra loss penalty');
 
@@ -61,12 +61,12 @@ try{
   let uno=await act(a,'uno-1','u-a',{type:'leave'});
   const trustee=uno.game?.seats?.find(x=>x?.forfeitUserId===a.userId);
   if(!trustee?.isBot||trustee.forfeited!==true)throw Error('UNO PVP quitter did not become AI trustee');
-  lb=await (await fetch(`http://127.0.0.1:${port}/api/leaderboards`)).json();
+  lb=await post('/api/leaderboards',cred(a));
   if((lb.leaderboards.games.uno.human.find(x=>x.userId===a.userId)?.losses||0)!==1)throw Error('UNO PVP quitter was not immediately counted as human loss');
   await act(b,'uno-1','u-b',{type:'leave'});
   uno=await room(a,'uno-1','u-check');
   if((uno.game?.seats||[]).some(Boolean)||uno.game?.phase==='playing')throw Error('all-AI UNO table survived after last live human left');
-  lb=await (await fetch(`http://127.0.0.1:${port}/api/leaderboards`)).json();
+  lb=await post('/api/leaderboards',cred(a));
   if((lb.leaderboards.games.uno.human.find(x=>x.userId===b.userId)?.losses||0)!==1)throw Error('second UNO PVP quitter was not counted as human loss');
 
   console.log('[OK] v0.2.4 server authority / board zero-sum / practice leave / UNO trustee + all-AI guard');

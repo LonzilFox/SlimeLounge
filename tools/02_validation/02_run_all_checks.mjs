@@ -8,10 +8,10 @@ const syntaxFiles=[
   'local_server.js',
   'server/action_receipts.js','server/chat_service.js','server/chat_state.js','server/release_rewards.js','server/device_identity.js','server/device_profile.js',
   'server/economy.js','server/http_room_transport.js','server/http_security.js','server/music_service.js',
-  'server/network_sync.js','server/rankings.js','server/release_notes.js','server/room_change_hub.js',
+  'server/network_sync.js','server/rankings.js','server/leaderboard_http.js','server/release_notes.js','server/room_change_hub.js',
   'server/runtime_diagnostics.js','server/progression.js','server/leisure_service.js','server/input_validation.js','server/music_http_routes.js','server/open_browser.js','server/static_service.js','server/game_lifecycle.js','server/user_merge.js','server/voice_config.js','server/ws_session_auth.js','server/ws_transport.js',
   'src/index.js',
-  'public/admin-economy.js','public/app-games.js','public/app.js','public/startup-ui.js','public/chat-ui.js','public/game-dice.js',
+  'public/admin-economy.js','public/app-games.js','public/app.js','public/accessory-visual.js','public/startup-ui.js','public/chat-ui.js','public/game-dice.js',
   'public/game-poker.js','public/game-mahjong.js','public/game-doudizhu.js','public/progression-ui.js','public/ui-v038.js','public/leisure-ui.js','public/music-ui.js','public/origin-migrate.js',
   'shared/dice.js','shared/extra_games.js','shared/games.js','shared/riichi.js','shared/doudizhu.js',
   'tools/02_validation/01_validate_project.js'
@@ -54,7 +54,9 @@ const testGroups=[
     'tools/03_tests/66_features_v036.mjs',
     'tools/03_tests/67_features_v037.mjs',
     'tools/03_tests/68_features_v038.mjs',
-    'tools/03_tests/69_security_v039.mjs'
+    'tools/03_tests/69_security_v039.mjs',
+    'tools/03_tests/70_features_v040.mjs',
+    'tools/03_tests/71_features_v041.mjs'
   ]]
 ];
 
@@ -64,7 +66,7 @@ function run(args,label){
   if(r.status!==0){console.error(`[FAIL] ${label}`);process.exit(r.status||1)}
 }
 
-console.log('=== SlimeLounge v0.3.9 · 工程检查 ===');
+console.log('=== SlimeLounge v0.4.1 · 工程检查 ===');
 console.log('\n[1/3] JavaScript 语法');
 for(const file of syntaxFiles)run(['--check',file],file);
 console.log(`[OK] ${syntaxFiles.length} 个源码文件语法通过`);

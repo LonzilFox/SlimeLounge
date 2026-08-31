@@ -36,7 +36,7 @@ try{
   await start();
   auth=await post('/api/auth',{userId:reg.userId,deviceId:reg.deviceId,deviceToken:reg.deviceToken});
   if(auth.profile.chips!==2500)throw Error(`wallet above 2000 was altered/clamped: ${auth.profile.chips}`);
-  const leaders=await (await fetch(`http://127.0.0.1:${port}/api/leaderboards`)).json();
+  const leaders=await post('/api/leaderboards',{userId:reg.userId,deviceId:reg.deviceId,deviceToken:reg.deviceToken});
   if(leaders.leaderboards?.chips?.find(x=>x.userId===reg.userId)?.chips!==2500)throw Error('chip leaderboard did not retain >2000 balance');
   console.log('[OK] v0.2.4 wallet: default 2000 / +1000 daily check-in / 1000-per-hour offline recovery / >2000 never clamped');
 }finally{
