@@ -28,7 +28,7 @@ async function post(p,b){const r=await fetch(`http://127.0.0.1:${port}${p}`,{met
 try{
   await wait();
   const health=await (await fetch(`http://127.0.0.1:${port}/api/health`)).json();
-  if(health.version!=='0.4.3'||'port' in health||'trustProxy' in health)throw Error('health mismatch / sensitive fields exposed');
+  if(health.version!=='0.4.4'||'port' in health||'trustProxy' in health)throw Error('health mismatch / sensitive fields exposed');
   const a=await post('/api/register',{name:'A',employeeId:'TA1001',slimeColor:'mint',deviceLabel:'PC-A'});
   const b=await post('/api/register',{name:'B',employeeId:'TB1002',slimeColor:'sky',deviceLabel:'PC-B'});
   if(a.profile?.chips!==2000||a.profile?.canChipCheckin!==true)throw Error('new-user chip wallet defaults failed');

@@ -71,7 +71,9 @@ const testGroups=[
     'tools/03_tests/69_security_v039.mjs',
     'tools/03_tests/70_features_v040.mjs',
     'tools/03_tests/71_features_v041.mjs',
-    'tools/03_tests/72_features_v042.mjs'
+    'tools/03_tests/72_features_v042.mjs',
+    'tools/03_tests/73_features_v043.mjs',
+    'tools/03_tests/74_features_v044.mjs'
   ]]
 ];
 
@@ -81,7 +83,7 @@ function run(args,label){
   if(r.status!==0){console.error(`[FAIL] ${label}`);process.exit(r.status||1)}
 }
 
-console.log('=== SlimeLounge v0.4.3 · 工程检查 ===');
+console.log('=== SlimeLounge v0.4.4 · 工程检查 ===');
 console.log('\n[1/3] JavaScript 语法');
 for(const file of syntaxFiles)run(['--check',file],file);
 console.log(`[OK] ${syntaxFiles.length} 个源码文件语法通过`);
