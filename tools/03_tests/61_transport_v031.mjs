@@ -13,7 +13,7 @@ async function post(url,obj){const r=await fetch(base+url,{method:'POST',headers
 const cred=s=>({userId:s.userId,deviceId:s.deviceId,deviceToken:s.deviceToken});
 async function wsOpen(s,roomId){return await new Promise((resolve,reject)=>{const ws=new WebSocket(`ws://127.0.0.1:${port}/api/ws`),timer=setTimeout(()=>reject(Error('first-frame WS auth timeout')),3000);ws.onopen=()=>ws.send(JSON.stringify({type:'auth',...cred(s),roomId,tabId:'v031-ws'}));ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch{return}if(m.type==='init'){clearTimeout(timer);resolve({ws,init:m})}};ws.onerror=()=>{clearTimeout(timer);reject(Error('WS error'))}})}
 try{
-  const health=await wait();if(health.version!=='0.4.2')throw Error('wrong version');
+  const health=await wait();if(health.version!=='0.4.4')throw Error('wrong version');
   const owner=await post('/api/register',{name:'V031',employeeId:'V031NET',slimeColor:'mint',deviceLabel:'test'}),c={...cred(owner),tabId:'v031-lp'};
 
   // WebSocket must authenticate in the first frame, with no ticket/query string.
