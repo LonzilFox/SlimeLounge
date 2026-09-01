@@ -17,6 +17,8 @@ rm -f \
   "$APP_DIR/public/styles-v038.css" \
   "$APP_DIR/public/accessory-visual.js" \
   "$APP_DIR/public/ui-v038.js" 2>/dev/null || true
+find "$APP_DIR/release_notes" -maxdepth 1 -type f -name '*.json' ! -name 'releases.json' -delete 2>/dev/null || true
+rm -f "$APP_DIR/public/accessories/"*.tint.svg "$APP_DIR/public/accessories/"*.detail.svg 2>/dev/null || true
 
 echo "[3/5] Verifying project..."
 npm run check

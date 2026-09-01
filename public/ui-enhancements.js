@@ -1,20 +1,28 @@
-// SlimeLounge shared UI enhancements: layered accessories, decorated avatars, titles, first-class leisure navigation and admin fold persistence.
+// SlimeLounge shared UI enhancements: single-SVG accessories, decorated avatars, titles,
+// first-class leisure navigation and admin fold persistence.
 const ACCESSORY_VISUAL_META={
-  '/accessories/bow.svg':{color:'#ff7fa2',mask:'/accessories/bow.tint.svg',detail:'/accessories/bow.detail.svg',aspect:48/28},
-  '/accessories/leaf.svg':{color:'#6fd477',mask:'/accessories/leaf.tint.svg',detail:'/accessories/leaf.detail.svg',aspect:36/40},
-  '/accessories/star.svg':{color:'#ffd75d',mask:'/accessories/star.tint.svg',detail:'/accessories/star.detail.svg',aspect:1},
-  '/accessories/glasses.svg':{color:'#1c2944',mask:'/accessories/glasses.tint.svg',detail:'/accessories/glasses.detail.svg',aspect:96/36},
-  '/accessories/scarf.svg':{color:'#d96583',mask:'/accessories/scarf.tint.svg',detail:'/accessories/scarf.detail.svg',aspect:96/34},
-  '/accessories/flower.svg':{color:'#ff83ad',mask:'/accessories/flower.tint.svg',detail:'/accessories/flower.detail.svg',aspect:1},
-  '/accessories/crown.svg':{color:'#f1c84c',mask:'/accessories/crown.tint.svg',detail:'/accessories/crown.detail.svg',aspect:64/42},
-  '/accessories/headphones.svg':{color:'#6278a8',mask:'/accessories/headphones.tint.svg',detail:'/accessories/headphones.detail.svg',aspect:112/72}
+  '/accessories/bow.svg':{color:'#ff7fa2',viewBox:'0 0 48 28',edge:'M2 6h8v-4h10v6h8V2h10v4h8v16h-8v4H28v-6h-8v6H10v-4H2z',primary:'M6 8h10v4h6v4h-6v4H6zm26 0h10v12H32v-4h-6v-4h6z',highlight:['M20 10h8v8h-8z','M8 8h6v3H8zm26 0h6v3h-6z']},
+  '/accessories/leaf.svg':{color:'#6fd477',viewBox:'0 0 36 40',edge:'M16 36h5V24h5v-5h5V5h-5V1H16v5h-5v5H6v14h5v5h5z',primary:'M16 30V10h5V6h6v9h-5v5h-5v10z',highlight:['M11 20V13h5V8h5v7h-5v5z']},
+  '/accessories/star.svg':{color:'#ffd75d',viewBox:'0 0 48 48',edge:'M20 0h8l5 14h15v8L36 31l5 17h-9l-8-8-8 8H7l5-17L0 22v-8h15z',primary:'M22 6h4l4 13h12v2l-10 7 4 13h-2L24 33 14 41h-2l4-13-10-7v-2h12z',highlight:['M22 8h4l2 8h-6z']},
+  '/accessories/glasses.svg':{color:'#1c2944',viewBox:'0 0 96 36',primary:'M0 10h8V6h30v4h20V6h30v4h8v8h-6v12H80v6H62v-6h-8V18H42v12h-8v6H16v-6H6V18H0zm12 4v12h6v4h14v-4h4V14zm48 0v12h4v4h14v-4h6V14z',highlight:['M16 14h16v12H16zm48 0h16v12H64z'],strokeEdge:true},
+  '/accessories/scarf.svg':{color:'#d96583',viewBox:'0 0 96 34',edge:'M4 0h84v6h8v16h-8v6H66v6H54V24H12v4H4z',primary:'M8 5h76v5h8v8h-8v5H62v7h-4V19H8z',highlight:['M12 5h40v4H12z']},
+  '/accessories/flower.svg':{color:'#ff83ad',viewBox:'0 0 40 40',edge:'M16 0h8v8h8v8h8v8h-8v8h-8v8h-8v-8H8v-8H0v-8h8V8h8z',primary:'M16 4h8v8h8v8h-8v8h-8v-8H8v-8h8z',highlight:['M16 16h8v8h-8z','M16 4h4v7h-4z']},
+  '/accessories/crown.svg':{color:'#f1c84c',viewBox:'0 0 64 42',edge:'M4 8h8V0h8v12h8V4h8v8h8V0h8v8h8v26h-4v8H8v-8H4z',primary:'M9 10h7V5h2v13h14V9h2v9h14V5h2v5h7v20H9z',highlight:['M12 12h8v5h-8zm20 0h8v5h-8zm20 0h4v5h-4z','M27 24h10v7H27z']},
+  '/accessories/headphones.svg':{color:'#6278a8',viewBox:'0 0 112 72',edge:'M20 20V12h8V6h56v6h8v8h8v40H88V32h-8V20H32v12h-8v28H12V20z',primary:'M28 12h56v8H28zm-12 24h16v28H16zm64 0h16v28H80z',highlight:['M20 40h8v20h-8zm64 0h8v20h-8z','M32 12h22v4H32z']}
 };
 function accessoryVisualMeta(asset=''){return ACCESSORY_VISUAL_META[String(asset||'')]||null}
-function accessoryDefaultColor(item){const c=String(item?.color||'');if(/^#[0-9a-f]{6}$/i.test(c))return c;return accessoryVisualMeta(item?.asset)?.color||'#7aa6c2'}
+function accessoryDefaultColor(item){const c=String(item?.color||'');if(/^#[0-9a-f]{6}$/i.test(c))return c.toLowerCase();return accessoryVisualMeta(item?.asset)?.color||'#7aa6c2'}
+function accessoryMixColor(hex,target,ratio){
+  const c=/^#[0-9a-f]{6}$/i.test(String(hex||''))?String(hex).slice(1):'7aa6c2',t=target==='white'?[255,255,255]:[0,0,0],r=Math.max(0,Math.min(1,Number(ratio)||0));
+  const rgb=[0,2,4].map(i=>parseInt(c.slice(i,i+2),16));return '#'+rgb.map((v,i)=>Math.round(v+(t[i]-v)*r).toString(16).padStart(2,'0')).join('');
+}
+function accessoryPalette(color){const main=/^#[0-9a-f]{6}$/i.test(String(color||''))?String(color).toLowerCase():'#7aa6c2';return {main,edge:accessoryMixColor(main,'black',.48),highlight:accessoryMixColor(main,'white',.48)}}
 function accessoryVisualMarkup(item,color,className,style,alt=''){
-  if(!item?.asset)return'';const asset=String(item.asset),meta=accessoryVisualMeta(asset),c=/^#[0-9a-f]{6}$/i.test(String(color||item.color||''))?String(color||item.color):'';
-  if(!meta||!c)return `<img class="${className}" src="${attr(asset)}" alt="${attr(alt)}" style="${attr(style)}" loading="lazy">`;
-  return `<img class="${className} accessory-base-layer" src="${attr(asset)}" alt="${attr(alt)}" style="${attr(style)}" loading="lazy"><span class="${className} accessory-primary-layer" aria-hidden="true" style="${attr(style)};--acc:${attr(c)};--acc-mask:url('${attr(meta.mask)}');--acc-aspect:${Number(meta.aspect)||1}"></span><img class="${className} accessory-detail-layer" src="${attr(meta.detail)}" alt="" aria-hidden="true" style="${attr(style)}" loading="lazy">`;
+  if(!item?.asset)return'';const asset=String(item.asset),meta=accessoryVisualMeta(asset),c=/^#[0-9a-f]{6}$/i.test(String(color||item.color||''))?String(color||item.color):accessoryDefaultColor(item);
+  if(!meta)return `<img class="${className}" src="${attr(asset)}" alt="${attr(alt)}" style="${attr(style)}" loading="lazy">`;
+  const p=accessoryPalette(c),edge=meta.edge?`<path fill="${p.edge}" d="${meta.edge}"></path>`:'',stroke=meta.strokeEdge?` stroke="${p.edge}" stroke-width="2" stroke-linejoin="miter"`:'';
+  const highlights=(meta.highlight||[]).map((d,i)=>`<path fill="${p.highlight}"${i>0?' opacity=".82"':''} d="${d}"></path>`).join('');
+  return `<svg class="${className} accessory-svg" viewBox="${meta.viewBox}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${attr(alt)}" style="${attr(style)}"><g shape-rendering="crispEdges">${edge}<path fill="${p.main}"${stroke} d="${meta.primary}"></path>${highlights}</g></svg>`;
 }
 
 function v038FindUser(id){if(!id)return null;if(state.profile?.userId===id)return state.profile;const pools=[state.roomUsers,state.directoryUsers,state.social?.friends,state.social?.incoming,state.social?.outgoing];for(const a of pools)for(const u of a||[])if(u?.userId===id)return u;return null}

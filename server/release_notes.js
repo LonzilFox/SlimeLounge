@@ -2,8 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 function readReleaseEntries(dir){
-  const out=[];
-  for(const file of fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort()){
+  const out=[],files=fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort();
+  // v0.4.2+ uses one consolidated file. Overlay upgrades may leave older per-version JSONs
+  // on disk, so once releases.json exists it is authoritative and stale siblings are ignored.
+  const chosen=files.includes('releases.json')?['releases.json']:files;
+  for(const file of chosen){
     let raw;try{raw=JSON.parse(fs.readFileSync(path.join(dir,file),'utf8'))}catch{continue}
     for(const note of Array.isArray(raw)?raw:[raw])if(note&&typeof note==='object')out.push({note,file});
   }
