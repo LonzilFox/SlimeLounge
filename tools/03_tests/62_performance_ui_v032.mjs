@@ -16,7 +16,7 @@ const css=fs.readFileSync(path.join(root,'public/styles.css'),'utf8')+fs.readFil
 const html=fs.readFileSync(path.join(root,'public/index.html'),'utf8');
 
 ok(!html.includes('<script defer src="/music-ui.js'), 'music module should be lazy loaded');
-ok(html.includes('startup-ui.js?v=0.4.4&build=044')&&html.includes('app.js?v=0.4.4&build=044')&&!html.includes('onload="this.media='), 'hotfix asset revision / CSP-safe startup loader missing');
+ok(html.includes('startup-ui.js?v=0.4.4&build=044fix3')&&html.includes('app.js?v=0.4.4&build=044fix3')&&!html.includes('onload="this.media='), 'hotfix asset revision / CSP-safe startup loader missing');
 ok(app.includes("loadFeatureScript('music-ui')")&&app.includes("loadFeatureScript('game-mahjong')"), 'lazy feature loader missing');
 ok(app.includes('WebSocket RTT')&&app.includes('大厅同步 RTT')&&app.includes('clientAt:Date.now()'), 'client RTT diagnostics missing');
 ok(games.includes('平均 RTT')&&games.includes('服务端 平均 / 最大'), 'admin latency diagnostics missing');
@@ -46,10 +46,10 @@ let logs='';child.stdout.on('data',d=>logs+=d);child.stderr.on('data',d=>logs+=d
 async function wait(){for(let i=0;i<60;i++){try{const r=await fetch(`http://127.0.0.1:${port}/api/health`);if(r.ok)return await r.json()}catch{}await new Promise(r=>setTimeout(r,100))}throw Error('server start timeout '+logs)}
 try{
   const health=await wait();ok(health.version==='0.4.4','server version mismatch');
-  const a=await fetch(`http://127.0.0.1:${port}/app.js?v=0.4.4&build=044`,{headers:{'accept-encoding':'gzip'}});
+  const a=await fetch(`http://127.0.0.1:${port}/app.js?v=0.4.4&build=044fix3`,{headers:{'accept-encoding':'gzip'}});
   ok(a.ok,'static asset failed');ok(/immutable/.test(a.headers.get('cache-control')||''),'versioned asset is not immutable');ok((a.headers.get('content-encoding')||'').includes('gzip'),'gzip missing');
   const etag=a.headers.get('etag');ok(etag,'etag missing');await a.arrayBuffer();
-  const b=await fetch(`http://127.0.0.1:${port}/app.js?v=0.4.4&build=044`,{headers:{'if-none-match':etag}});ok(b.status===304,'etag did not return 304');
+  const b=await fetch(`http://127.0.0.1:${port}/app.js?v=0.4.4&build=044fix3`,{headers:{'if-none-match':etag}});ok(b.status===304,'etag did not return 304');
   const h=await fetch(`http://127.0.0.1:${port}/`);ok((h.headers.get('cache-control')||'')==='no-cache','HTML should revalidate');
   console.log('[OK] v0.3.8 cache/gzip/lazy loading / RTT diagnostics / dynamic cleanup / READY / poker / riichi / mobile music UI');
 }finally{child.kill('SIGTERM');await new Promise(r=>setTimeout(r,120));fs.rmSync(tmp,{recursive:true,force:true})}

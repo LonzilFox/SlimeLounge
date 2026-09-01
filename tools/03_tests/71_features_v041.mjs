@@ -16,7 +16,7 @@ ok(css.includes('#adminView .admin-item-scroll')&&css.includes('max-height:none!
 ok(games.includes('restoreScroll=options.resetScroll?0')&&games.includes('e.scrollTop=restoreScroll')&&games.includes('renderAdmin({resetScroll:true})'),'admin save scroll preservation/tab reset missing');
 ok(css.includes('.diag-overview-card')&&css.includes('.diag-user-card')&&css.includes('.diag-grid>div'),'diagnostics UI repair missing');
 ok(leisure.includes('<small>可用筹码</small>')&&!leisure.includes('这是 SlimeLounge 内部模拟行情')&&css.includes('min-height:82px!important')&&css.includes('min-height:40px!important'),'market row remains compressed or obsolete note remains');
-ok(html.includes('ui-enhancements.js?v=0.4.4&build=044')&&acc.includes('accessoryPalette')&&acc.includes('accessory-svg')&&!acc.includes('accessory-base-layer'),'single-SVG accessory renderer not loaded');
+ok(html.includes('ui-enhancements.js?v=0.4.4&build=044fix3')&&acc.includes('accessoryPalette')&&acc.includes('accessory-svg')&&!acc.includes('accessory-base-layer'),'single-SVG accessory renderer not loaded');
 ok(prog.includes('ACCESSORY_ORIGINAL_COLORS')&&prog.includes("c.toLowerCase()==='#ffffff'")&&prog.includes('version:8'),'accessory original-color migration missing');
 ok(read('public/accessories/star.svg').includes('viewBox="0 0 48 48"')&&read('public/accessories/star.svg').includes('l5 17')&&read('public/accessories/star.svg').includes('l-8-8'),'star asset is not the redesigned five-point shape');
 ok(progUi.includes('data-prog-shop-move')&&prog.includes("action==='move'")&&progUi.includes('↑ 上移')&&progUi.includes('↓ 下移'),'shop ordering controls/API missing');

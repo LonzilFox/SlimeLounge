@@ -12,7 +12,7 @@ const pkg=JSON.parse(read('package.json'));
 const html=read('public/index.html'),app=read('public/app.js'),games=read('public/app-games.js'),leisure=read('public/leisure-ui.js'),prog=read('public/progression-ui.js'),progression=read('server/progression.js'),rank=read('server/rankings.js'),diag=read('server/runtime_diagnostics.js'),css=read('public/ui-overrides.css');
 
 ok(pkg.version==='0.4.4','package version is not v0.4.4');
-ok(html.includes('v=0.4.4&build=044')&&!html.includes('042fix2'),'v0.4.4 asset cache revision missing');
+ok(html.includes('v=0.4.4&build=044fix3')&&!html.includes('042fix2'),'v0.4.4 asset cache revision missing');
 ok(app.includes("FEATURE_VERSION='0.4.4',ASSET_BUILD='044'"),'dynamic feature cache revision missing');
 
 const cfg=normalizeLeisureConfig({});

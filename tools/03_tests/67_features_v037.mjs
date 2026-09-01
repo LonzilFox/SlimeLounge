@@ -27,7 +27,7 @@ ok(poker.includes('boss-token')&&poker.includes('数据协作')&&poker.includes(
 ok(css.includes('.poker-boss-shell')&&css.includes('.boss-token'),'boss-mode neutral visual treatment missing');
 
 // Responsive / spacing baseline.
-ok(html.includes('styles.css?v=0.4.4&build=044'),'v0.3.8 responsive stylesheet not loaded');
+ok(html.includes('styles.css?v=0.4.4&build=044fix3'),'v0.3.8 responsive stylesheet not loaded');
 ok(css.includes('.game-row-list')&&css.includes('gap:12px')&&css.includes('@media(max-width:520px)')&&css.includes('min-width:0!important'),'spacing/zoom responsive guardrails missing');
 
 // v0.3.6 -> v0.3.8 migration must preserve Owner custom values/deletions and append ONLY v4 additions.

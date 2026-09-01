@@ -46,7 +46,7 @@ ok(bjUi.includes('对子边注')&&bjUi.includes('花色不限')&&bjUi.includes('
   const s=createGame('blackjack');applyGameAction(s,'U1',{type:'join',seat:0,chips:2000});addBotToGame(s,1);applyGameAction(s,'U1',{type:'ready'});applyGameAction(s,'U1',{type:'start'});ok(s.practice===true&&s.practiceSnapshot?.U1===2000,'AI blackjack did not use practice snapshot');
 }
 
-ok(leisureUi.includes('fish-track')&&leisureUi.includes('market-chart')&&leisureUi.includes('完全模拟')&&html.includes('leisure-ui.js?v=0.4.4&build=044'),'fishing/market client UI missing');
+ok(leisureUi.includes('fish-track')&&leisureUi.includes('market-chart')&&leisureUi.includes('完全模拟')&&html.includes('leisure-ui.js?v=0.4.4&build=044fix3'),'fishing/market client UI missing');
 ok(leisureUi.includes('钓到一条 XP')&&leisureUi.includes('每笔交易 XP')&&leisureUi.includes('波动率 0~0.5'),'leisure admin controls incomplete');
 ok(leisureSvc.includes('/api/leisure/fishing/sell')&&leisureSvc.includes('/api/leisure/market/trade')&&leisureSvc.includes('tradeXp'),'leisure service endpoints/config missing');
 ok(progression.includes("a.u.pet.equipped[item.slot]===id?'':id"),'click-again accessory unequip toggle missing');
