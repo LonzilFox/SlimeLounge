@@ -2,23 +2,30 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createLeisureService} from '../../server/leisure_service.js';
+import {normalizeProgressionConfig} from '../../server/progression.js';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const retired=['src/index.js','wrangler.jsonc','deploy_cloudflare.bat','check_repo_root.bat','test_internal_connection.bat','test_ipop_connection.bat','public/styles-v038.css','public/accessory-visual.js','public/ui-v038.js'];
 for(const rel of retired){const p=path.join(root,rel);try{if(fs.existsSync(p))fs.rmSync(p,{force:true})}catch{}}
+for(const [dirRel,test] of [['release_notes',n=>n.endsWith('.json')&&n!=='releases.json'],['public/accessories',n=>/\.(?:tint|detail)\.svg$/i.test(n)]]){const dir=path.join(root,dirRel);if(fs.existsSync(dir))for(const n of fs.readdirSync(dir))if(test(n))try{fs.rmSync(path.join(dir,n),{force:true})}catch{}}
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const ok=(v,m)=>{if(!v)throw Error(m)};
-const app=read('public/app.js'),ui=read('public/leisure-ui.js'),css=read('public/styles.css'),pkg=JSON.parse(read('package.json'));
+const app=read('public/app.js'),ui=read('public/leisure-ui.js'),progUi=read('public/progression-ui.js'),enh=read('public/ui-enhancements.js'),css=read('public/styles.css')+'\n'+read('public/styles-responsive.css')+'\n'+read('public/ui-overrides.css'),pkg=JSON.parse(read('package.json'));
 
 ok(app.includes("catch(parseErr){throw Error(r.ok?'响应不完整，请重试'"),'broken 200 JSON is still swallowed as a successful empty object');
 ok(ui.includes("!r?.fishing||!Array.isArray(r.fishing.inventory)")&&ui.includes('for(let i=0;i<2;i++'),'leisure state schema guard / retry missing');
 ok(ui.includes('最近捕获')&&ui.includes('稀有度')&&ui.includes('售价')&&ui.includes('data-fish-select')&&ui.includes('fishSellSelected'),'fishing sort / multi-select sell UI missing');
 ok(ui.includes('钓鱼图鉴')&&ui.includes('最轻')&&ui.includes('最重')&&ui.includes('次</strong>'),'fishing catalogue stats UI missing');
-ok(css.includes('#adminView .admin-tabs-v038{position:static!important'),'admin top tabs still sticky over long pages');
+ok(css.includes('.admin-tabs-v038{display:flex')&&css.includes('#adminView .admin-tabs-v038{position:static!important'),'admin top tabs / post-responsive repair missing');
 ok(css.includes('.fish-collection-grid')&&css.includes('.fish-card.selected'),'fishing catalogue/selection styles missing');
 ok(!fs.existsSync(path.join(root,'src/index.js'))&&!fs.existsSync(path.join(root,'wrangler.jsonc'))&&!fs.existsSync(path.join(root,'deploy_cloudflare.bat'))&&!fs.existsSync(path.join(root,'check_repo_root.bat'))&&!fs.existsSync(path.join(root,'test_internal_connection.bat'))&&!fs.existsSync(path.join(root,'test_ipop_connection.bat')),'obsolete Worker/root helper files were not cleaned');
-ok(fs.readdirSync(path.join(root,'release_notes')).filter(x=>x.endsWith('.json')).length===1&&Array.isArray(JSON.parse(read('release_notes/releases.json'))),'release notes were not consolidated');
+ok(fs.readdirSync(path.join(root,'release_notes')).filter(x=>x.endsWith('.json')).join(',')==='releases.json'&&Array.isArray(JSON.parse(read('release_notes/releases.json'))),'release notes were not consolidated / stale overlay notes were not cleaned');
 ok(fs.existsSync(path.join(root,'public/ui-enhancements.js'))&&!fs.existsSync(path.join(root,'public/ui-v038.js'))&&!fs.existsSync(path.join(root,'public/accessory-visual.js'))&&!fs.existsSync(path.join(root,'public/styles-v038.css')),'versioned UI assets were not consolidated');
+ok(enh.includes('accessoryPalette')&&enh.includes('accessory-svg')&&!enh.includes('accessory-base-layer')&&!enh.includes('accessory-primary-layer'),'accessories are still rendered as overlapping duplicate layers');
+ok(progUi.includes("slime(profile?.slimeColor||'mint',cls)}<div class=\"pet-accessory-visual\">")&&!progUi.includes("slime(profile?.slimeColor||'mint',cls,profile?.userId||'')}<div class=\"pet-accessory-visual\">"),'pet view still renders the same equipped accessories twice');
+ok(!fs.readdirSync(path.join(root,'public/accessories')).some(x=>/\.(?:tint|detail)\.svg$/i.test(x)),'obsolete accessory layer SVGs were not cleaned');
+const migrated=normalizeProgressionConfig({version:5,shop:{accessories:[{id:'acc_bow',name:'小蝴蝶结',asset:'/accessories/bow.svg',color:'#ffffff'}],food:[],titles:[]},achievements:[]});
+ok(migrated.version===6&&migrated.shop.accessories[0].color==='#ff7fa2','legacy white accessory color was not migrated back to its original main color');
 ok(ui.includes('返回结果不完整，正在重新同步鱼篓')&&ui.includes('Number.isInteger(sold)')&&ui.includes('Number.isFinite(value)'),'fish sale UI can still render undefined sold/value');
 ok(pkg.version==='0.4.2'&&!pkg.scripts?.deploy&&!pkg.devDependencies?.wrangler,'obsolete Cloudflare deployment entry still present');
 

@@ -9,6 +9,16 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const retiredFiles=['src/index.js','wrangler.jsonc','deploy_cloudflare.bat','check_repo_root.bat','test_internal_connection.bat','test_ipop_connection.bat','public/styles-v038.css','public/accessory-visual.js','public/ui-v038.js'];
 for(const rel of retiredFiles){const p=path.join(root,rel);try{if(fs.existsSync(p))fs.rmSync(p,{force:true})}catch(e){console.warn(`[WARN] 无法清理旧文件 ${rel}: ${e.message}`)}}
 
+// Consolidated release notes / accessory layers may leave obsolete siblings after overlay upgrades.
+for(const dirRel of ['release_notes','public/accessories']){
+  const dir=path.join(root,dirRel);if(!fs.existsSync(dir))continue;
+  for(const name of fs.readdirSync(dir)){
+    const oldNote=dirRel==='release_notes'&&name.endsWith('.json')&&name!=='releases.json';
+    const oldAcc=dirRel==='public/accessories'&&/\.(?:tint|detail)\.svg$/i.test(name);
+    if(!oldNote&&!oldAcc)continue;try{fs.rmSync(path.join(dir,name),{force:true})}catch(e){console.warn(`[WARN] 无法清理旧文件 ${dirRel}/${name}: ${e.message}`)}
+  }
+}
+
 const syntaxFiles=[
   'local_server.js',
   'server/action_receipts.js','server/chat_service.js','server/chat_state.js','server/release_rewards.js','server/device_identity.js','server/device_profile.js',

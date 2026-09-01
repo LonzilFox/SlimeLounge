@@ -20,7 +20,7 @@ const html=fs.readFileSync(path.join(root,'public/index.html'),'utf8');
 // Upgrade is patch/merge, never a reset of the Owner's current values.
 const old={version:2,account:{...DEFAULT_PROGRESSION_CONFIG.account,levelXpBase:987},pet:{...DEFAULT_PROGRESSION_CONFIG.pet,feedXp:77},shop:{accessories:[{...DEFAULT_PROGRESSION_CONFIG.shop.accessories[0],price:54321},{id:'acc_owner_custom',name:'自定义',price:87654,slot:'head',asset:'/accessories/bow.svg',enabled:true}],food:[{...DEFAULT_PROGRESSION_CONFIG.shop.food[0],price:4321}],titles:[{...DEFAULT_PROGRESSION_CONFIG.shop.titles[0],price:65432}]},achievements:DEFAULT_PROGRESSION_CONFIG.achievements.filter(x=>!x.id.startsWith('fish_')&&!x.id.startsWith('market_'))};
 const migrated=normalizeProgressionConfig(old);
-ok(migrated.version===5&&migrated.account.levelXpBase===987&&migrated.pet.feedXp===77,'custom growth values were overwritten');
+ok(migrated.version===6&&migrated.account.levelXpBase===987&&migrated.pet.feedXp===77,'custom growth values were overwritten');
 ok(migrated.shop.accessories.find(x=>x.id==='acc_bow')?.price===54321&&migrated.shop.accessories.some(x=>x.id==='acc_owner_custom'),'custom shop values/items were overwritten');
 ok(migrated.shop.food.find(x=>x.id==='food_jelly')?.price===4321&&migrated.shop.titles.find(x=>x.id==='title_lounge_regular')?.price===65432,'custom food/title price was overwritten');
 ok(migrated.achievements.some(x=>x.id==='fish_1')&&migrated.achievements.some(x=>x.id==='market_1'),'new achievement defaults were not appended');
@@ -46,7 +46,7 @@ ok(bjUi.includes('对子边注')&&bjUi.includes('花色不限')&&bjUi.includes('
   const s=createGame('blackjack');applyGameAction(s,'U1',{type:'join',seat:0,chips:2000});addBotToGame(s,1);applyGameAction(s,'U1',{type:'ready'});applyGameAction(s,'U1',{type:'start'});ok(s.practice===true&&s.practiceSnapshot?.U1===2000,'AI blackjack did not use practice snapshot');
 }
 
-ok(leisureUi.includes('fish-track')&&leisureUi.includes('market-chart')&&leisureUi.includes('完全模拟')&&html.includes('leisure-ui.js?v=0.4.2&build=042'),'fishing/market client UI missing');
+ok(leisureUi.includes('fish-track')&&leisureUi.includes('market-chart')&&leisureUi.includes('完全模拟')&&html.includes('leisure-ui.js?v=0.4.2&build=042fix2'),'fishing/market client UI missing');
 ok(leisureUi.includes('钓到一条 XP')&&leisureUi.includes('每笔交易 XP')&&leisureUi.includes('波动率 0~0.5'),'leisure admin controls incomplete');
 ok(leisureSvc.includes('/api/leisure/fishing/sell')&&leisureSvc.includes('/api/leisure/market/trade')&&leisureSvc.includes('tradeXp'),'leisure service endpoints/config missing');
 ok(progression.includes("a.u.pet.equipped[item.slot]===id?'':id"),'click-again accessory unequip toggle missing');

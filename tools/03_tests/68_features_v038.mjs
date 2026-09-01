@@ -5,7 +5,7 @@ import {applyReleaseReward} from '../../server/release_rewards.js';
 import {createDoudizhu,applyDoudizhuAction,addDoudizhuBot} from '../../shared/doudizhu.js';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8'),ok=(v,m)=>{if(!v)throw Error(m)};
-const html=read('public/index.html'),app=read('public/app.js'),games=read('public/app-games.js'),chat=read('public/chat-ui.js'),chatState=read('server/chat_state.js'),pet=read('public/progression-ui.js'),prog=read('server/progression.js'),leisure=read('public/leisure-ui.js'),adminEcon=read('public/admin-economy.js'),glue=read('public/ui-enhancements.js'),css=read('public/styles.css'),local=read('local_server.js');
+const html=read('public/index.html'),app=read('public/app.js'),games=read('public/app-games.js'),chat=read('public/chat-ui.js'),chatState=read('server/chat_state.js'),pet=read('public/progression-ui.js'),prog=read('server/progression.js'),leisure=read('public/leisure-ui.js'),adminEcon=read('public/admin-economy.js'),glue=read('public/ui-enhancements.js'),css=read('public/styles.css')+'\n'+read('public/styles-responsive.css')+'\n'+read('public/ui-overrides.css'),local=read('local_server.js');
 
 // 1: latest-first chat viewport + upward history.
 ok(chat.includes('/api/chat/history')&&chat.includes('scrollTop<80')&&chat.includes("e.style.visibility='hidden'")&&chat.includes("e.style.scrollBehavior='auto'")&&chat.includes('historyMessages'),'chat latest-first/history loading missing');
@@ -23,7 +23,7 @@ ok(leisure.includes('<b>钓鱼设置</b>')&&leisure.includes('<summary>基础参
 ok(pet.includes('保存账号成长')&&pet.includes('重置账号成长')&&pet.includes('保存宠物成长')&&pet.includes('重置宠物成长')&&pet.includes('成就设置'),'growth/pet/achievement grouping missing');
 // 5/6/7: decorated avatars, live accessory preview, fold persistence.
 ok(prog.includes('appearance=Object.values(u.pet.equipped')&&glue.includes('profileSlimeMarkup')&&glue.includes('v038DecorateStatic'),'decorated user avatars missing');
-ok(pet.includes('data-acc-preview')&&pet.includes('refreshAdminAccessoryPreview')&&pet.includes('默认颜色'),'accessory live preview/config missing');
+ok(pet.includes('data-acc-preview')&&pet.includes('refreshAdminAccessoryPreview')&&pet.includes('默认主色'),'accessory live preview/config missing');
 ok(glue.includes('ADMIN_FOLD_KEY')&&glue.includes('sessionStorage')&&glue.includes('v038RestoreFolds')&&glue.includes('v038SaveFolds'),'admin fold persistence missing');
 // 8/9: multiple titles and accessory colors/toggle.
 ok(prog.includes('equippedTitles')&&prog.includes("slice(0,8)")&&pet.includes('data-title-equip')&&pet.includes('可同时佩戴多个')&&glue.includes('equippedTitle'),'multi-title behavior missing');

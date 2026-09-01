@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const ok=(v,m)=>{if(!v)throw Error(m)};
-const app=read('public/app.js'),games=read('public/app-games.js'),leisureUi=read('public/leisure-ui.js'),progUi=read('public/progression-ui.js'),leisure=read('server/leisure_service.js'),rankings=read('server/rankings.js'),rankHttp=read('server/leaderboard_http.js'),staticSvc=read('server/static_service.js'),css=read('public/styles.css');
+const app=read('public/app.js'),games=read('public/app-games.js'),leisureUi=read('public/leisure-ui.js'),progUi=read('public/progression-ui.js'),leisure=read('server/leisure_service.js'),rankings=read('server/rankings.js'),rankHttp=read('server/leaderboard_http.js'),staticSvc=read('server/static_service.js'),css=read('public/styles.css')+'\n'+read('public/styles-responsive.css')+'\n'+read('public/ui-overrides.css');
 
 ok(app.includes("RANK_NAMES={chips:'筹码榜',market:'交易盈亏',dice:'摇骰子'") ,'market rank order missing');
 ok(app.includes("['dice','gomoku','xiangqi','chess','go','blackjack','poker','uno','mahjong','doudizhu']"),'斗地主未移动到日麻下面');

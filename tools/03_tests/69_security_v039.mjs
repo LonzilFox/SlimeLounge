@@ -8,7 +8,7 @@ import {normalizeLeisureConfig,DEFAULT_LEISURE_CONFIG} from '../../server/leisur
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const ok=(v,m)=>{if(!v)throw Error(m)};
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const input=read('server/input_validation.js'),http=read('server/http_security.js'),local=read('local_server.js'),leisure=read('server/leisure_service.js'),leisureUi=read('public/leisure-ui.js'),games=read('shared/games.js'),gameUi=read('public/app-games.js'),ui=read('public/ui-enhancements.js'),css=read('public/styles.css');
+const input=read('server/input_validation.js'),http=read('server/http_security.js'),local=read('local_server.js'),leisure=read('server/leisure_service.js'),leisureUi=read('public/leisure-ui.js'),games=read('shared/games.js'),gameUi=read('public/app-games.js'),ui=read('public/ui-enhancements.js'),css=read('public/styles.css')+'\n'+read('public/styles-responsive.css')+'\n'+read('public/ui-overrides.css');
 
 // Static security invariants: untrusted client input must hit a server-side boundary.
 ok(input.includes('directLoopbackOnly')&&input.includes("x-forwarded-for")&&local.includes("url.pathname.startsWith('/api/local-admin/')")&&local.includes('directLoopbackOnly(req)'),'local-admin direct-loopback guard missing');
