@@ -5,7 +5,7 @@ import {applyReleaseReward} from '../../server/release_rewards.js';
 import {createDoudizhu,applyDoudizhuAction,addDoudizhuBot} from '../../shared/doudizhu.js';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8'),ok=(v,m)=>{if(!v)throw Error(m)};
-const html=read('public/index.html'),app=read('public/app.js'),games=read('public/app-games.js'),chat=read('public/chat-ui.js'),chatState=read('server/chat_state.js'),pet=read('public/progression-ui.js'),prog=read('server/progression.js'),leisure=read('public/leisure-ui.js'),adminEcon=read('public/admin-economy.js'),glue=read('public/ui-v038.js'),css=read('public/styles-v038.css'),local=read('local_server.js');
+const html=read('public/index.html'),app=read('public/app.js'),games=read('public/app-games.js'),chat=read('public/chat-ui.js'),chatState=read('server/chat_state.js'),pet=read('public/progression-ui.js'),prog=read('server/progression.js'),leisure=read('public/leisure-ui.js'),adminEcon=read('public/admin-economy.js'),glue=read('public/ui-enhancements.js'),css=read('public/styles.css'),local=read('local_server.js');
 
 // 1: latest-first chat viewport + upward history.
 ok(chat.includes('/api/chat/history')&&chat.includes('scrollTop<80')&&chat.includes("e.style.visibility='hidden'")&&chat.includes("e.style.scrollBehavior='auto'")&&chat.includes('historyMessages'),'chat latest-first/history loading missing');
@@ -42,5 +42,5 @@ ok(local.includes("'/api/social/remark'")&&games.includes('data-friend-remark')&
 // 14: 管理页首次进入默认全折叠，保存后的本次展开状态仍可恢复。
 ok(glue.includes("sec==='admin'&&state.section!=='admin'")&&glue.includes("sessionStorage.removeItem('slimelounge.adminFolds.v038')")&&!games.includes('<details open><summary>设备 / 最近 IP'),'admin default collapsed behavior missing');
 
-ok(fs.existsSync(path.join(root,'release_notes/v0.3.8.json')),'v0.3.8 release note missing');
+ok(JSON.parse(read('release_notes/releases.json')).some(x=>x.id==='v0.3.8'),'v0.3.8 release note missing');
 console.log('[OK] v0.3.8 chat history / leisure / admin IA / avatars / titles / unread / compensation / DDZ rematch / friend remarks');

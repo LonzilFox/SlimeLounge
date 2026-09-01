@@ -1,8 +1,13 @@
 import {spawnSync} from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
+
+// Overlay deployment leaves deleted files behind. Remove only explicitly retired project files.
+const retiredFiles=['src/index.js','wrangler.jsonc','deploy_cloudflare.bat','check_repo_root.bat','test_internal_connection.bat','test_ipop_connection.bat','public/styles-v038.css','public/accessory-visual.js','public/ui-v038.js'];
+for(const rel of retiredFiles){const p=path.join(root,rel);try{if(fs.existsSync(p))fs.rmSync(p,{force:true})}catch(e){console.warn(`[WARN] 无法清理旧文件 ${rel}: ${e.message}`)}}
 
 const syntaxFiles=[
   'local_server.js',
@@ -10,9 +15,8 @@ const syntaxFiles=[
   'server/economy.js','server/http_room_transport.js','server/http_security.js','server/music_service.js',
   'server/network_sync.js','server/rankings.js','server/leaderboard_http.js','server/release_notes.js','server/room_change_hub.js',
   'server/runtime_diagnostics.js','server/progression.js','server/leisure_service.js','server/input_validation.js','server/music_http_routes.js','server/open_browser.js','server/static_service.js','server/game_lifecycle.js','server/user_merge.js','server/voice_config.js','server/ws_session_auth.js','server/ws_transport.js',
-  'src/index.js',
-  'public/admin-economy.js','public/app-games.js','public/app.js','public/accessory-visual.js','public/startup-ui.js','public/chat-ui.js','public/game-dice.js',
-  'public/game-poker.js','public/game-mahjong.js','public/game-doudizhu.js','public/progression-ui.js','public/ui-v038.js','public/leisure-ui.js','public/music-ui.js','public/origin-migrate.js',
+  'public/admin-economy.js','public/app-games.js','public/app.js','public/ui-enhancements.js','public/startup-ui.js','public/chat-ui.js','public/game-dice.js',
+  'public/game-poker.js','public/game-mahjong.js','public/game-doudizhu.js','public/progression-ui.js','public/leisure-ui.js','public/music-ui.js','public/origin-migrate.js',
   'shared/dice.js','shared/extra_games.js','shared/games.js','shared/riichi.js','shared/doudizhu.js',
   'tools/02_validation/01_validate_project.js'
 ];
@@ -56,7 +60,8 @@ const testGroups=[
     'tools/03_tests/68_features_v038.mjs',
     'tools/03_tests/69_security_v039.mjs',
     'tools/03_tests/70_features_v040.mjs',
-    'tools/03_tests/71_features_v041.mjs'
+    'tools/03_tests/71_features_v041.mjs',
+    'tools/03_tests/72_features_v042.mjs'
   ]]
 ];
 
@@ -66,7 +71,7 @@ function run(args,label){
   if(r.status!==0){console.error(`[FAIL] ${label}`);process.exit(r.status||1)}
 }
 
-console.log('=== SlimeLounge v0.4.1 · 工程检查 ===');
+console.log('=== SlimeLounge v0.4.2 · 工程检查 ===');
 console.log('\n[1/3] JavaScript 语法');
 for(const file of syntaxFiles)run(['--check',file],file);
 console.log(`[OK] ${syntaxFiles.length} 个源码文件语法通过`);

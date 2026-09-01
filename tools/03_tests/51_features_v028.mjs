@@ -40,7 +40,7 @@ const html=fs.readFileSync(path.join(root,'public/index.html'),'utf8');
 const readme=fs.readFileSync(path.join(root,'README.md'),'utf8');
 const security=fs.readFileSync(path.join(root,'server/http_security.js'),'utf8');
 const economy=fs.readFileSync(path.join(root,'server/economy.js'),'utf8');
-const release=JSON.parse(fs.readFileSync(path.join(root,'release_notes/v0.2.8.json'),'utf8'));
+const release=JSON.parse(fs.readFileSync(path.join(root,'release_notes/releases.json'),'utf8')).find(x=>x.id==='v0.2.8');
 ok(app.includes("timeout:12000,retries:2")&&app.includes('不代表 Cookie 失效或被删除')&&!app.includes("el.textContent=err.message"),'music Cookie timeout UX regression');
 ok(app.includes('abortWithReason')&&app.includes('isAbortLike')&&!/setTimeout\(\(\)=>ctrl\.abort\(\),\s*(?:9000|9500)\)/.test(app),'browser music requests still use reasonless AbortController cancellation');
 const musicService=fs.readFileSync(path.join(root,'server/music_service.js'),'utf8');
@@ -48,7 +48,7 @@ ok(musicService.includes('abortAfter')&&musicService.includes('wasAborted')&&!/s
 ok(!app.includes('signal is aborted without reason')&&!musicService.includes('signal is aborted without reason'),'raw Chromium AbortError wording leaked into product code');
 ok(app.includes("slimelounge.musicVolume.v2")&&app.includes("volumechange")&&app.includes('return .25'),'persistent music volume/default missing');
 ok(/pattern="\[A-Za-z0-9\]\{6,9\}"/.test(html)&&html.includes('00XXXXXX'),'employee ID 6-9/old-user guidance missing');
-ok(!readme.includes('## 更新日志')&&readme.includes('release_notes/*.json'),'README contains changelog or release-note append docs missing');
+ok(!readme.includes('## 更新日志')&&readme.includes('release_notes/releases.json'),'README contains changelog or release-note append docs missing');
 ok(release.id==='v0.2.8'&&release.items?.length>=5,'v0.2.8 append-only release note missing');
 ok(security.includes('preferredV4')&&security.includes('strict-transport-security')&&security.includes('permissions-policy'),'IPv4 preference/security headers missing');
 ok(economy.includes('dailyReward:1000')&&economy.includes('entryFee'),'configurable economy/entry fee defaults missing');

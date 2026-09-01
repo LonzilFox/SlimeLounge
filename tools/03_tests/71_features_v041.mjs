@@ -7,7 +7,7 @@ import {validateRoomMessage} from '../../server/input_validation.js';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const ok=(v,m)=>{if(!v)throw Error(m)};
-const app=read('public/app.js'),chat=read('public/chat-ui.js'),ws=read('server/ws_session_auth.js'),server=read('local_server.js'),prog=read('server/progression.js'),progUi=read('public/progression-ui.js'),acc=read('public/accessory-visual.js'),leisure=read('public/leisure-ui.js'),css=read('public/styles-v038.css'),games=read('public/app-games.js'),html=read('public/index.html');
+const app=read('public/app.js'),chat=read('public/chat-ui.js'),ws=read('server/ws_session_auth.js'),server=read('local_server.js'),prog=read('server/progression.js'),progUi=read('public/progression-ui.js'),acc=read('public/ui-enhancements.js'),leisure=read('public/leisure-ui.js'),css=read('public/styles.css'),games=read('public/app-games.js'),html=read('public/index.html');
 
 ok(server.includes('messages:m.slice(-24)')&&ws.includes('allMessages.slice(-24)')&&app.includes('chatHasMore:j.chatHasMore'),'initial chat window is not newest 24 / HTTP metadata missing');
 ok(chat.includes('chatHistoryBatchSize')&&chat.includes('Math.ceil(h/58)+6')&&chat.includes('if(e.scrollTop>80)return')&&!chat.includes('limit:40'),'chat history is not top-triggered adaptive batching');
@@ -16,7 +16,7 @@ ok(css.includes('#adminView .admin-item-scroll')&&css.includes('max-height:none!
 ok(games.includes('restoreScroll=options.resetScroll?0')&&games.includes('e.scrollTop=restoreScroll')&&games.includes('renderAdmin({resetScroll:true})'),'admin save scroll preservation/tab reset missing');
 ok(css.includes('.diag-overview-card')&&css.includes('.diag-user-card')&&css.includes('.diag-grid>div'),'diagnostics UI repair missing');
 ok(leisure.includes('<small>可用筹码</small>')&&!leisure.includes('这是 SlimeLounge 内部模拟行情')&&css.includes('min-height:82px!important')&&css.includes('min-height:40px!important'),'market row remains compressed or obsolete note remains');
-ok(html.includes('accessory-visual.js?v=0.4.1&build=041')&&acc.includes('accessory-primary-layer')&&acc.includes('accessory-detail-layer')&&acc.includes('accessory-base-layer'),'layered accessory renderer not loaded');
+ok(html.includes('ui-enhancements.js?v=0.4.2&build=042')&&acc.includes('accessory-primary-layer')&&acc.includes('accessory-detail-layer')&&acc.includes('accessory-base-layer'),'layered accessory renderer not loaded');
 ok(prog.includes('ACCESSORY_ORIGINAL_COLORS')&&prog.includes("c.toLowerCase()==='#ffffff'")&&prog.includes('version:5'),'accessory original-color migration missing');
 ok(read('public/accessories/star.svg').includes('viewBox="0 0 48 48"')&&read('public/accessories/star.svg').includes('l5 17')&&read('public/accessories/star.svg').includes('l-8-8'),'star asset is not the redesigned five-point shape');
 ok(progUi.includes('data-prog-shop-move')&&prog.includes("action==='move'")&&progUi.includes('↑ 上移')&&progUi.includes('↓ 下移'),'shop ordering controls/API missing');
@@ -39,4 +39,4 @@ const svc=createProgressionService({data,body:async()=>({}),auth:()=>null,json:(
 let payload=svc.selfPayload(user);ok(payload.progression.pet.hunger===76&&payload.progression.pet.mood===68,'mood must decay every elapsed hour even while not hungry');
 user.pet.hunger=20;user.pet.mood=20;user.pet.lastCareAt=Date.now();user.activityXpAt.game=0;const gained=svc.activity(user,'game');ok(gained===2,'combined hunger+mood penalty should reduce default 4 game activity XP to 2');
 
-console.log('[OK] v0.4.1 newest-chat paging / full admin expansion / market UI / accessory layering+order / pet mood penalties');
+console.log('[OK] v0.4.2 newest-chat paging / full admin expansion / market UI / accessory layering+order / pet mood penalties');

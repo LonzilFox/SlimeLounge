@@ -1,4 +1,4 @@
-# SlimeLounge v0.4.1
+# SlimeLounge v0.4.2
 
 SlimeLounge 是一个自建的多人休闲网页空间，整合 Discord 式文字/语音频道、同步听歌、好友、个人筹码、排行榜与多种小游戏。正式服务器推荐使用 Node.js + systemd；公网入口可以使用 Tailscale Funnel 提供 HTTPS/WSS，无需单独购买 WebSocket 服务。
 
@@ -77,12 +77,12 @@ Owner / Admin 可管理：
 
 ## 自动发布更新说明
 
-项目更新说明使用 `release_notes/*.json` 独立维护，不写在 README 中。服务器第一次识别到新的 release id 时，会向聊天室“更新日志”频道**追加**一条记录并标记为已发布：
+项目更新说明集中维护在 `release_notes/releases.json`，避免每个版本单独生成一个小文件。服务器第一次识别到新的 release id 时，会向聊天室“更新日志”频道**追加**一条记录并标记为已发布：
 
 - 不覆盖已有更新日志。
 - Owner / Admin 后续手工编辑后不会被服务器改回。
 - 手工删除后，服务器重启也不会重复发布同一个 release id。
-- 后续版本只需要新增新的 release 文件，即可继续向频道末尾追加。
+- 后续版本只需要在 `releases.json` 数组末尾追加一条记录，即可继续向频道末尾发布。
 
 ## 公网 HTTPS / WebSocket
 
@@ -118,7 +118,6 @@ SLIMELOUNGE_TURN_CREDENTIAL=密码
 ## 运行
 
 ```bash
-npm install
 npm run check
 node local_server.js
 ```
@@ -187,7 +186,7 @@ sudo journalctl -u slimelounge -f
 
 升级到 v0.3.8 时，养成/商城迁移只追加本版本新增的稳定 ID 商品和成就。已有价格、成长数值、配饰坐标、Owner 自定义商品均保留；此前主动删除的旧默认商品不会因为本次升级重新出现。
 
-持续维护建议见 `docs/PRODUCT_ROADMAP.md`。
+持续维护与安全基线统一见 `docs/PROJECT_GUIDE.md`。
 
 ### v0.3.8 聊天未读与版本补偿
 
@@ -195,6 +194,14 @@ sudo journalctl -u slimelounge -f
 - 用户史莱姆头像会同步渲染已装备的配饰和玩家自选颜色；商城后台配饰条目提供实时史莱姆预览。
 - 每次新版本首次启动时，根据重启前已持久化的在线状态一次性发放版本补偿：游戏中/听歌中 +1500 筹码，其他在线状态 +500 筹码。同一版本重复重启不会重复发放，已明确离线的用户不参与。
 
+
+## v0.4.2 钓鱼图鉴、批量出售与工程清理
+
+- 钓鱼状态读取增加响应完整性校验与短重试，避免弱网/代理截断 JSON 后继续访问不存在的 `fishing.inventory`。
+- 鱼篓支持按最近、稀有度、售价排序，可多选/全选后一次出售。
+- 新增钓鱼图鉴，按鱼种累计捕获次数、最轻/最重重量以及最小/最大尺寸；v0.4.2 起鱼获保存 kg 重量，出售鱼获不会删除图鉴记录。
+- 管理页顶部分类不再 sticky 覆盖长页面正文。
+- 删除已经落后于正式 Node 服务的 Cloudflare Worker 分支，以及未再使用的旧部署/连通性 BAT；正式运行统一保留 Node.js + systemd + Tailscale Funnel。
 
 ## v0.4.1 聊天历史、管理展开、配饰分层与宠物状态
 
@@ -213,6 +220,6 @@ sudo journalctl -u slimelounge -f
 
 ## v0.3.9 安全加固
 
-v0.3.9 将客户端进一步视为不可信：钓鱼评分改为服务端权威计算，`/api/room/action` 和 WebSocket 增加统一输入边界，本机管理接口禁止通过反向代理访问，JSON API 增加体积/结构/危险键限制。部署与持续维护清单见 `docs/SECURITY.md`。
+v0.3.9 将客户端进一步视为不可信：钓鱼评分改为服务端权威计算，`/api/room/action` 和 WebSocket 增加统一输入边界，本机管理接口禁止通过反向代理访问，JSON API 增加体积/结构/危险键限制。部署与持续维护清单见 `docs/PROJECT_GUIDE.md`。
 
 21 点对子边注采用“同牌面、花色不限”的 12:1 规则；标准分牌仍按同点数牌处理，可继续重分至最多 4 手牌。虚拟交易所默认刷新周期调整为 30 秒并显示服务器倒计时。

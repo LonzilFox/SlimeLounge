@@ -1,12 +1,20 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+function readReleaseEntries(dir){
+  const out=[];
+  for(const file of fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort()){
+    let raw;try{raw=JSON.parse(fs.readFileSync(path.join(dir,file),'utf8'))}catch{continue}
+    for(const note of Array.isArray(raw)?raw:[raw])if(note&&typeof note==='object')out.push({note,file});
+  }
+  return out;
+}
+
 export function syncReleaseNotes({data,root,crypto}){
   data.releaseNotesPublished=Array.isArray(data.releaseNotesPublished)?data.releaseNotesPublished:[];
   const dir=path.join(root,'release_notes');if(!fs.existsSync(dir))return {added:0};
   const published=new Set(data.releaseNotesPublished),arr=data.roomMessages['chat-changelog']||(data.roomMessages['chat-changelog']=[]);let added=0;
-  for(const file of fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort()){
-    let note;try{note=JSON.parse(fs.readFileSync(path.join(dir,file),'utf8'))}catch{continue}
+  for(const {note,file} of readReleaseEntries(dir)){
     const id=String(note.id||path.basename(file,'.json'));if(!id||published.has(id))continue;
     const owner=data.users[data.ownerUserId]||Object.values(data.users).find(x=>x.role==='admin')||null;
     const title=String(note.title||id),items=Array.isArray(note.items)?note.items.map(x=>String(x).trim()).filter(Boolean):[];

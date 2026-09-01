@@ -1,4 +1,22 @@
-// SlimeLounge v0.3.8 UI glue: first-class leisure pages, decorated avatars, titles and admin fold persistence.
+// SlimeLounge shared UI enhancements: layered accessories, decorated avatars, titles, first-class leisure navigation and admin fold persistence.
+const ACCESSORY_VISUAL_META={
+  '/accessories/bow.svg':{color:'#ff7fa2',mask:'/accessories/bow.tint.svg',detail:'/accessories/bow.detail.svg',aspect:48/28},
+  '/accessories/leaf.svg':{color:'#6fd477',mask:'/accessories/leaf.tint.svg',detail:'/accessories/leaf.detail.svg',aspect:36/40},
+  '/accessories/star.svg':{color:'#ffd75d',mask:'/accessories/star.tint.svg',detail:'/accessories/star.detail.svg',aspect:1},
+  '/accessories/glasses.svg':{color:'#1c2944',mask:'/accessories/glasses.tint.svg',detail:'/accessories/glasses.detail.svg',aspect:96/36},
+  '/accessories/scarf.svg':{color:'#d96583',mask:'/accessories/scarf.tint.svg',detail:'/accessories/scarf.detail.svg',aspect:96/34},
+  '/accessories/flower.svg':{color:'#ff83ad',mask:'/accessories/flower.tint.svg',detail:'/accessories/flower.detail.svg',aspect:1},
+  '/accessories/crown.svg':{color:'#f1c84c',mask:'/accessories/crown.tint.svg',detail:'/accessories/crown.detail.svg',aspect:64/42},
+  '/accessories/headphones.svg':{color:'#6278a8',mask:'/accessories/headphones.tint.svg',detail:'/accessories/headphones.detail.svg',aspect:112/72}
+};
+function accessoryVisualMeta(asset=''){return ACCESSORY_VISUAL_META[String(asset||'')]||null}
+function accessoryDefaultColor(item){const c=String(item?.color||'');if(/^#[0-9a-f]{6}$/i.test(c))return c;return accessoryVisualMeta(item?.asset)?.color||'#7aa6c2'}
+function accessoryVisualMarkup(item,color,className,style,alt=''){
+  if(!item?.asset)return'';const asset=String(item.asset),meta=accessoryVisualMeta(asset),c=/^#[0-9a-f]{6}$/i.test(String(color||item.color||''))?String(color||item.color):'';
+  if(!meta||!c)return `<img class="${className}" src="${attr(asset)}" alt="${attr(alt)}" style="${attr(style)}" loading="lazy">`;
+  return `<img class="${className} accessory-base-layer" src="${attr(asset)}" alt="${attr(alt)}" style="${attr(style)}" loading="lazy"><span class="${className} accessory-primary-layer" aria-hidden="true" style="${attr(style)};--acc:${attr(c)};--acc-mask:url('${attr(meta.mask)}');--acc-aspect:${Number(meta.aspect)||1}"></span><img class="${className} accessory-detail-layer" src="${attr(meta.detail)}" alt="" aria-hidden="true" style="${attr(style)}" loading="lazy">`;
+}
+
 function v038FindUser(id){if(!id)return null;if(state.profile?.userId===id)return state.profile;const pools=[state.roomUsers,state.directoryUsers,state.social?.friends,state.social?.incoming,state.social?.outgoing];for(const a of pools)for(const u of a||[])if(u?.userId===id)return u;return null}
 function v038AccStyle(x){return `left:${Number(x.x)||50}%;top:${Number(x.y)||10}%;width:${Math.max(8,Number(x.w)||40)}%;z-index:${Number(x.z)||5};transform:translate(-50%,-50%) rotate(${Number(x.rotate)||0}deg)`}
 function v038AccMarkup(x){if(!x?.asset)return'';const st=v038AccStyle(x);return typeof accessoryVisualMarkup==='function'?accessoryVisualMarkup(x,x.color||accessoryDefaultColor(x),'slime-avatar-acc',st,''):`<img class="slime-avatar-acc" src="${attr(x.asset)}" style="${attr(st)}" alt="" loading="lazy">`}
