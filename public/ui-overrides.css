@@ -246,3 +246,32 @@ input,textarea,select,button{max-width:100%}
 @media(max-width:900px){.market-order{grid-template-columns:repeat(3,minmax(0,1fr))!important}.market-order input:first-child,.market-order select,.market-order [data-market-limit]{grid-column:auto!important}.market-margin-open{grid-template-columns:repeat(3,minmax(0,1fr))}.market-position-actions{grid-template-columns:1fr 1fr}.market-position-actions button{width:100%}}
 @media(max-width:600px){#adminView .admin-tabs-v038{position:sticky!important;top:0!important;z-index:9999!important}.market-range-bar{grid-template-columns:1fr}.market-range-bar>small{grid-column:auto}.market-chart{height:155px}.market-order,.market-margin-open{grid-template-columns:1fr 1fr!important}.market-order [data-market-limit],.market-margin-open [data-margin-sl],.market-margin-open [data-margin-tp]{grid-column:auto!important}.market-position-actions{grid-template-columns:1fr 1fr}.market-pending-order{grid-template-columns:1fr}.fish-card{grid-template-columns:auto minmax(0,1fr) auto!important}.fish-card [data-fish-lock],.fish-card [data-fish-sell]{grid-column:auto!important}}
 @media(max-width:380px){.market-summary{grid-template-columns:1fr!important}.market-order,.market-margin-open,.market-position-actions{grid-template-columns:1fr!important}.market-chart{height:145px}}
+
+/* v0.4.4 responsive market hotfix: content-driven wrapping, never fixed column counts. */
+#leisureView,#leisureView .page-card,#leisureView .market-grid,#leisureView .market-asset,#leisureView .market-trade-panel,#leisureView .market-book{min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+#leisureView .market-summary{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr))!important;gap:8px!important;width:100%!important;overflow:visible!important}
+#leisureView .market-summary>div{min-width:0!important;width:auto!important;max-width:100%!important;height:auto!important;overflow:visible!important}
+#leisureView .market-range-bar{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:8px 12px!important;min-width:0!important}
+#leisureView .market-range-bar>b{flex:0 0 auto!important}
+#leisureView .market-range-bar>div{display:flex!important;flex:1 1 260px!important;min-width:0!important;flex-wrap:wrap!important;gap:6px!important}
+#leisureView .market-range-bar>div>button{flex:1 1 86px!important;min-width:min(86px,100%)!important;max-width:180px!important}
+#leisureView .market-range-bar>small{flex:1 0 100%!important;min-width:0!important;overflow-wrap:anywhere!important}
+#leisureView .market-grid{grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr))!important;width:100%!important}
+#leisureView .market-asset-head{display:flex!important;flex-wrap:wrap!important;align-items:flex-start!important;min-width:0!important}
+#leisureView .market-asset-head>div{flex:1 1 180px!important;min-width:0!important;max-width:100%!important}
+#leisureView .market-asset-head>div:last-child{text-align:right!important;flex:0 1 auto!important}
+#leisureView .market-asset-head small,#leisureView .market-asset-head b,#leisureView .market-asset-head strong{max-width:100%!important;overflow-wrap:anywhere!important}
+#leisureView .market-order,#leisureView .market-margin-open,#leisureView .market-position-actions{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(128px,100%),1fr))!important;gap:6px!important;width:100%!important;min-width:0!important;align-items:end!important}
+#leisureView .market-order>*,#leisureView .market-margin-open>*,#leisureView .market-position-actions>*{grid-column:auto!important;min-width:0!important;max-width:100%!important;width:100%!important;box-sizing:border-box!important}
+#leisureView .market-order button,#leisureView .market-margin-open button,#leisureView .market-position-actions button{white-space:normal!important;overflow-wrap:anywhere!important;min-height:38px!important}
+#leisureView .market-position-stats{display:flex!important;flex-wrap:wrap!important;min-width:0!important;gap:6px 10px!important}
+#leisureView .market-position-stats>*{min-width:0!important;overflow-wrap:anywhere!important}
+#leisureView .market-pending-order{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:7px!important;min-width:0!important}
+#leisureView .market-pending-order>span{flex:1 1 220px!important;min-width:0!important;overflow-wrap:anywhere!important}
+#leisureView .market-pending-order>button{flex:0 1 auto!important;max-width:100%!important}
+#leisureView .market-chart{max-width:100%!important;min-width:0!important;overflow:hidden!important}
+#leisureView .market-x-labels text{fill:#91a6b8;font-size:5.1px;font-family:monospace}
+@media(orientation:portrait){
+  #leisureView .market-grid{grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))!important}
+  #leisureView .market-order,#leisureView .market-margin-open,#leisureView .market-position-actions{grid-template-columns:repeat(auto-fit,minmax(min(118px,100%),1fr))!important}
+}
