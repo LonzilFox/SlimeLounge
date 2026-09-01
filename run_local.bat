@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions
 cd /d "%~dp0"
-title SlimeLounge v0.4.2 Local Server
+title SlimeLounge v0.4.3 Local Server
 where node >nul 2>&1
 if errorlevel 1 goto NO_NODE
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0tools\01_runtime\01_start_local.ps1"

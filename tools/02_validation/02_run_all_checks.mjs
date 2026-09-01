@@ -81,7 +81,7 @@ function run(args,label){
   if(r.status!==0){console.error(`[FAIL] ${label}`);process.exit(r.status||1)}
 }
 
-console.log('=== SlimeLounge v0.4.2 · 工程检查 ===');
+console.log('=== SlimeLounge v0.4.3 · 工程检查 ===');
 console.log('\n[1/3] JavaScript 语法');
 for(const file of syntaxFiles)run(['--check',file],file);
 console.log(`[OK] ${syntaxFiles.length} 个源码文件语法通过`);

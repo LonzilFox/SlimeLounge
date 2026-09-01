@@ -14,13 +14,14 @@ export const DEFAULT_GAME_CHIP_RULES={
   doudizhu:{stake:40,entryFee:18,aiEntryFee:7},
   mahjong:{pointsPerChip:100,forfeitPenalty:50,entryFee:50,aiEntryFee:20},
   sudoku:{entryFee:12,aiEntryFee:12},
-  minesweeper:{entryFee:8,aiEntryFee:8}
+  minesweeper:{entryFee:8,aiEntryFee:8},
+  tetris:{entryFee:10,aiEntryFee:10}
 };
 
 export const V028_GAME_CHIP_RULES={
   dice:{stake:30,entryFee:30},gomoku:{stake:50,entryFee:30},xiangqi:{stake:50,entryFee:30},chess:{stake:50,entryFee:30},go:{stake:50,entryFee:30},
   blackjack:{minBet:10,maxBet:200,defaultBet:20,entryFee:20},poker:{smallBlind:10,bigBlind:20,entryFee:20},uno:{rankStep:50,entryFee:30},
-  mahjong:{pointsPerChip:100,forfeitPenalty:50,entryFee:50},sudoku:{entryFee:10},minesweeper:{entryFee:10}
+  mahjong:{pointsPerChip:100,forfeitPenalty:50,entryFee:50},sudoku:{entryFee:10},minesweeper:{entryFee:10},tetris:{entryFee:10}
 };
 
 export function boundedInt(v,min,max,fallback){
@@ -47,6 +48,7 @@ export function normalizeEconomy(raw={}){
   out.gameRules.mahjong={pointsPerChip:boundedInt(src.mahjong?.pointsPerChip,1,100000,DEFAULT_GAME_CHIP_RULES.mahjong.pointsPerChip),forfeitPenalty:boundedInt(src.mahjong?.forfeitPenalty,1,100000,DEFAULT_GAME_CHIP_RULES.mahjong.forfeitPenalty),entryFee:fee(src,'mahjong'),aiEntryFee:fee(src,'mahjong','aiEntryFee')};
   out.gameRules.sudoku={entryFee:fee(src,'sudoku'),aiEntryFee:fee(src,'sudoku','aiEntryFee')};
   out.gameRules.minesweeper={entryFee:fee(src,'minesweeper'),aiEntryFee:fee(src,'minesweeper','aiEntryFee')};
+  out.gameRules.tetris={entryFee:fee(src,'tetris'),aiEntryFee:fee(src,'tetris','aiEntryFee')};
   out.updatedAt=Number(raw?.updatedAt)||0;out.updatedBy=String(raw?.updatedBy||'');return out;
 }
 

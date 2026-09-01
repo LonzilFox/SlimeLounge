@@ -4,7 +4,7 @@ export function applyReleaseReward({data,version,now=Date.now(),activeWindowMs=2
   let rewarded=0,activity=0,online=0;
   for(const u of Object.values(data.users||{})){
     if(!u||u.presenceStatus==='offline'||now-Number(u.lastSeenAt||0)>activeWindowMs)continue;
-    const active=['gaming','listening'].includes(u.presenceStatus)||['games','music'].includes(u.currentSection)||/游戏中|听歌中/.test(String(u.activityLabel||''));
+    const active=['gaming','listening','trading','fishing'].includes(u.presenceStatus)||['games','music','market','fishing'].includes(u.currentSection)||/游戏中|听歌中|炒股中|钓鱼中/.test(String(u.activityLabel||''));
     const amount=active?activityReward:onlineReward;if(amount<=0)continue;
     u.chips=Math.max(0,Number(u.chips)||0)+amount;u.chipsUpdatedAt=now;u.lastReleaseReward={version,amount,at:now};
     data.chipLedger=Array.isArray(data.chipLedger)?data.chipLedger:[];data.chipLedger.push({id:`release:${version}:${u.userId}`,userId:u.userId,delta:amount,before:Math.max(0,Number(u.chips)||0)-amount,after:u.chips,reason:`版本更新补偿 ${version}`,at:now});
