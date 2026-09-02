@@ -12,7 +12,7 @@ ok(html.indexOf('startup-ui.js')<html.indexOf('app.js'),'startup UI must load be
 ok(html.includes('bootStatus')&&html.includes('bootBar')&&html.includes('bootRetry'),'boot progress markup missing');
 ok(css.includes('.boot-track')&&css.includes('.boot-error'),'boot progress styling missing');
 ok(!html.includes('media="print" onload='),'CSP-blocked inline font onload handler returned');
-ok(html.includes('build=045'),'same-version cache bust is missing');
+ok(html.includes('build=046'),'same-version cache bust is missing');
 const ui038=fs.readFileSync(path.join(root,'public/ui-enhancements.js'),'utf8');
 ok(ui038.includes('e.dataset.v038Sig===sig')&&ui038.includes("v038ObserveRoot=$('#app')||document.body")&&!ui038.includes('v038Observer.observe(document.documentElement'), 'v0.3.8 avatar MutationObserver feedback loop regression');
 ok(app.includes('setTimeout(()=>c.abort(),7000)')&&app.includes('signal:c.signal'), 'room list boot timeout guard missing');

@@ -74,7 +74,8 @@ const testGroups=[
     'tools/03_tests/72_features_v042.mjs',
     'tools/03_tests/73_features_v043.mjs',
     'tools/03_tests/74_features_v044.mjs',
-    'tools/03_tests/75_features_v045.mjs'
+    'tools/03_tests/75_features_v045.mjs',
+    'tools/03_tests/76_features_v046.mjs'
   ]]
 ];
 

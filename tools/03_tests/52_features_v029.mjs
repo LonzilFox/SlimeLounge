@@ -18,7 +18,7 @@ const css=fs.readFileSync(path.join(root,'public/styles.css'),'utf8')+fs.readFil
 const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));
 const release=JSON.parse(fs.readFileSync(path.join(root,'release_notes/releases.json'),'utf8')).find(x=>x.id==='v0.2.9');
 
-ok(pkg.version==='0.4.5','package version is not 0.3.1');
+ok(pkg.version==='0.4.6','package version is not 0.3.1');
 ok(ROOM_DEFS.filter(r=>r.game==='dice').length===5,'dice room count is not 5');
 ok(ROOM_DEFS.filter(r=>r.category==='music'&&r.style==='其他风格').length===1,'other-style music room missing');
 ok(diceUi.includes('class="pip p')&&diceUi.includes('dicePips')&&!diceUi.includes('class="die-face">${n}'),'dice UI is not physical pip style');
@@ -68,7 +68,7 @@ async function openRoom(s,roomId,tabId){return new Promise((resolve,reject)=>{co
 async function wsGame(ws,action,pred=()=>true){const p=waitMsg(ws,m=>m.type==='game_state'&&pred(m.state),4000,action.type);ws.send(JSON.stringify({type:'game_action',action}));return (await p).state}
 try{
   await waitServer();
-  const health=await (await fetch(`http://127.0.0.1:${port}/api/health`)).json();ok(health.version==='0.4.5','live server is not v0.4.5');
+  const health=await (await fetch(`http://127.0.0.1:${port}/api/health`)).json();ok(health.version==='0.4.6','live server is not v0.4.6');
   const owner=await post('/api/register',{name:'V029',employeeId:'V029OWN',slimeColor:'mint',deviceLabel:'test'});
 
   const chat=await openRoom(owner,'chat-general','v029-chat');

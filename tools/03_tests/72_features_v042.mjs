@@ -16,7 +16,7 @@ ok(app.includes("catch(parseErr){throw Error(r.ok?'响应不完整，请重试'"
 ok(ui.includes("!r?.fishing||!Array.isArray(r.fishing.inventory)")&&ui.includes('for(let i=0;i<2;i++'),'leisure state schema guard / retry missing');
 ok(ui.includes('最近捕获')&&ui.includes('稀有度')&&ui.includes('售价')&&ui.includes('data-fish-select')&&ui.includes('fishSellSelected'),'fishing sort / multi-select sell UI missing');
 ok(ui.includes('钓鱼图鉴')&&ui.includes('最轻')&&ui.includes('最重')&&ui.includes('次</strong>'),'fishing catalogue stats UI missing');
-ok(css.includes('.admin-tabs-v038{display:flex')&&css.includes('#adminView .admin-tabs-v038{position:sticky!important'),'admin top tabs / v0.4.5 sticky repair missing');
+ok(css.includes('.admin-tabs-v038{display:flex')&&css.includes('#adminView .admin-tabs-v038{position:sticky!important'),'admin top tabs / v0.4.6 sticky repair missing');
 ok(css.includes('.fish-collection-grid')&&css.includes('.fish-card.selected'),'fishing catalogue/selection styles missing');
 ok(!fs.existsSync(path.join(root,'src/index.js'))&&!fs.existsSync(path.join(root,'wrangler.jsonc'))&&!fs.existsSync(path.join(root,'deploy_cloudflare.bat'))&&!fs.existsSync(path.join(root,'check_repo_root.bat'))&&!fs.existsSync(path.join(root,'test_internal_connection.bat'))&&!fs.existsSync(path.join(root,'test_ipop_connection.bat')),'obsolete Worker/root helper files were not cleaned');
 ok(fs.readdirSync(path.join(root,'release_notes')).filter(x=>x.endsWith('.json')).join(',')==='releases.json'&&Array.isArray(JSON.parse(read('release_notes/releases.json'))),'release notes were not consolidated / stale overlay notes were not cleaned');
@@ -25,9 +25,9 @@ ok(enh.includes('accessoryPalette')&&enh.includes('accessory-svg')&&!enh.include
 ok(progUi.includes("slime(profile?.slimeColor||'mint',cls)}<div class=\"pet-accessory-visual\">")&&!progUi.includes("slime(profile?.slimeColor||'mint',cls,profile?.userId||'')}<div class=\"pet-accessory-visual\">"),'pet view still renders the same equipped accessories twice');
 ok(!fs.readdirSync(path.join(root,'public/accessories')).some(x=>/\.(?:tint|detail)\.svg$/i.test(x)),'obsolete accessory layer SVGs were not cleaned');
 const migrated=normalizeProgressionConfig({version:5,shop:{accessories:[{id:'acc_bow',name:'小蝴蝶结',asset:'/accessories/bow.svg',color:'#ffffff'}],food:[],titles:[]},achievements:[]});
-ok(migrated.version===9&&migrated.shop.accessories[0].color==='#ff7fa2','legacy white accessory color was not migrated back to its original main color');
+ok(migrated.version===10&&migrated.shop.accessories[0].color==='#ff7fa2','legacy white accessory color was not migrated back to its original main color');
 ok(ui.includes('返回结果不完整，正在重新同步鱼篓')&&ui.includes('Number.isInteger(sold)')&&ui.includes('Number.isFinite(value)'),'fish sale UI can still render undefined sold/value');
-ok(pkg.version==='0.4.5'&&!pkg.scripts?.deploy&&!pkg.devDependencies?.wrangler,'obsolete Cloudflare deployment entry still present');
+ok(pkg.version==='0.4.6'&&!pkg.scripts?.deploy&&!pkg.devDependencies?.wrangler,'obsolete Cloudflare deployment entry still present');
 
 // Existing basket data is migrated into the catalogue once, and selected IDs can be sold atomically.
 const now=Date.now();
@@ -60,4 +60,4 @@ ok(r.status===200&&r.payload.sold===2&&r.payload.value===230&&user.fishing.inven
 ok(user.chips===1230&&user.fishing.collection.sardine.count===2&&user.fishing.collection.carp.count===1,'selling fish must not erase catalogue records');
 ok(saved>0,'fish sale did not persist');
 
-console.log('[OK] v0.4.5 fishing resilience / sorting+bulk sell / catalogue / admin tabs / project cleanup');
+console.log('[OK] v0.4.6 fishing resilience / sorting+bulk sell / catalogue / admin tabs / project cleanup');
