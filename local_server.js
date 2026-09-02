@@ -36,7 +36,7 @@ import {validateRoomMessage,directLoopbackOnly} from './server/input_validation.
 import {createMusicHttpRoutes} from './server/music_http_routes.js';
 const __filename=fileURLToPath(import.meta.url),ROOT=path.dirname(__filename),PUBLIC=path.join(ROOT,'public');
 try{if(typeof process.loadEnvFile==='function'&&fs.existsSync(path.join(ROOT,'.dev.vars')))process.loadEnvFile(path.join(ROOT,'.dev.vars'))}catch(e){console.warn('[WARN] .dev.vars:',e.message)}
-const APP='SlimeLounge',VERSION='0.4.5',HOST='0.0.0.0',PORT=Number(process.env.PORT||8090);
+const APP='SlimeLounge',VERSION='0.4.6',HOST='0.0.0.0',PORT=Number(process.env.PORT||8090);
 const CHIP_TIME_ZONE=process.env.SLIMELOUNGE_TIME_ZONE||'Asia/Shanghai',TRUST_PROXY=process.env.SLIMELOUNGE_TRUST_PROXY!=='0',TRUSTED_PROXY_IPS=String(process.env.SLIMELOUNGE_TRUSTED_PROXY_IPS||''),COOKIE_SECURE=process.env.SLIMELOUNGE_COOKIE_SECURE==='1',PUBLIC_ORIGIN=String(process.env.SLIMELOUNGE_PUBLIC_ORIGIN||'').trim().replace(/\/$/,'');
 const rateBuckets=new Map();
 const {requestIp,requestIpInfo,applySecurityHeaders,rateLimit,rateLimitSubject,sameOriginWs,json,body,contentType,canonicalRedirectTarget}=createHttpSecurity({trustProxy:TRUST_PROXY,publicOrigin:PUBLIC_ORIGIN,rateBuckets,trustedProxyIps:TRUSTED_PROXY_IPS});

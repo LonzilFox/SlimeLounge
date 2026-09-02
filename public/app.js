@@ -20,7 +20,7 @@ const state={identity:null,profile:null,employeeMasked:'',deviceLabel:'',rooms:[
 const isLocalServerHost=()=>['localhost','127.0.0.1','::1'].includes(location.hostname);
 const useHttpRoomTransport=()=>false;
 
-const FEATURE_VERSION='0.4.5',ASSET_BUILD='045',featureLoads=new Map();
+const FEATURE_VERSION='0.4.6',ASSET_BUILD='046',featureLoads=new Map();
 function loadFeatureScript(name){if(featureLoads.has(name))return featureLoads.get(name);const p=new Promise((resolve,reject)=>{const el=document.createElement('script');el.src=`/${name}.js?v=${FEATURE_VERSION}&build=${ASSET_BUILD}`;el.defer=true;el.onload=resolve;el.onerror=()=>reject(Error(`功能模块加载失败：${name}`));document.head.appendChild(el)});featureLoads.set(name,p);return p}
 async function ensureFeature(kind){try{if(kind==='music')await loadFeatureScript('music-ui');else if(kind==='pages')await loadFeatureScript('app-games');else if(kind==='games'){await Promise.all([loadFeatureScript('game-dice'),loadFeatureScript('game-poker'),loadFeatureScript('game-mahjong'),loadFeatureScript('game-doudizhu')]);await loadFeatureScript('app-games')}else if(kind==='admin'){await loadFeatureScript('admin-economy');await loadFeatureScript('app-games')}}catch(e){toast(e.message||'功能模块加载失败');throw e}}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c])}
