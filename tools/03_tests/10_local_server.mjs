@@ -103,7 +103,7 @@ try{
   const ownerCred={userId:ownerSession.userId,deviceId:ownerSession.deviceId,deviceToken:ownerSession.deviceToken};
   // Earlier WebSocket tests used a shared synthetic tab id; explicitly close that synthetic page before testing new tabs.
   await post('/api/presence/offline',{...ownerCred,tabId:'test-local'});
-  // Unready cleanup is now player-count aware and unit-tested in 62_performance_ui_v032; keep this server test focused on join/leave integration.
+  // Unready cleanup is now player-count aware and unit-tested in 62_ui_performance; keep this server test focused on join/leave integration.
   await post('/api/room/snapshot',{...ownerCred,roomId:'go-3',tabId:'unready-tab'});
   await post('/api/room/action',{...ownerCred,roomId:'go-3',tabId:'unready-tab',message:{type:'game_action',action:{type:'join',seat:0}}});
   await post('/api/room/action',{...ownerCred,roomId:'go-3',tabId:'unready-tab',message:{type:'game_action',action:{type:'leave'}}});

@@ -32,50 +32,46 @@ const syntaxFiles=[
 ];
 
 const testGroups=[
-  ['核心游戏',[
+  ['基础玩法',[
     'tools/03_tests/01_core_games.mjs',
     'tools/03_tests/02_extra_games.mjs',
-    'tools/03_tests/03_riichi.mjs'
-  ]],
-  ['本地服务',[
+    'tools/03_tests/03_riichi.mjs',
     'tools/03_tests/10_local_server.mjs'
   ]],
-  ['筹码经济',[
-    'tools/03_tests/20_wallet_v023.mjs',
-    'tools/03_tests/21_chip_games_v023.mjs',
-    'tools/03_tests/22_chip_admin_v024.mjs'
+  ['经济与筹码',[
+    'tools/03_tests/20_economy_wallet.mjs',
+    'tools/03_tests/21_economy_game_rules.mjs',
+    'tools/03_tests/22_economy_admin.mjs'
   ]],
-  ['迁移与规则',[
-    'tools/03_tests/30_migration_v022.mjs',
-    'tools/03_tests/31_rules_v024.mjs',
-    'tools/03_tests/32_server_v024.mjs'
+  ['规则 / 迁移 / 身份',[
+    'tools/03_tests/30_migration_legacy.mjs',
+    'tools/03_tests/31_rules_game_config.mjs',
+    'tools/03_tests/32_server_contracts.mjs',
+    'tools/03_tests/40_identity_poker.mjs',
+    'tools/03_tests/41_identity_mobile.mjs'
   ]],
-  ['身份与移动端',[
-    'tools/03_tests/40_identity_poker_v025.mjs',
-    'tools/03_tests/41_identity_mobile_v026.mjs'
+  ['网络与启动',[
+    'tools/03_tests/60_network_sync.mjs',
+    'tools/03_tests/61_transport_http_ws.mjs',
+    'tools/03_tests/62_ui_performance.mjs',
+    'tools/03_tests/63_startup_hotfixes.mjs',
+    'tools/03_tests/69_security_boundaries.mjs'
   ]],
-  ['版本回归',[
-    'tools/03_tests/50_regressions_v027.mjs',
-    'tools/03_tests/51_features_v028.mjs',
-    'tools/03_tests/52_features_v029.mjs'
-  ]],
-  ['网络与传输',[
-    'tools/03_tests/60_network_v030.mjs',
-    'tools/03_tests/61_transport_v031.mjs',
-    'tools/03_tests/62_performance_ui_v032.mjs',
-    'tools/03_tests/63_startup_hotfix_v032.mjs',
-    'tools/03_tests/65_features_v035.mjs',
-    'tools/03_tests/66_features_v036.mjs',
-    'tools/03_tests/67_features_v037.mjs',
-    'tools/03_tests/68_features_v038.mjs',
-    'tools/03_tests/69_security_v039.mjs',
-    'tools/03_tests/70_features_v040.mjs',
-    'tools/03_tests/71_features_v041.mjs',
-    'tools/03_tests/72_features_v042.mjs',
-    'tools/03_tests/73_features_v043.mjs',
-    'tools/03_tests/74_features_v044.mjs',
-    'tools/03_tests/75_features_v045.mjs',
-    'tools/03_tests/76_features_v046.mjs'
+  ['功能综合',[
+    'tools/03_tests/50_regression_project.mjs',
+    'tools/03_tests/51_feature_music_games.mjs',
+    'tools/03_tests/52_feature_network_music.mjs',
+    'tools/03_tests/65_feature_pet_rankings.mjs',
+    'tools/03_tests/66_feature_poker_blackjack_market.mjs',
+    'tools/03_tests/67_feature_doudizhu_and_inputs.mjs',
+    'tools/03_tests/68_feature_navigation_titles.mjs',
+    'tools/03_tests/70_feature_market_admin_rankings.mjs',
+    'tools/03_tests/71_feature_accessories_achievements.mjs',
+    'tools/03_tests/72_feature_fishing_catalog_admin.mjs',
+    'tools/03_tests/73_feature_network_fishing_tetris.mjs',
+    'tools/03_tests/74_feature_fishing_margin_ui.mjs',
+    'tools/03_tests/75_feature_accessories_titles_market.mjs',
+    'tools/03_tests/76_feature_accessory_market_schedule.mjs'
   ]]
 ];
 
