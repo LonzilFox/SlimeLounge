@@ -8,7 +8,15 @@ const ACCESSORY_VISUAL_META={
   '/accessories/scarf.svg':{color:'#d96583',viewBox:'0 0 96 34',edge:'M4 0h84v6h8v16h-8v6H66v6H54V24H12v4H4z',primary:'M8 5h76v5h8v8h-8v5H62v7h-4V19H8z',highlight:['M12 5h40v4H12z']},
   '/accessories/flower.svg':{color:'#ff83ad',viewBox:'0 0 40 40',edge:'M16 0h8v8h8v8h8v8h-8v8h-8v8h-8v-8H8v-8H0v-8h8V8h8z',primary:'M16 4h8v8h8v8h-8v8h-8v-8H8v-8h8z',highlight:['M16 16h8v8h-8z','M16 4h4v7h-4z']},
   '/accessories/crown.svg':{color:'#f1c84c',viewBox:'0 0 64 42',edge:'M4 8h8V0h8v12h8V4h8v8h8V0h8v8h8v26h-4v8H8v-8H4z',primary:'M9 10h7V5h2v13h14V9h2v9h14V5h2v5h7v20H9z',highlight:['M12 12h8v5h-8zm20 0h8v5h-8zm20 0h4v5h-4z','M27 24h10v7H27z']},
-  '/accessories/headphones.svg':{color:'#6278a8',viewBox:'0 0 112 72',edge:'M20 20V12h8V6h56v6h8v8h8v40H88V32h-8V20H32v12h-8v28H12V20z',primary:'M28 12h56v8H28zm-12 24h16v28H16zm64 0h16v28H80z',highlight:['M20 40h8v20h-8zm64 0h8v20h-8z','M32 12h22v4H32z']}
+  '/accessories/headphones.svg':{color:'#6278a8',viewBox:'0 0 112 72',edge:'M20 20V12h8V6h56v6h8v8h8v40H88V32h-8V20H32v12h-8v28H12V20z',primary:'M28 12h56v8H28zm-12 24h16v28H16zm64 0h16v28H80z',highlight:['M20 40h8v20h-8zm64 0h8v20h-8z','M32 12h22v4H32z']},
+  '/accessories/partyhat.svg':{color:'#8f76df',viewBox:'0 0 64 64',edge:'M32 2 8 56h48z',primary:'M32 7 14 50h36z',highlight:['M29 14h6l-3 9z','M20 33h8l-4 8zm18-6h8l-4 8z']},
+  '/accessories/horns.svg':{color:'#d45c77',viewBox:'0 0 96 48',edge:'M7 46C5 24 14 6 33 1c-5 10-6 20 2 37zm82 0c2-22-7-40-26-45 5 10 6 20-2 37z',primary:'M11 41C9 25 16 11 30 5c-4 9-4 18 2 30zm74 0c2-16-5-30-19-36 4 9 4 18-2 30z',highlight:['M17 26c2-7 5-12 10-16-2 6-2 11 1 17zm62 0c-2-7-5-12-10-16 2 6 2 11-1 17z']},
+  '/accessories/blush.svg':{color:'#ff7891',viewBox:'0 0 96 40',primary:'M8 16h24v12H8zm56 0h24v12H64z',highlight:['M13 18h8v3h-8zm56 0h8v3h-8z']},
+  '/accessories/monocle.svg':{color:'#d3b260',viewBox:'0 0 80 80',strokePath:'M13 28a18 18 0 1 0 36 0 18 18 0 1 0-36 0M43 42c10 9 8 24 17 31M58 74h6',highlight:['M20 18c5-5 13-6 19-2']},
+  '/accessories/bowtie.svg':{color:'#cb5472',viewBox:'0 0 80 48',edge:'M4 2 34 14h12L76 2v44L46 34H34L4 46z',primary:'M35 17 8 6v36l27-11zm10 0L72 6v36L45 31zM33 14h14v20H33z',highlight:['M13 13v11l18-5zm54 0v11l-18-5z']},
+  '/accessories/bell.svg':{color:'#e0b349',viewBox:'0 0 80 56',edge:'M5 5h70v16H50v7c8 4 12 10 12 19H49c0 8-18 8-18 0H18c0-9 4-15 12-19v-7H5z',primary:'M8 8h64v10H8zm26 10h12v8c8 3 12 9 12 18H22c0-9 4-15 12-18zm0 31a6 6 0 0 0 12 0z',highlight:['M29 31h7v9h-9c0-4 1-7 2-9']},
+  '/accessories/halo.svg':{color:'#ffe77a',viewBox:'0 0 96 36',strokePath:'M8 18c0-15 80-15 80 0S8 33 8 18',highlight:['M17 15c12-8 50-8 62 0']},
+  '/accessories/sparkles.svg':{color:'#9dd9ff',viewBox:'0 0 120 120',primary:'m20 10 5 13 13 5-13 5-5 13-5-13-13-5 13-5zm76 16 4 10 10 4-10 4-4 10-4-10-10-4 10-4zm-4 56 6 15 15 6-15 6-6 15-6-15-15-6 15-6zM24 80l3 8 8 3-8 3-3 8-3-8-8-3 8-3z',highlight:['M18 25h5v5h-5zm76 13h4v4h-4zm-4 62h5v5h-5z']}
 };
 function accessoryVisualMeta(asset=''){return ACCESSORY_VISUAL_META[String(asset||'')]||null}
 function accessoryDefaultColor(item){const c=String(item?.color||'');if(/^#[0-9a-f]{6}$/i.test(c))return c.toLowerCase();return accessoryVisualMeta(item?.asset)?.color||'#7aa6c2'}
@@ -20,9 +28,9 @@ function accessoryPalette(color){const main=/^#[0-9a-f]{6}$/i.test(String(color|
 function accessoryVisualMarkup(item,color,className,style,alt=''){
   if(!item?.asset)return'';const asset=String(item.asset),meta=accessoryVisualMeta(asset),c=/^#[0-9a-f]{6}$/i.test(String(color||item.color||''))?String(color||item.color):accessoryDefaultColor(item);
   if(!meta)return `<img class="${className}" src="${attr(asset)}" alt="${attr(alt)}" style="${attr(style)}" loading="lazy">`;
-  const p=accessoryPalette(c),edge=meta.edge?`<path fill="${p.edge}" d="${meta.edge}"></path>`:'',stroke=meta.strokeEdge?` stroke="${p.edge}" stroke-width="2" stroke-linejoin="miter"`:'';
-  const highlights=(meta.highlight||[]).map((d,i)=>`<path fill="${p.highlight}"${i>0?' opacity=".82"':''} d="${d}"></path>`).join('');
-  return `<svg class="${className} accessory-svg" viewBox="${meta.viewBox}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${attr(alt)}" style="${attr(style)}"><g shape-rendering="crispEdges">${edge}<path fill="${p.main}"${stroke} d="${meta.primary}"></path>${highlights}</g></svg>`;
+  const p=accessoryPalette(c),edge=meta.edge?`<path fill="${p.edge}" d="${meta.edge}"></path>`:'',stroke=meta.strokeEdge?` stroke="${p.edge}" stroke-width="2" stroke-linejoin="miter"`:'',primary=meta.primary?`<path fill="${p.main}"${stroke} d="${meta.primary}"></path>`:'',strokePath=meta.strokePath?`<path fill="none" stroke="${p.main}" stroke-width="6" stroke-linecap="square" stroke-linejoin="round" d="${meta.strokePath}"></path>`:'';
+  const highlights=(meta.highlight||[]).map((d,i)=>`<path fill="${p.highlight}"${meta.strokePath?' stroke="'+p.highlight+'" stroke-width="2.5" fill="none"':''}${i>0?' opacity=".82"':''} d="${d}"></path>`).join('');
+  return `<svg class="${className} accessory-svg" viewBox="${meta.viewBox}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${attr(alt)}" style="${attr(style)}"><g shape-rendering="crispEdges">${edge}${primary}${strokePath}${highlights}</g></svg>`;
 }
 
 function v038FindUser(id){if(!id)return null;if(state.profile?.userId===id)return state.profile;const pools=[state.roomUsers,state.directoryUsers,state.social?.friends,state.social?.incoming,state.social?.outgoing];for(const a of pools)for(const u of a||[])if(u?.userId===id)return u;return null}

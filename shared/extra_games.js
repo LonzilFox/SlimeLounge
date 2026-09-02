@@ -4,6 +4,7 @@ import {createRiichiState,riichiStartHand,applyRiichiAction,riichiBotTurn,riichi
 // This module intentionally stays independent from games.js so new rule engines do not destabilize the original five games.
 
 export const EXTRA_ROOM_DEFS=[
+  {id:'tetris-1',category:'game',game:'tetris',single:true,mode:'single',label:'经典',name:'俄罗斯方块 · 经典',description:'10×20 · 键盘 / 触屏 · 逐级加速',capacity:1,difficulty:'classic'},
   {id:'sudoku-1',category:'game',game:'sudoku',single:true,mode:'single',label:'简单',name:'数独 · 简单',description:'单机数独，约 40 个空格',capacity:1,difficulty:'easy'},
   {id:'sudoku-2',category:'game',game:'sudoku',single:true,mode:'single',label:'中等',name:'数独 · 中等',description:'单机数独，约 50 个空格',capacity:1,difficulty:'medium'},
   {id:'sudoku-3',category:'game',game:'sudoku',single:true,mode:'single',label:'困难',name:'数独 · 困难',description:'单机数独，约 56 个空格',capacity:1,difficulty:'hard'},
@@ -12,7 +13,6 @@ export const EXTRA_ROOM_DEFS=[
   {id:'minesweeper-3',category:'game',game:'minesweeper',single:true,mode:'single',label:'中级',name:'扫雷 · 中级',description:'16×16 / 40 雷',capacity:1,difficulty:'intermediate',board:{w:16,h:16,mines:40}},
   {id:'minesweeper-4',category:'game',game:'minesweeper',single:true,mode:'single',label:'高级',name:'扫雷 · 高级',description:'20×16 / 60 雷',capacity:1,difficulty:'expert',board:{w:20,h:16,mines:60}},
   {id:'minesweeper-5',category:'game',game:'minesweeper',single:true,mode:'single',label:'地狱',name:'扫雷 · 地狱',description:'24×18 / 90 雷',capacity:1,difficulty:'hell',board:{w:24,h:18,mines:90}},
-  {id:'tetris-1',category:'game',game:'tetris',single:true,mode:'single',label:'经典',name:'俄罗斯方块 · 经典',description:'10×20 · 键盘 / 触屏 · 逐级加速',capacity:1,difficulty:'classic'},
   ...Array.from({length:3},(_,i)=>({id:`go-${i+1}`,category:'game',game:'go',mode:'multi',name:`围棋 ${i+1}号房`,label:`${i+1}号房`,description:'19路标准围棋 · 提子 / 禁入点 / 全局同形 / 数目',capacity:2})),
   ...Array.from({length:2},(_,i)=>({id:`mahjong-${i+1}`,category:'game',game:'mahjong',mode:'multi',name:`日麻 ${i+1}号房`,label:`${i+1}号房`,description:'四人立直麻将 · 番符 / 吃碰杠 / 宝牌 / 振听',capacity:4,minPlayers:1})),
   ...Array.from({length:2},(_,i)=>({id:`uno-${i+1}`,category:'game',game:'uno',mode:'multi',name:`UNO ${i+1}号房`,label:`${i+1}号房`,description:'2~4 人 UNO · +2 / +4 / 跳过 / 反转',capacity:4,minPlayers:1})),
