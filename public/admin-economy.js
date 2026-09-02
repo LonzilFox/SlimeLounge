@@ -5,7 +5,7 @@ const ECON_REC={
   chess:{name:'国际象棋',entryFee:35,aiEntryFee:14,stake:80,note:'通常 15–30 分钟 / 局'},
   go:{name:'围棋',entryFee:45,aiEntryFee:18,stake:100,note:'19 路通常较长'},
   blackjack:{name:'21点',entryFee:6,aiEntryFee:3,minBet:10,defaultBet:20,maxBet:200,note:'单手较短，下注本身已承担主要波动'},
-  poker:{name:'德州扑克',entryFee:10,aiEntryFee:4,smallBlind:10,bigBlind:20,note:'按每手牌计费，盲注承担主要波动'},
+  poker:{name:'德州扑克',entryFee:10,aiEntryFee:4,smallBlind:10,bigBlind:20,buyInCapBb:200,note:'按每手牌计费，盲注承担主要波动；建议最大带入上限 200BB'},
   doudizhu:{name:'斗地主',entryFee:18,aiEntryFee:7,stake:40,note:'三人局，结算再乘叫分与炸弹/春天倍数'},
   uno:{name:'UNO',entryFee:20,aiEntryFee:8,rankStep:50,note:'通常 5–15 分钟 / 局'},
   mahjong:{name:'日麻',entryFee:50,aiEntryFee:20,pointsPerChip:100,forfeitPenalty:50,note:'完整对局时间最长'},
@@ -27,7 +27,7 @@ function renderChipAdmin(rules,d,users){
   ${gameEconomyCard('chess',rules,econInput('chipRuleChess','胜负转移',econVal(rules.chess?.stake,ECON_REC.chess.stake),1,`推荐 ${ECON_REC.chess.stake}`))}
   ${gameEconomyCard('go',rules,econInput('chipRuleGo','胜负转移',econVal(rules.go?.stake,ECON_REC.go.stake),1,`推荐 ${ECON_REC.go.stake}`))}
   ${gameEconomyCard('blackjack',rules,`${econInput('chipRuleBjMin','最小下注',econVal(rules.blackjack?.minBet,10),1,'推荐 10')}${econInput('chipRuleBjDefault','默认下注',econVal(rules.blackjack?.defaultBet,20),1,'推荐 20')}${econInput('chipRuleBjMax','最大下注',econVal(rules.blackjack?.maxBet,200),1,'推荐 200')}`)}
-  ${gameEconomyCard('poker',rules,`${econInput('chipRulePokerSb','小盲',econVal(rules.poker?.smallBlind,10),1,'推荐 10')}${econInput('chipRulePokerBb','大盲 / 最小完整加注',econVal(rules.poker?.bigBlind,20),1,'推荐 20')}`)}
+  ${gameEconomyCard('poker',rules,`${econInput('chipRulePokerSb','小盲',econVal(rules.poker?.smallBlind,10),1,'推荐 10')}${econInput('chipRulePokerBb','大盲 / 最小完整加注',econVal(rules.poker?.bigBlind,20),1,'推荐 20')}${econInput('chipRulePokerCap','最大带入上限（BB）',econVal(rules.poker?.buyInCapBb,200),20,'推荐 200BB；可防止单桌过度堆叠')}`)}
   ${gameEconomyCard('doudizhu',rules,econInput('chipRuleDdzStake','基础胜负转移',econVal(rules.doudizhu?.stake,40),1,'结算再乘叫分 / 炸弹 / 春天倍数；地主双份'))}
   ${gameEconomyCard('uno',rules,econInput('chipRuleUno','名次级差',econVal(rules.uno?.rankStep,50),1,'推荐 50'))}
   ${gameEconomyCard('mahjong',rules,`${econInput('chipRuleMahjong','每多少点折 1 筹码',econVal(rules.mahjong?.pointsPerChip,100),1,'推荐 100')}${econInput('chipRuleMahjongForfeit','中途退出最低损失',econVal(rules.mahjong?.forfeitPenalty,50),1,'推荐 50')}`)}
@@ -36,7 +36,7 @@ function renderChipAdmin(rules,d,users){
 }
 function chipRulesPayload(){
   const n=id=>Math.max(0,Math.floor(Number($(id)?.value)||0)),rule=(kind,extra={})=>({entryFee:n(`#fee_${kind}`),aiEntryFee:n(`#aifee_${kind}`),...extra}),single=kind=>({entryFee:n(`#aifee_${kind}`),aiEntryFee:n(`#aifee_${kind}`)});
-  return {chipFloor:n('#econFloor'),dailyReward:n('#econDaily'),recoverPerHour:n('#econRecover'),gameRules:{dice:rule('dice',{stake:n('#chipRuleDice')}),gomoku:rule('gomoku',{stake:n('#chipRuleGomoku')}),xiangqi:rule('xiangqi',{stake:n('#chipRuleXiangqi')}),chess:rule('chess',{stake:n('#chipRuleChess')}),go:rule('go',{stake:n('#chipRuleGo')}),blackjack:rule('blackjack',{minBet:n('#chipRuleBjMin'),defaultBet:n('#chipRuleBjDefault'),maxBet:n('#chipRuleBjMax')}),poker:rule('poker',{smallBlind:n('#chipRulePokerSb'),bigBlind:n('#chipRulePokerBb')}),doudizhu:rule('doudizhu',{stake:n('#chipRuleDdzStake')}),uno:rule('uno',{rankStep:n('#chipRuleUno')}),mahjong:rule('mahjong',{pointsPerChip:n('#chipRuleMahjong'),forfeitPenalty:n('#chipRuleMahjongForfeit')}),sudoku:single('sudoku'),minesweeper:single('minesweeper'),tetris:single('tetris')}};
+  return {chipFloor:n('#econFloor'),dailyReward:n('#econDaily'),recoverPerHour:n('#econRecover'),gameRules:{dice:rule('dice',{stake:n('#chipRuleDice')}),gomoku:rule('gomoku',{stake:n('#chipRuleGomoku')}),xiangqi:rule('xiangqi',{stake:n('#chipRuleXiangqi')}),chess:rule('chess',{stake:n('#chipRuleChess')}),go:rule('go',{stake:n('#chipRuleGo')}),blackjack:rule('blackjack',{minBet:n('#chipRuleBjMin'),defaultBet:n('#chipRuleBjDefault'),maxBet:n('#chipRuleBjMax')}),poker:rule('poker',{smallBlind:n('#chipRulePokerSb'),bigBlind:n('#chipRulePokerBb'),buyInCapBb:Math.max(20,n('#chipRulePokerCap')||200)}),doudizhu:rule('doudizhu',{stake:n('#chipRuleDdzStake')}),uno:rule('uno',{rankStep:n('#chipRuleUno')}),mahjong:rule('mahjong',{pointsPerChip:n('#chipRuleMahjong'),forfeitPenalty:n('#chipRuleMahjongForfeit')}),sudoku:single('sudoku'),minesweeper:single('minesweeper'),tetris:single('tetris')}};
 }
 function bindChipAdmin(root){
   $('#chipRulesSave')&&($('#chipRulesSave').onclick=async()=>{try{await post('/api/admin/chips',creds({action:'set_rules',...chipRulesPayload()}));toast('经济与全部游戏筹码规则已保存');renderAdmin()}catch(err){toast(err.message)}});
