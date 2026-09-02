@@ -25,7 +25,7 @@ ok(leisure.includes('x.samples<4')&&leisure.includes('elapsed<cfg.fishing.minPla
 // v1 -> v2 migration changes only untouched defaults; Owner custom values survive.
 const old={version:1,fishing:{...DEFAULT_LEISURE_CONFIG.fishing,fish:DEFAULT_LEISURE_CONFIG.fishing.fish.map(x=>({...x,basePrice:x.id==='sardine'?1775:(x.id==='anchovy'?90:x.basePrice)}))},market:{...DEFAULT_LEISURE_CONFIG.market,tickSeconds:45}};
 const migrated=normalizeLeisureConfig(old);
-ok(migrated.version===4&&migrated.fishing.fish.find(x=>x.id==='sardine')?.basePrice===1775,'custom fish price overwritten');
+ok(migrated.version===5&&migrated.fishing.fish.find(x=>x.id==='sardine')?.basePrice===1775,'custom fish price overwritten');
 ok(migrated.fishing.fish.find(x=>x.id==='anchovy')?.basePrice===50,'untouched old fish price was not softly migrated');
 ok(migrated.market.tickSeconds===30,'default market tick did not migrate to 30 seconds');
 const customTick=normalizeLeisureConfig({...migrated,market:{...migrated.market,tickSeconds:37}});ok(customTick.market.tickSeconds===37,'custom market tick was overwritten');
@@ -51,7 +51,7 @@ async function wait(){for(let i=0;i<80;i++){try{const r=await fetch(base+'/api/h
 async function req(p,{method='GET',body,headers={}}={}){const r=await fetch(base+p,{method,headers:{...(body!==undefined?{'content-type':'application/json'}:{}),...headers},body:body===undefined?undefined:(typeof body==='string'?body:JSON.stringify(body))});const j=await r.json().catch(()=>({}));return {r,j}}
 async function post(p,b){const {r,j}=await req(p,{method:'POST',body:b});if(!r.ok)throw Error(`${p}: ${r.status} ${j.error||''}`);return j}
 try{
-  const health=await wait();ok(health.version==='0.4.4'&&!('port' in health)&&!('trustProxy' in health),'health data minimization/version failed');
+  const health=await wait();ok(health.version==='0.4.5'&&!('port' in health)&&!('trustProxy' in health),'health data minimization/version failed');
   let q=await req('/api/local-admin/users',{headers:{'x-forwarded-for':'203.0.113.8','x-forwarded-host':'example.com'}});ok(q.r.status===403,'proxied public local-admin/users was exposed');
   q=await req('/api/network/info',{headers:{'x-forwarded-for':'203.0.113.8'}});ok(q.r.status===403,'proxied network info was exposed');
   q=await req('/api/auth',{method:'POST',body:'{"constructor":{"prototype":{"polluted":true}}}'});ok(q.r.status===400,'dangerous JSON object keys were accepted');
@@ -70,5 +70,5 @@ try{
   const caught=await post('/api/leisure/fishing/catch',{...cred,token:cast.token,score:-999999});ok(caught.caught===true&&caught.fish?.score>=20,'valid server-observed fishing did not settle independently of client score');
   q=await req('/api/leisure/fishing/catch',{method:'POST',body:{...cred,token:cast.token,score:100}});ok(q.r.status===410,'fishing token was reusable');
 
-  console.log('[OK] v0.4.4 security boundaries / authoritative fishing / Blackjack rules+RNG / market countdown / admin rendering');
+  console.log('[OK] v0.4.5 security boundaries / authoritative fishing / Blackjack rules+RNG / market countdown / admin rendering');
 }finally{proc.kill('SIGTERM');await sleep(120);fs.rmSync(tmp,{recursive:true,force:true})}

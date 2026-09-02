@@ -18,7 +18,7 @@ const css=fs.readFileSync(path.join(root,'public/styles.css'),'utf8')+fs.readFil
 const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));
 const release=JSON.parse(fs.readFileSync(path.join(root,'release_notes/releases.json'),'utf8')).find(x=>x.id==='v0.2.9');
 
-ok(pkg.version==='0.4.4','package version is not 0.3.1');
+ok(pkg.version==='0.4.5','package version is not 0.3.1');
 ok(ROOM_DEFS.filter(r=>r.game==='dice').length===5,'dice room count is not 5');
 ok(ROOM_DEFS.filter(r=>r.category==='music'&&r.style==='其他风格').length===1,'other-style music room missing');
 ok(diceUi.includes('class="pip p')&&diceUi.includes('dicePips')&&!diceUi.includes('class="die-face">${n}'),'dice UI is not physical pip style');
@@ -30,7 +30,7 @@ ok(app.includes('data-drag-handle')&&app.includes('setPointerCapture')&&css.incl
 ok(app.includes('这里是主要播放器')&&app.includes('同一 Lounge 账号')||app.includes('同一 SlimeLounge 账号'),'music main-player/account-sharing explanation missing');
 ok(admin.includes('筹码经济 · 总设置')&&admin.includes('分游戏设置')&&admin.includes('玩家筹码修改 · 从高到低'),'admin economy hierarchy missing');
 ok(admin.includes('aiEntryFee')&&admin.includes('sort((a,b)=>(Number(b.chips)||0)-(Number(a.chips)||0)'),'AI fee or descending player sorting missing');
-ok(appGames.includes('paySingleRound')&&appGames.includes("$('#sudokuNew').onclick=async")&&appGames.includes("$('#mineNew').onclick=async")&&appGames.includes('await paySingleRound(def.game)')&&appGames.includes('await paySingleRound(state.room.game)'),'single-player per-round charging missing');
+ok(appGames.includes('paySingleRound')&&appGames.includes("$('#sudokuNew').onclick=async")&&appGames.includes("$('#mineNew').onclick=async")&&appGames.includes('await paySingleRound(def.game,def.difficulty)')&&appGames.includes("await paySingleRound('tetris','classic')"),'single-player per-round charging missing');
 ok(release.id==='v0.2.9'&&release.items?.length>=8,'v0.2.9 release note missing');
 ok(fs.existsSync(path.join(root,'public/favicon.ico'))&&fs.existsSync(path.join(root,'public/favicon-32.png'))&&fs.existsSync(path.join(root,'public/icon-192.png')),'new favicon assets missing');
 
@@ -68,7 +68,7 @@ async function openRoom(s,roomId,tabId){return new Promise((resolve,reject)=>{co
 async function wsGame(ws,action,pred=()=>true){const p=waitMsg(ws,m=>m.type==='game_state'&&pred(m.state),4000,action.type);ws.send(JSON.stringify({type:'game_action',action}));return (await p).state}
 try{
   await waitServer();
-  const health=await (await fetch(`http://127.0.0.1:${port}/api/health`)).json();ok(health.version==='0.4.4','live server is not v0.4.4');
+  const health=await (await fetch(`http://127.0.0.1:${port}/api/health`)).json();ok(health.version==='0.4.5','live server is not v0.4.5');
   const owner=await post('/api/register',{name:'V029',employeeId:'V029OWN',slimeColor:'mint',deviceLabel:'test'});
 
   const chat=await openRoom(owner,'chat-general','v029-chat');

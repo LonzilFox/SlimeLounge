@@ -11,13 +11,13 @@ const ok=(v,m)=>{if(!v)throw Error(m)};
 const pkg=JSON.parse(read('package.json'));
 const html=read('public/index.html'),app=read('public/app.js'),games=read('public/app-games.js'),leisure=read('public/leisure-ui.js'),prog=read('public/progression-ui.js'),progression=read('server/progression.js'),rank=read('server/rankings.js'),diag=read('server/runtime_diagnostics.js'),css=read('public/ui-overrides.css');
 
-ok(pkg.version==='0.4.4','package version is not v0.4.4');
-ok(html.includes('v=0.4.4&build=044fix3')&&!html.includes('042fix2'),'v0.4.4 asset cache revision missing');
-ok(app.includes("FEATURE_VERSION='0.4.4',ASSET_BUILD='044'"),'dynamic feature cache revision missing');
+ok(pkg.version==='0.4.5','package version is not v0.4.5');
+ok(html.includes('v=0.4.5&build=045')&&!html.includes('042fix2'),'v0.4.5 asset cache revision missing');
+ok(app.includes("FEATURE_VERSION='0.4.5',ASSET_BUILD='045'"),'dynamic feature cache revision missing');
 
 const cfg=normalizeLeisureConfig({});
 const fish=cfg.fishing.fish;
-ok(DEFAULT_LEISURE_CONFIG.version===4&&fish.length===77,'Stardew fishing catalogue should contain 77 entries');
+ok(DEFAULT_LEISURE_CONFIG.version===5&&fish.length===77,'Stardew fishing catalogue should contain 77 entries');
 ok(new Set(fish.map(x=>x.id)).size===77,'duplicate fish ids');
 ok(['legend','legend_ii','goby','river_jelly','sea_jelly','cave_jelly'].every(id=>fish.some(x=>x.id===id)),'key Stardew fish/special catches missing');
 ok(fish.every(x=>x.basePrice>=50&&x.basePrice<=2000&&x.basePrice%25===0),'fish prices must be 50..2000 and multiples of 25');
@@ -29,7 +29,7 @@ ok(leisure.includes('fishingCastBlockedUntil=Date.now()+850')&&leisure.includes(
 ok(leisure.includes('持股实时盈亏')&&leisure.includes('spreadBps')&&leisure.includes('marketTradeBusy'),'market floating P/L, spread or client trade lock missing');
 ok(DEFAULT_LEISURE_CONFIG.market.spreadBps>0&&cfg.market.tradeCooldownMs>=500,'market difficulty defaults not applied');
 
-ok(app.includes("fishing:'钓鱼盈利'")&&rank.includes('return {chips,market,fishing,games}'),'fishing profit ranking missing');
+ok(app.includes("fishing:'钓鱼盈利'")&&games.includes("isFishing=tab==='fishing'")&&games.includes('累计钓鱼盈利')&&rank.includes('const fishing=Object.values(data.users)')&&rank.includes('return {chips,market,fishing,single,games}'),'fishing profit ranking missing');
 ok(app.includes("trading:'炒股中'")&&app.includes("fishing:'钓鱼中'"),'trading/fishing presence labels missing');
 ok(app.includes("setTimeout(()=>{if(!established)ensureFallback")&&app.includes('},3500)')&&app.includes('},1800)'),'room transport tolerance not updated');
 ok(app.includes('setInterval(healthPing,25000)')&&app.includes('},60000)'),'background request intervals not reduced');
@@ -47,8 +47,9 @@ ok(prog.includes("['effect','特效']")&&progression.includes("'effect'"),'pet e
 
 const finalSticky=css.lastIndexOf('#adminView .admin-tabs-v038{');
 ok(finalSticky>=0&&css.slice(finalSticky,finalSticky+300).includes('position:sticky!important'),'admin tabs final rule is not sticky/topmost');
-ok(css.includes('grid-template-columns:repeat(5,minmax(0,1fr))!important')&&css.includes('overflow:visible!important')&&css.includes('@media(max-width:360px)'), 'market/mobile responsive summary repair missing');
-ok(!css.slice(css.lastIndexOf('/* v0.4.4 final responsive layer')).includes('.market-summary{grid-template-columns:repeat(4,minmax(158px,1fr))'),'v0.4.4 final layer reintroduced market horizontal scroller');
+ok(css.includes('.market-summary{grid-template-columns:repeat(auto-fit,minmax')&&css.includes('overflow:visible!important')&&css.includes('@media(max-width:380px)'), 'market/mobile responsive summary repair missing');
+const finalResponsive=css.slice(css.lastIndexOf('/* v0.4.4 responsive market hotfix'));
+ok(finalResponsive.includes('repeat(auto-fit,minmax')&&!/market-(?:summary|grid|asset|order|margin-open|position-actions)[^{]*\{[^}]*overflow-x\s*:\s*auto!important/.test(finalResponsive),'v0.4.5 final market layer reintroduced a horizontal scroller');
 
 ok(fs.statSync(path.join(root,'public/app.js')).size<90000&&fs.statSync(path.join(root,'local_server.js')).size<90000,'upload-sensitive source file exceeds 90KB');
-console.log('[OK] v0.4.4 fishing state machine / Stardew catalogue / transport tuning / Tetris / rankings / responsive UI');
+console.log('[OK] v0.4.5 fishing state machine / Stardew catalogue / transport tuning / Tetris / rankings / responsive UI');
