@@ -1,4 +1,4 @@
-# SlimeLounge v0.4.6
+# SlimeLounge v0.4.7
 
 SlimeLounge 是一个自建的多人休闲网页空间，整合 Discord 式文字/语音频道、同步听歌、好友、个人筹码、排行榜与多种小游戏。正式服务器推荐使用 Node.js + systemd；公网入口可以使用 Tailscale Funnel 提供 HTTPS/WSS，无需单独购买 WebSocket 服务。
 
