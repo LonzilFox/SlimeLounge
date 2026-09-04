@@ -1,6 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 38" shape-rendering="crispEdges">
-  <!-- no filled lens: the glass area is intentionally transparent -->
-  <path fill="#5e4b20" d="M5 5h18v3h3v18h-3v3H5v-3H2V8h3zm3 3H6v3H5v12h3v3h12v-3h3V11h-3V8zM26 23h3v3h3v3h3v3h3v3h3v3h-4v-3h-3v-3h-3v-3h-3v-3h-2z"/>
-  <path fill="#d3b260" d="M8 6h12v2H8zM5 9h3v14H5zm15 0h3v14h-3zM8 24h12v3H8zM27 24h2v3h3v3h3v3h3v3h-2v-2h-3v-3h-3v-3h-3z"/>
-  <path fill="#fff1b6" d="M9 8h6v2H9zM7 10h2v5H7z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 42" shape-rendering="crispEdges"><g fill="#5f4c20"><path d="M9 2h18v3H9zM5 5h5v4H5zm22 0h5v4h-5zM2 9h5v18H2zm28 0h5v18h-5zM5 27h5v4H5zm22 0h5v4h-5zM9 31h18v3H9zm24-5h4v5h3v5h3v6h-5v-4h-3v-5h-3v-5h-2v-4h3z"/></g><g fill="#d3b260"><path d="M10 4h16v2H10zM6 8h3v18H6zm21 0h3v18h-3zM10 28h16v3H10zm24-1h2v4h3v5h3v4h-3v-3h-3v-5h-2z"/></g><path fill="#fff0b1" d="M11 5h7v2h-7zM7 9h2v6H7z"/></svg>
