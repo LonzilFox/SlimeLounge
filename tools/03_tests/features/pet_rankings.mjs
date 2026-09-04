@@ -21,7 +21,7 @@ ok(admin.includes('商城设置')&&admin.includes('成长与宠物')&&!admin.inc
 ok(ui.includes('pet-acc-img')&&ui.includes('图片/样式资源')&&ui.includes('data-prog-core')&&ui.includes('用户成长数据'),'admin/real accessory UI missing');
 ok(css.includes('.pet-acc-img')&&css.includes('.prog-admin-row'),'progression/accessory CSS missing');
 for(const f of ['bow.svg','leaf.svg','star.svg','glasses.svg','scarf.svg'])ok(fs.existsSync(path.join(root,'public/accessories',f)),`accessory asset missing ${f}`);
-ok(html.includes('progression-ui.js?v=0.4.7&build=047'),'v0.3.8 asset revision missing');
+ok(html.includes('progression-ui.js?v=0.4.8&build=048'),'v0.3.8 asset revision missing');
 const releases=JSON.parse(fs.readFileSync(path.join(root,'release_notes/releases.json'),'utf8')),note=releases.find(x=>x.id==='v0.3.5');ok(note?.items.length>=8,'release note v0.3.5 missing');
 const prev=releases.find(x=>x.id==='v0.3.3');ok(prev?.id==='v0.3.3','v0.3.3 release-note metadata corrupted');
 console.log('[OK] retained v0.3.5 configurable growth/shop/achievements/user data / purchasable titles / real pet accessories');

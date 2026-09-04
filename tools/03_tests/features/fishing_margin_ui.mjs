@@ -15,7 +15,7 @@ const gameUi=fs.readFileSync(path.join(root,'public/app-games.js'),'utf8');
 const css=fs.readFileSync(path.join(root,'public/ui-overrides.css'),'utf8');
 const regression=fs.readFileSync(path.join(root,'tools/03_tests/regression/project.mjs'),'utf8');
 const runner=fs.readFileSync(path.join(root,'tools/02_validation/02_run_all_checks.mjs'),'utf8');
-ok(pkg.version==='0.4.7','package version is not v0.4.7');
+ok(pkg.version==='0.4.8','package version is not v0.4.8');
 ok(leisure.includes('heartbeatMs:650')&&leisure.includes('version:9'),'fishing request-frequency migration missing');
 ok(leisure.includes("'/api/leisure/fishing/lock'")&&leisure.includes('x.locked'),'server-side fish lock missing');
 ok(leisure.includes("'/api/leisure/market/order'")&&leisure.includes("'/api/leisure/market/margin'")&&leisure.includes('maxLeverage:10')&&leisure.includes('maintenanceMarginPct:20'),'simulated exchange order/margin core missing');
@@ -28,8 +28,8 @@ ok(progUi.includes('低饱腹每小时消耗筹码')&&progUi.includes('互动冷
 ok(gameUi.includes('data-single-game-exit')&&gameUi.includes('外部音源慢响应'),'single-player exit or diagnostics distinction missing');
 ok(diag.includes('isExternalWait')&&diag.includes('externalSlow'),'external music latency classification missing');
 ok(css.includes('#adminView.page:not(.hidden),#shopView.page:not(.hidden){display:block')&&css.includes('z-index:9999')&&css.includes('repeat(auto-fit,minmax(min(128px,100%),1fr))')&&css.includes('@media(orientation:portrait)'),'full-page admin/shop or content-driven market responsive overrides missing');
-ok(regression.includes("readFileSync(path.join(root,'package.json')")&&!regression.includes("health.version!=='0.4.7'"),'legacy regression still hardcodes release version');
-ok(runner.includes('features/fishing_tetris.mjs')&&runner.includes('features/fishing_margin_ui.mjs'),'v0.4.3/v0.4.7 tests missing from npm run check');
+ok(regression.includes("readFileSync(path.join(root,'package.json')")&&!regression.includes("health.version!=='0.4.8'"),'legacy regression still hardcodes release version');
+ok(runner.includes('features/fishing_tetris.mjs')&&runner.includes('features/fishing_margin_ui.mjs'),'v0.4.3/v0.4.8 tests missing from npm run check');
 
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'slimelounge-v044-')),port=18144;let logs='';
 const proc=spawn(process.execPath,['local_server.js'],{cwd:root,env:{...process.env,PORT:String(port),AUTO_OPEN:'0',SLIMELOUNGE_DATA_DIR:tmp,OWNER_EMPLOYEE_ID:'V044OWN',EMPLOYEE_HASH_SECRET:'v044-secret'},stdio:['ignore','pipe','pipe'],windowsHide:true});proc.stdout.on('data',d=>logs+=d);proc.stderr.on('data',d=>logs+=d);
@@ -46,5 +46,5 @@ try{
  const oid=order.market.portfolio.orders[0].id;const cancelled=await post('/api/leisure/market/order',{...cred,action:'cancel',orderId:oid});ok(cancelled.market.portfolio.orders.length===0,'limit order cancel failed');
  const margin=await post('/api/leisure/market/margin',{...cred,action:'open',assetId:asset.id,side:'long',qty:1,leverage:2,stopLoss:0,takeProfit:0});ok(margin.market.portfolio.positions.length===1&&margin.market.portfolio.marginUsed>0,'cash-margin position not opened');
  const pid=margin.market.portfolio.positions[0].id;const closed=await post('/api/leisure/market/margin',{...cred,action:'close',positionId:pid});ok(closed.market.portfolio.positions.length===0,'margin close failed');
- console.log('[OK] v0.4.7 fish lock / diagnostics / pet penalty / responsive UI / limit+margin trading');
+ console.log('[OK] v0.4.8 fish lock / diagnostics / pet penalty / responsive UI / limit+margin trading');
 }finally{proc.kill();fs.rmSync(tmp,{recursive:true,force:true})}

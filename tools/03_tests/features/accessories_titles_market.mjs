@@ -14,7 +14,7 @@ const leisureUi=fs.readFileSync(path.join(root,'public/leisure-ui.js'),'utf8');
 const progUi=fs.readFileSync(path.join(root,'public/progression-ui.js'),'utf8');
 const ui=fs.readFileSync(path.join(root,'public/ui-enhancements.js'),'utf8');
 const css=fs.readFileSync(path.join(root,'public/ui-overrides.css'),'utf8');
-ok(pkg.version==='0.4.7','package version is not v0.4.7');
+ok(pkg.version==='0.4.8','package version is not v0.4.8');
 ok(extra.indexOf("game:'tetris'")<extra.indexOf("game:'sudoku'")&&extra.indexOf("game:'sudoku'")<extra.indexOf("game:'minesweeper'"),'single-player order is not Tetris / Sudoku / Minesweeper');
 ok(single.includes("'/api/game/single/result'")&&single.includes('roundToken')&&single.includes('bestScore')&&single.includes('bestMs'),'server-authoritative single-player result tracking missing');
 ok(leisure.includes("rod_training")&&leisure.includes("rod_bamboo")&&leisure.includes("rod_fiberglass")&&leisure.includes("rod_iridium")&&leisure.includes("rod_advanced_iridium"),'five fishing rods missing');
@@ -25,10 +25,10 @@ ok(leisure.includes('function baseTickTrend')&&leisure.includes('(1-ratio)/.5')&
 ok(leisure.includes("'/api/leisure/market/quotes'")&&leisure.includes("'/api/leisure/market/history'")&&leisure.includes('candleWindow')&&leisure.includes('history1h'),'lightweight quotes / OHLC history retention missing');
 ok(leisureUi.includes('refreshMarketDynamic')&&leisureUi.includes('exportMarketHistory')&&leisureUi.includes('market-candle')&&!/if\(sec<=0\)[^}]*renderMarket\(epoch\)/.test(leisureUi),'market refresh still rebuilds the page or K-line export missing');
 ok(leisureUi.includes('data-f="tickTrend"')&&leisureUi.includes('当前实际趋势'),'admin configured / live tick trend fields missing');
-ok(progression.includes("version:13")&&progression.includes('title_market_operator')&&progression.includes('title_lake_legend')&&progression.includes('checkin_streak_30')&&progression.includes('market_batch_10000'),'advanced titles / achievements / v9 migration missing');
+ok(progression.includes("version:14")&&progression.includes('title_market_operator')&&progression.includes('title_lake_legend')&&progression.includes('checkin_streak_30')&&progression.includes('market_batch_10000'),'advanced titles / achievements / v9 migration missing');
 ok(progUi.includes('draggable="true"')&&progUi.includes('insertBefore(titleDrag'),'draggable title display order missing');
 ok(ui.includes("'/accessories/partyhat.svg'")&&ui.includes("'/accessories/halo.svg'")&&ui.includes('accessoryPalette'),'new recolorable accessory visuals missing');
-ok(css.includes('.fishing-rod-grid')&&css.includes('.fish-card .fish-card-main>*')&&css.includes('.market-candle.up')&&css.includes('repeat(auto-fit'),'v0.4.7 responsive fishing/market styles missing');
+ok(css.includes('.fishing-rod-grid')&&css.includes('.fish-card .fish-card-main>*')&&css.includes('.market-candle.up')&&css.includes('repeat(auto-fit'),'v0.4.8 responsive fishing/market styles missing');
 
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'slimelounge-v045-')),port=18145;let logs='';
 const proc=spawn(process.execPath,['local_server.js'],{cwd:root,env:{...process.env,PORT:String(port),AUTO_OPEN:'0',SLIMELOUNGE_DATA_DIR:tmp,OWNER_EMPLOYEE_ID:'V045OWN',EMPLOYEE_HASH_SECRET:'v045-secret'},stdio:['ignore','pipe','pipe'],windowsHide:true});proc.stdout.on('data',d=>logs+=d);proc.stderr.on('data',d=>logs+=d);
@@ -48,6 +48,6 @@ try{
  const p2=await post('/api/leisure/market/margin',{...cred,action:'open',assetId:a.id,side:'long',qty:1,leverage:2});const ids=p2.market.portfolio.positions.map(x=>x.id);ok(ids.length===2&&new Set(ids).size===2,'same-asset margin positions not independently identified');
  const first=ids[0],second=ids[1],closed=await post('/api/leisure/market/margin',{...cred,action:'close',positionId:first}),left=closed.market.portfolio.positions;ok(left.length===1&&left[0].id===second,'closing one position affected another position');
  const entry=await post('/api/game/entry',{...cred,kind:'tetris',difficulty:'classic'});ok(entry.roundToken,'single-game round token missing');await sleep(1550);await post('/api/game/single/result',{...cred,roundToken:entry.roundToken,won:true,score:5432,lines:12});const ranks=await post('/api/leaderboards',cred);ok(ranks.leaderboards?.single?.tetris?.classic?.some(x=>x.userId===u.userId&&x.bestScore===5432&&x.games>=1),'Tetris score/completed-game leaderboard missing');
- const pr=await post('/api/progression/self',cred);ok(pr.progression.achievements.some(x=>x.id==='checkin_streak_30')&&pr.progression.shop.accessories.some(x=>x.id==='acc_sparkles')&&pr.progression.shop.titles.some(x=>x.id==='title_table_master'),'v0.4.7 shop/title/achievement payload missing');
- console.log('[OK] v0.4.7 single rankings / rods+quality fishing / titles+achievements / independent positions / dynamic OHLC market');
+ const pr=await post('/api/progression/self',cred);ok(pr.progression.achievements.some(x=>x.id==='checkin_streak_30')&&pr.progression.shop.accessories.some(x=>x.id==='acc_sparkles')&&pr.progression.shop.titles.some(x=>x.id==='title_table_master'),'v0.4.8 shop/title/achievement payload missing');
+ console.log('[OK] v0.4.8 single rankings / rods+quality fishing / titles+achievements / independent positions / dynamic OHLC market');
 }finally{proc.kill();fs.rmSync(tmp,{recursive:true,force:true})}

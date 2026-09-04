@@ -11,9 +11,9 @@ const ok=(v,m)=>{if(!v)throw Error(m)};
 const pkg=JSON.parse(read('package.json'));
 const html=read('public/index.html'),app=read('public/app.js'),games=read('public/app-games.js'),leisure=read('public/leisure-ui.js'),prog=read('public/progression-ui.js'),progression=read('server/progression.js'),rank=read('server/rankings.js'),diag=read('server/runtime_diagnostics.js'),css=read('public/ui-overrides.css');
 
-ok(pkg.version==='0.4.7','package version is not v0.4.7');
-ok(html.includes('v=0.4.7&build=047')&&!html.includes('042fix2'),'v0.4.7 asset cache revision missing');
-ok(app.includes("FEATURE_VERSION='0.4.7',ASSET_BUILD='047'"),'dynamic feature cache revision missing');
+ok(pkg.version==='0.4.8','package version is not v0.4.8');
+ok(html.includes('v=0.4.8&build=048')&&!html.includes('042fix2'),'v0.4.8 asset cache revision missing');
+ok(app.includes("FEATURE_VERSION='0.4.8',ASSET_BUILD='048'"),'dynamic feature cache revision missing');
 
 const cfg=normalizeLeisureConfig({});
 const fish=cfg.fishing.fish;
@@ -49,7 +49,7 @@ const finalSticky=css.lastIndexOf('#adminView .admin-tabs-v038{');
 ok(finalSticky>=0&&css.slice(finalSticky,finalSticky+300).includes('position:sticky!important'),'admin tabs final rule is not sticky/topmost');
 ok(css.includes('.market-summary{grid-template-columns:repeat(auto-fit,minmax')&&css.includes('overflow:visible!important')&&css.includes('@media(max-width:380px)'), 'market/mobile responsive summary repair missing');
 const finalResponsive=css.slice(css.lastIndexOf('/* v0.4.4 responsive market hotfix'));
-ok(finalResponsive.includes('repeat(auto-fit,minmax')&&!/market-(?:summary|grid|asset|order|margin-open|position-actions)[^{]*\{[^}]*overflow-x\s*:\s*auto!important/.test(finalResponsive),'v0.4.7 final market layer reintroduced a horizontal scroller');
+ok(finalResponsive.includes('repeat(auto-fit,minmax')&&!/market-(?:summary|grid|asset|order|margin-open|position-actions)[^{]*\{[^}]*overflow-x\s*:\s*auto!important/.test(finalResponsive),'v0.4.8 final market layer reintroduced a horizontal scroller');
 
 ok(fs.statSync(path.join(root,'public/app.js')).size<90000&&fs.statSync(path.join(root,'local_server.js')).size<90000,'upload-sensitive source file exceeds 90KB');
-console.log('[OK] v0.4.7 fishing state machine / Stardew catalogue / transport tuning / Tetris / rankings / responsive UI');
+console.log('[OK] v0.4.8 fishing state machine / Stardew catalogue / transport tuning / Tetris / rankings / responsive UI');
