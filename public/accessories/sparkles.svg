@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 52" shape-rendering="crispEdges"><path fill="#35546d" d="M8 0h4v8h8v4h-8v8H8v-8H0V8h8zm34 6h4v6h6v4h-6v6h-4v-6h-6v-4h6zM24 24h8v10h10v8H32v10h-8V42H14v-8h10zM6 34h4v5h5v4h-5v5H6v-5H1v-4h5z"/><path fill="#9dd9ff" d="M9 3h2v7h7v2h-7v7H9v-7H2v-2h7zm34 5h2v6h5v2h-5v5h-2v-5h-5v-2h5zM27 27h2v9h9v4h-9v9h-2v-9h-9v-4h9zM7 36h2v5h4v2H9v4H7v-4H3v-2h4z"/><path fill="#effbff" d="M9 4h2v3H9zm34 5h2v3h-2zM27 28h2v4h-2zM7 37h2v2H7z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 60" shape-rendering="crispEdges">
+  <!-- tiny Terraria-like dust motes; deliberately no large cross particles -->
+  <g fill="#466781">
+    <path d="M8 8h3v3H8zM20 4h2v2h-2zM33 12h3v2h-3zM48 7h2v3h-2zM57 18h2v2h-2zM6 27h2v2H6zM18 33h3v2h-3zM39 25h2v2h-2zM52 34h3v2h-3zM29 42h2v2h-2zM10 49h3v3h-3zM44 47h2v2h-2zM56 53h2v3h-2zM23 56h2v2h-2z"/>
+  </g>
+  <g fill="#9dd9ff">
+    <path d="M9 9h1v1H9zM20 4h2v2h-2zM34 12h2v2h-2zM49 8h1v1h-1zM57 18h2v2h-2zM6 27h2v2H6zM19 33h2v2h-2zM39 25h2v2h-2zM53 34h2v2h-2zM29 42h2v2h-2zM11 50h2v2h-2zM44 47h2v2h-2zM56 54h2v2h-2zM23 56h2v2h-2z"/>
+  </g>
+  <g fill="#e9f8ff"><path d="M33 11h1v1h-1zM10 49h1v1h-1zM52 33h1v1h-1zM18 32h1v1h-1z"/></g>
+</svg>

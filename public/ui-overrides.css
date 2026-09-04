@@ -285,3 +285,7 @@ input,textarea,select,button{max-width:100%}
 /* v0.4.7 admin accessory preview uses the exact same coordinate canvas as real pet wear */
 .admin-acc-live{min-height:190px!important;overflow:visible!important}.admin-acc-live .pet-slime-wrap{width:auto!important;height:auto!important}.admin-acc-live .slime.pet-big{width:180px!important;height:145px!important}.admin-acc-live .pet-accessory-visual{inset:0!important;overflow:visible!important}
 .market-session{display:grid;gap:4px}.market-session.open{border-color:#4f8f61}.market-session.closed{border-color:#8b5b5b}.market-session small{color:var(--muted)}
+
+/* v0.4.7 admin-only market formula helper */
+.admin-formula-result{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:6px;margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.025)}
+.admin-formula-result>b{grid-column:1/-1}.admin-formula-result>span{min-width:0;overflow-wrap:anywhere}.admin-formula-help{margin:10px 0}.admin-formula-help>div{padding:8px 2px}.admin-formula-help p{margin:6px 0;line-height:1.55}

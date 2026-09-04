@@ -2,7 +2,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const COLORS=['mint','sky','peach','lemon','lilac','milk','cocoa','rose','aqua','lime'];
 const COLOR_NAMES={mint:'薄荷',sky:'天空',peach:'蜜桃',lemon:'柠檬',lilac:'葡萄',milk:'牛奶',cocoa:'可可',rose:'玫瑰',aqua:'海盐',lime:'青柠'};
 const GAME_NAMES={dice:'摇骰子',gomoku:'五子棋',xiangqi:'中国象棋',chess:'国际象棋',blackjack:'21点',poker:'德州扑克',go:'围棋',mahjong:'日麻',uno:'UNO',sudoku:'数独',minesweeper:'扫雷',tetris:'俄罗斯方块',doudizhu:'斗地主'};
-const RANK_NAMES={chips:'筹码榜',market:'交易盈亏',fishing:'钓鱼盈利',tetris:'俄罗斯方块',sudoku:'数独',minesweeper:'扫雷',dice:'摇骰子',gomoku:'五子棋',xiangqi:'中国象棋',chess:'国际象棋',go:'围棋',blackjack:'21点',poker:'德州扑克',uno:'UNO',mahjong:'日麻',doudizhu:'斗地主'};
+const RANK_NAMES={chips:'筹码榜',accountLevel:'用户等级',petLevel:'宠物等级',market:'交易盈亏',fishing:'钓鱼盈利',tetris:'俄罗斯方块',sudoku:'数独',minesweeper:'扫雷',dice:'摇骰子',gomoku:'五子棋',xiangqi:'中国象棋',chess:'国际象棋',go:'围棋',blackjack:'21点',poker:'德州扑克',uno:'UNO',mahjong:'日麻',doudizhu:'斗地主'};
 const STATUS_NAMES={online:'在线',busy:'忙碌',away:'暂离',trading:'炒股中',fishing:'钓鱼中',gaming:'游戏中',listening:'听歌中',voice:'语音中',offline:'离线'};
 function socialPresenceRank(u){return !u?.online?8:u.presenceStatus==='trading'?0:u.presenceStatus==='fishing'?1:u.presenceStatus==='gaming'?2:u.presenceStatus==='listening'?3:u.presenceStatus==='voice'?4:u.presenceStatus==='online'?5:u.presenceStatus==='busy'?6:u.presenceStatus==='away'?7:8}
 function socialPresenceSort(a,b){const ra=socialPresenceRank(a),rb=socialPresenceRank(b);if(ra!==rb)return ra-rb;if(ra>=7)return (Number(b?.lastSeenAt)||0)-(Number(a?.lastSeenAt)||0)||String(a?.name||'').localeCompare(String(b?.name||''),'zh-CN');return String(a?.name||'').localeCompare(String(b?.name||''),'zh-CN')}
