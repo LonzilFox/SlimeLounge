@@ -43,7 +43,7 @@ const previous={
   achievements:DEFAULT_PROGRESSION_CONFIG.achievements.filter(x=>!['fish_250','market_200','pet_100','game_300'].includes(x.id))
 };
 const up=normalizeProgressionConfig(previous);
-ok(up.version===12&&up.account.levelXpBase===777&&up.pet.feedXp===91,'v3 growth customization overwritten by v4 migration');
+ok(up.version===13&&up.account.levelXpBase===777&&up.pet.feedXp===91,'v3 growth customization overwritten by v4 migration');
 ok(up.shop.accessories.find(x=>x.id==='acc_bow')?.price===76543,'custom accessory price overwritten');
 ok(!up.shop.accessories.some(x=>x.id==='acc_leaf'),'previously deleted old default accessory was resurrected');
 for(const id of ['acc_flower','acc_crown','acc_headphones'])ok(up.shop.accessories.some(x=>x.id===id),`new v4 accessory not appended: ${id}`);

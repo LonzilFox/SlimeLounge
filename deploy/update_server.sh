@@ -22,8 +22,8 @@ rm -f "$APP_DIR/public/accessories/"*.tint.svg "$APP_DIR/public/accessories/"*.d
 # v0.4.7 tests are grouped by feature. Overlay upgrades may leave old flat version-named tests behind.
 find "$APP_DIR/tools/03_tests" -maxdepth 1 -type f -name '*.mjs' -delete 2>/dev/null || true
 
-echo "[3/5] Verifying project..."
-npm run check
+echo "[3/5] Cleaning + verifying project..."
+npm run clean:repo
 
 echo "[4/5] Restarting SlimeLounge..."
 if systemctl list-unit-files | grep -q '^slimelounge.service'; then

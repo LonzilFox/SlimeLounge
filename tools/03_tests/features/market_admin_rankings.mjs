@@ -19,7 +19,8 @@ ok(leisureUi.includes('<small>可用筹码</small>')&&leisureUi.includes('<small
 ok(leisureUi.includes('data-market-user-save')&&leisureUi.includes('玩家虚拟交易数据'),'market per-user admin UI missing');
 ok(progUi.includes('账号经验排行')&&progUi.includes('史莱姆经验排行')&&progUi.includes('accountRank')&&progUi.includes('petRank'),'account/slime XP rankings missing');
 ok(games.includes("isMarket=tab==='market'")&&games.includes('已实现盈亏')&&games.includes("post('/api/leaderboards',creds()"),'market leaderboard/authenticated client load missing');
-ok(rankings.includes('const market=Object.values(data.users)')&&rankings.includes('profit:Math.round(Number(u.market?.realized)||0)'),'server market leaderboard missing');
+ok(rankings.includes('const users=Object.values(data.users||{})')&&rankings.includes('profit:Math.round(Number(u.market?.realized)||0)'),'server market leaderboard missing');
+ok(rankings.includes('accountLevel=users.map')&&rankings.includes('petLevel=users.map')&&app.includes("accountLevel:'用户等级'")&&app.includes("petLevel:'宠物等级'"),'user/pet level leaderboard missing');
 ok(rankHttp.includes("req.method!=='POST'")&&rankHttp.includes('verifiedOnly')&&rankHttp.includes("limitUser(a,'leaderboards',30,60000"),'leaderboard auth/rate boundary missing');
 ok(staticSvc.includes('path.relative(publicDir,requested)')&&staticSvc.includes("rel==='..'")&&staticSvc.includes('path.isAbsolute(rel)')&&staticSvc.includes("res.writeHead(403"),'static path boundary traversal guard missing');
 ok(leisure.includes('tradeCooldownMs')&&leisure.includes('maxTrades10m')&&leisure.includes("action==='market-user-set'")&&leisure.includes('marketAdminUsers()'),'market security/admin service missing');
@@ -39,7 +40,7 @@ try{
   let q=await req('/api/leaderboards');ok(q.r.status===405,'public GET leaderboard still accessible');
   q=await req('/api/leaderboards',{method:'POST',body:{}});ok(q.r.status===401,'unauthenticated leaderboard POST accepted');
   const u=await post('/api/register',{name:'V040Owner',employeeId:'V04001',slimeColor:'mint',deviceLabel:'test'}),cred={userId:u.userId,deviceId:u.deviceId,deviceToken:u.deviceToken};
-  let lb=await post('/api/leaderboards',cred);ok(Array.isArray(lb.leaderboards?.market),'market leaderboard payload missing');
+  let lb=await post('/api/leaderboards',cred);ok(Array.isArray(lb.leaderboards?.market)&&Array.isArray(lb.leaderboards?.accountLevel)&&Array.isArray(lb.leaderboards?.petLevel),'market/user/pet leaderboard payload missing');
   await post('/api/leisure/admin',{...cred,action:'save-core',config:{market:{sessionStartHour:0,sessionEndHour:24,weekendClosed:false}}});
   let admin=await post('/api/leisure/admin',{...cred,action:'get'});ok(Array.isArray(admin.users)&&admin.users.some(x=>x.userId===u.userId),'admin market users missing');
   await post('/api/leisure/admin',{...cred,action:'market-user-set',targetUserId:u.userId,holdings:{SLM:12},avgCost:{SLM:101.25},realized:500});

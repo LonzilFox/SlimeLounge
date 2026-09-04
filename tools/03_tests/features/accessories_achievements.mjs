@@ -17,7 +17,7 @@ ok(games.includes('restoreScroll=options.resetScroll?0')&&games.includes('e.scro
 ok(css.includes('.diag-overview-card')&&css.includes('.diag-user-card')&&css.includes('.diag-grid>div'),'diagnostics UI repair missing');
 ok(leisure.includes('<small>可用筹码</small>')&&!leisure.includes('这是 SlimeLounge 内部模拟行情')&&css.includes('min-height:82px!important')&&css.includes('min-height:40px!important'),'market row remains compressed or obsolete note remains');
 ok(html.includes('ui-enhancements.js?v=0.4.7&build=047')&&acc.includes('accessoryPalette')&&acc.includes('accessory-svg')&&!acc.includes('accessory-base-layer'),'single-SVG accessory renderer not loaded');
-ok(prog.includes('ACCESSORY_ORIGINAL_COLORS')&&prog.includes("c.toLowerCase()==='#ffffff'")&&prog.includes('version:12'),'accessory original-color migration missing');
+ok(prog.includes('ACCESSORY_ORIGINAL_COLORS')&&prog.includes("c.toLowerCase()==='#ffffff'")&&prog.includes('version:13'),'accessory original-color migration missing');
 ok(read('public/accessories/star.svg').includes('viewBox="0 0 32 28"')&&read('public/accessories/star.svg').includes('shape-rendering="crispEdges"'),'star asset is not the v0.4.7 pixel redesign');
 ok(progUi.includes('data-prog-shop-move')&&prog.includes("action==='move'")&&progUi.includes('↑ 上移')&&progUi.includes('↓ 下移'),'shop ordering controls/API missing');
 ok(progUi.includes('每次活跃结算 XP')&&progUi.includes('约每 60 秒申请一次'),'account growth timer wording is still ambiguous');
@@ -30,7 +30,7 @@ ok(badNumberRejected,'non-finite numeric payloads must still be rejected');
 
 // v4 white-default migration -> original per-accessory color.
 const migrated=normalizeProgressionConfig({version:4,shop:{accessories:[{id:'acc_bow',name:'x',asset:'/accessories/bow.svg',color:'#ffffff',enabled:true}]}});
-ok(migrated.version===12&&migrated.shop.accessories.find(x=>x.id==='acc_bow')?.color==='#ff7fa2','white accessory migration did not recover bow original color');
+ok(migrated.version===13&&migrated.shop.accessories.find(x=>x.id==='acc_bow')?.color==='#ff7fa2','white accessory migration did not recover bow original color');
 
 // Pet mood always decays; low hunger adds extra mood loss; poor care reduces normal activity XP.
 const now=Date.now(),user={userId:'u1',name:'T',level:1,xp:0,stats:{},inventory:{},achievements:[],pet:{name:'S',level:1,xp:0,hunger:80,mood:70,lastCareAt:now-2*3600000,equipped:{},accessoryColors:{}},activityXpAt:{}};

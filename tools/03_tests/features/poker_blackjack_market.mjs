@@ -20,7 +20,7 @@ const html=fs.readFileSync(path.join(root,'public/index.html'),'utf8');
 // Upgrade is patch/merge, never a reset of the Owner's current values.
 const old={version:2,account:{...DEFAULT_PROGRESSION_CONFIG.account,levelXpBase:987},pet:{...DEFAULT_PROGRESSION_CONFIG.pet,feedXp:77},shop:{accessories:[{...DEFAULT_PROGRESSION_CONFIG.shop.accessories[0],price:54321},{id:'acc_owner_custom',name:'自定义',price:87654,slot:'head',asset:'/accessories/bow.svg',enabled:true}],food:[{...DEFAULT_PROGRESSION_CONFIG.shop.food[0],price:4321}],titles:[{...DEFAULT_PROGRESSION_CONFIG.shop.titles[0],price:65432}]},achievements:DEFAULT_PROGRESSION_CONFIG.achievements.filter(x=>!x.id.startsWith('fish_')&&!x.id.startsWith('market_'))};
 const migrated=normalizeProgressionConfig(old);
-ok(migrated.version===12&&migrated.account.levelXpBase===987&&migrated.pet.feedXp===77,'custom growth values were overwritten');
+ok(migrated.version===13&&migrated.account.levelXpBase===987&&migrated.pet.feedXp===77,'custom growth values were overwritten');
 ok(migrated.shop.accessories.find(x=>x.id==='acc_bow')?.price===54321&&migrated.shop.accessories.some(x=>x.id==='acc_owner_custom'),'custom shop values/items were overwritten');
 ok(migrated.shop.food.find(x=>x.id==='food_jelly')?.price===4321&&migrated.shop.titles.find(x=>x.id==='title_lounge_regular')?.price===65432,'custom food/title price was overwritten');
 ok(migrated.achievements.some(x=>x.id==='fish_1')&&migrated.achievements.some(x=>x.id==='market_1'),'new achievement defaults were not appended');

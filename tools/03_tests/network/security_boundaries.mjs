@@ -25,7 +25,7 @@ ok(leisure.includes('x.samples<4')&&leisure.includes('elapsed<cfg.fishing.minPla
 // v1 -> v2 migration changes only untouched defaults; Owner custom values survive.
 const old={version:1,fishing:{...DEFAULT_LEISURE_CONFIG.fishing,fish:DEFAULT_LEISURE_CONFIG.fishing.fish.map(x=>({...x,basePrice:x.id==='sardine'?1775:(x.id==='anchovy'?90:x.basePrice)}))},market:{...DEFAULT_LEISURE_CONFIG.market,tickSeconds:45}};
 const migrated=normalizeLeisureConfig(old);
-ok(migrated.version===8&&migrated.fishing.fish.find(x=>x.id==='sardine')?.basePrice===1775,'custom fish price overwritten');
+ok(migrated.version===9&&migrated.fishing.fish.find(x=>x.id==='sardine')?.basePrice===1775,'custom fish price overwritten');
 ok(migrated.fishing.fish.find(x=>x.id==='anchovy')?.basePrice===50,'untouched old fish price was not softly migrated');
 ok(migrated.market.tickSeconds===30,'default market tick did not migrate to 30 seconds');
 const customTick=normalizeLeisureConfig({...migrated,market:{...migrated.market,tickSeconds:37}});ok(customTick.market.tickSeconds===37,'custom market tick was overwritten');

@@ -16,7 +16,7 @@ const css=fs.readFileSync(path.join(root,'public/ui-overrides.css'),'utf8');
 const regression=fs.readFileSync(path.join(root,'tools/03_tests/regression/project.mjs'),'utf8');
 const runner=fs.readFileSync(path.join(root,'tools/02_validation/02_run_all_checks.mjs'),'utf8');
 ok(pkg.version==='0.4.7','package version is not v0.4.7');
-ok(leisure.includes('heartbeatMs:650')&&leisure.includes('version:8'),'fishing request-frequency migration missing');
+ok(leisure.includes('heartbeatMs:650')&&leisure.includes('version:9'),'fishing request-frequency migration missing');
 ok(leisure.includes("'/api/leisure/fishing/lock'")&&leisure.includes('x.locked'),'server-side fish lock missing');
 ok(leisure.includes("'/api/leisure/market/order'")&&leisure.includes("'/api/leisure/market/margin'")&&leisure.includes('maxLeverage:10')&&leisure.includes('maintenanceMarginPct:20'),'simulated exchange order/margin core missing');
 ok(leisure.includes('s.fairPrice=Number(s.price)')&&leisure.includes('gapToFair=clamp(Math.log')&&leisure.includes('1-Math.pow(1-cfg.market.fairPriceAlpha,scale)')&&!leisure.includes('mean=-.0015*Math.log(Math.max(.01,Number(s.price))/Math.max(.01,a.basePrice))'),'market still mean-reverts directly to initial basePrice');

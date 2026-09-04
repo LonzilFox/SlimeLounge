@@ -25,7 +25,7 @@ ok(leisure.includes('function baseTickTrend')&&leisure.includes('(1-ratio)/.5')&
 ok(leisure.includes("'/api/leisure/market/quotes'")&&leisure.includes("'/api/leisure/market/history'")&&leisure.includes('candleWindow')&&leisure.includes('history1h'),'lightweight quotes / OHLC history retention missing');
 ok(leisureUi.includes('refreshMarketDynamic')&&leisureUi.includes('exportMarketHistory')&&leisureUi.includes('market-candle')&&!/if\(sec<=0\)[^}]*renderMarket\(epoch\)/.test(leisureUi),'market refresh still rebuilds the page or K-line export missing');
 ok(leisureUi.includes('data-f="tickTrend"')&&leisureUi.includes('当前实际趋势'),'admin configured / live tick trend fields missing');
-ok(progression.includes("version:12")&&progression.includes('title_market_operator')&&progression.includes('title_lake_legend')&&progression.includes('checkin_streak_30')&&progression.includes('market_batch_10000'),'advanced titles / achievements / v9 migration missing');
+ok(progression.includes("version:13")&&progression.includes('title_market_operator')&&progression.includes('title_lake_legend')&&progression.includes('checkin_streak_30')&&progression.includes('market_batch_10000'),'advanced titles / achievements / v9 migration missing');
 ok(progUi.includes('draggable="true"')&&progUi.includes('insertBefore(titleDrag'),'draggable title display order missing');
 ok(ui.includes("'/accessories/partyhat.svg'")&&ui.includes("'/accessories/halo.svg'")&&ui.includes('accessoryPalette'),'new recolorable accessory visuals missing');
 ok(css.includes('.fishing-rod-grid')&&css.includes('.fish-card .fish-card-main>*')&&css.includes('.market-candle.up')&&css.includes('repeat(auto-fit'),'v0.4.7 responsive fishing/market styles missing');

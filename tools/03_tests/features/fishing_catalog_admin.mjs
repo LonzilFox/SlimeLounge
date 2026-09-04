@@ -25,7 +25,7 @@ ok(enh.includes('accessoryPalette')&&enh.includes('accessory-svg')&&!enh.include
 ok(progUi.includes("slime(profile?.slimeColor||'mint',cls)}<div class=\"pet-accessory-visual\">")&&!progUi.includes("slime(profile?.slimeColor||'mint',cls,profile?.userId||'')}<div class=\"pet-accessory-visual\">"),'pet view still renders the same equipped accessories twice');
 ok(!fs.readdirSync(path.join(root,'public/accessories')).some(x=>/\.(?:tint|detail)\.svg$/i.test(x)),'obsolete accessory layer SVGs were not cleaned');
 const migrated=normalizeProgressionConfig({version:5,shop:{accessories:[{id:'acc_bow',name:'小蝴蝶结',asset:'/accessories/bow.svg',color:'#ffffff'}],food:[],titles:[]},achievements:[]});
-ok(migrated.version===12&&migrated.shop.accessories[0].color==='#ff7fa2','legacy white accessory color was not migrated back to its original main color');
+ok(migrated.version===13&&migrated.shop.accessories[0].color==='#ff7fa2','legacy white accessory color was not migrated back to its original main color');
 ok(ui.includes('返回结果不完整，正在重新同步鱼篓')&&ui.includes('Number.isInteger(sold)')&&ui.includes('Number.isFinite(value)'),'fish sale UI can still render undefined sold/value');
 ok(pkg.version==='0.4.7'&&!pkg.scripts?.deploy&&!pkg.devDependencies?.wrangler,'obsolete Cloudflare deployment entry still present');
 

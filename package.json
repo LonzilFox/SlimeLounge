@@ -6,6 +6,7 @@
   "description": "Pixel slime chat, music and multiplayer game rooms",
   "scripts": {
     "dev": "node local_server.js",
-    "check": "node tools/02_validation/02_run_all_checks.mjs"
+    "check": "node tools/02_validation/02_run_all_checks.mjs",
+    "clean:repo": "node tools/00_maintenance/clean_repo.mjs"
   }
 }

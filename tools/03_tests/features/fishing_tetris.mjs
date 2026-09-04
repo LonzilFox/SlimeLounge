@@ -17,7 +17,7 @@ ok(app.includes("FEATURE_VERSION='0.4.7',ASSET_BUILD='047'"),'dynamic feature ca
 
 const cfg=normalizeLeisureConfig({});
 const fish=cfg.fishing.fish;
-ok(DEFAULT_LEISURE_CONFIG.version===8&&fish.length===77,'Stardew fishing catalogue should contain 77 entries');
+ok(DEFAULT_LEISURE_CONFIG.version===9&&fish.length===77,'Stardew fishing catalogue should contain 77 entries');
 ok(new Set(fish.map(x=>x.id)).size===77,'duplicate fish ids');
 ok(['legend','legend_ii','goby','river_jelly','sea_jelly','cave_jelly'].every(id=>fish.some(x=>x.id===id)),'key Stardew fish/special catches missing');
 ok(fish.every(x=>x.basePrice>=50&&x.basePrice<=2000&&x.basePrice%25===0),'fish prices must be 50..2000 and multiples of 25');
@@ -29,7 +29,7 @@ ok(leisure.includes('fishingCastBlockedUntil=Date.now()+850')&&leisure.includes(
 ok(leisure.includes('持股实时盈亏')&&leisure.includes('spreadBps')&&leisure.includes('marketTradeBusy'),'market floating P/L, spread or client trade lock missing');
 ok(DEFAULT_LEISURE_CONFIG.market.spreadBps>0&&cfg.market.tradeCooldownMs>=500,'market difficulty defaults not applied');
 
-ok(app.includes("fishing:'钓鱼盈利'")&&games.includes("isFishing=tab==='fishing'")&&games.includes('累计钓鱼盈利')&&rank.includes('const fishing=Object.values(data.users)')&&rank.includes('return {chips,market,fishing,single,games}'),'fishing profit ranking missing');
+ok(app.includes("fishing:'钓鱼盈利'")&&games.includes("isFishing=tab==='fishing'")&&games.includes('累计钓鱼盈利')&&rank.includes('fishing=users.map')&&rank.includes('return {chips,accountLevel,petLevel,market,fishing,single,games}'),'fishing profit ranking missing');
 ok(app.includes("trading:'炒股中'")&&app.includes("fishing:'钓鱼中'"),'trading/fishing presence labels missing');
 ok(app.includes("setTimeout(()=>{if(!established)ensureFallback")&&app.includes('},3500)')&&app.includes('},1800)'),'room transport tolerance not updated');
 ok(app.includes('setInterval(healthPing,25000)')&&app.includes('},60000)'),'background request intervals not reduced');
